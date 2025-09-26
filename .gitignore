@@ -27,3 +27,16 @@ dist-ssr
 # Electron
 out/
 release/
+
+# AI/Claude related files
+.claude/
+.claude-*
+claude.json
+claude-config.json
+.ai-config/
+.cursor/
+.cursor-*
+cursor.json
+.aider*
+.continue/
+claude
