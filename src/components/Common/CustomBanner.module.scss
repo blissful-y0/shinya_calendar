@@ -4,7 +4,7 @@
 .bannerContainer {
   position: relative;
   width: 100%;
-  height: 120px;
+  height: 200px;
   margin-bottom: $spacing-md;
   cursor: pointer;
   overflow: hidden;
@@ -21,12 +21,12 @@
 
   // 작은 화면 최적화
   @media (max-height: 700px) {
-    height: 80px;
+    height: 150px;
     margin-bottom: $spacing-xs;
   }
 
   @media (max-height: 600px) {
-    height: 60px;
+    height: 120px;
   }
 }
 
@@ -93,6 +93,7 @@
 }
 
 .changeButton,
+.cropButton,
 .removeButton {
   @include button-reset;
   width: 36px;
@@ -116,6 +117,13 @@
 
   &:active {
     transform: scale(0.95);
+  }
+}
+
+.cropButton {
+  &:hover {
+    background: var(--color-primary);
+    color: white;
   }
 }
 

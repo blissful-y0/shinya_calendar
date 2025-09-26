@@ -20,7 +20,8 @@
       "Bash(gh pr create:*)",
       "Bash(open https://github.com/blissful-y0/shinya_calendar/pull/new/feature/build-configuration)",
       "Bash(find:*)",
-      "Bash(for:*)"
+      "Bash(for:*)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []
