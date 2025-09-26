@@ -12,15 +12,12 @@
   flex: 1;
   display: flex;
   overflow: hidden;
+  position: relative;
 }
 
 .calendarContainer {
   flex: 1;
   padding: $spacing-lg;
   overflow: auto;
-  transition: margin-right $transition-normal;
-
-  &.fullWidth {
-    margin-right: 0;
-  }
+  height: 100%;
 }

@@ -6,6 +6,7 @@ import Calendar from '@components/Calendar/Calendar';
 import DayView from '@components/Calendar/DayView';
 import WeekView from '@components/Calendar/WeekView';
 import Sidebar from '@components/Sidebar/Sidebar';
+import ResizableLayout from '@components/Common/ResizableLayout';
 import { useTheme } from '@hooks/useTheme';
 import styles from './App.module.scss';
 
@@ -35,10 +36,21 @@ function App() {
     <div className={styles.app}>
       <Header />
       <div className={styles.mainContent}>
-        <div className={`${styles.calendarContainer} ${!sidebarOpen ? styles.fullWidth : ''}`}>
-          {renderView()}
-        </div>
-        <Sidebar />
+        {sidebarOpen ? (
+          <ResizableLayout
+            sidebar={<Sidebar />}
+            minWidth={280}
+            maxWidth={600}
+          >
+            <div className={styles.calendarContainer}>
+              {renderView()}
+            </div>
+          </ResizableLayout>
+        ) : (
+          <div className={styles.calendarContainer}>
+            {renderView()}
+          </div>
+        )}
       </div>
     </div>
   );

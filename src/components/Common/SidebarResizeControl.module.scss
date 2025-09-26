@@ -1,0 +1,60 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.resizeControl {
+  padding: $spacing-sm $spacing-md;
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border);
+  margin-top: auto; // 사이드바 하단에 고정
+}
+
+.currentSize {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+  font-size: $font-size-small;
+}
+
+.label {
+  color: var(--color-text-secondary);
+}
+
+.value {
+  color: var(--color-text);
+  font-weight: $font-weight-medium;
+  font-family: $font-mono;
+}
+
+.presetButtons {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.presetButton {
+  flex: 1;
+  padding: $spacing-xs;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: $border-radius-small;
+  font-size: $font-size-xs;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-accent);
+    color: var(--color-text);
+    border-color: var(--color-primary);
+  }
+
+  &.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}

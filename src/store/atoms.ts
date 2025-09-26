@@ -98,6 +98,27 @@ export const sidebarOpenState = atom<boolean>({
   default: true
 });
 
+export const sidebarWidthState = atom<number>({
+  key: 'sidebarWidth',
+  default: 320, // 기본 너비 (px)
+  effects: [
+    ({ setSelf, onSet }) => {
+      // localStorage에서 저장된 너비 불러오기
+      const savedWidth = localStorage.getItem('sidebarWidth');
+      if (savedWidth) {
+        setSelf(parseInt(savedWidth));
+      }
+
+      // 너비 변경 시 localStorage에 저장
+      onSet((newWidth, _, isReset) => {
+        if (!isReset && typeof newWidth === 'number') {
+          localStorage.setItem('sidebarWidth', newWidth.toString());
+        }
+      });
+    }
+  ]
+});
+
 export const viewModeState = atom<'month' | 'week' | 'day'>({
   key: 'viewMode',
   default: 'month'

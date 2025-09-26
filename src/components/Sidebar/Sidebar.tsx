@@ -10,6 +10,7 @@ import EventForm from './EventForm';
 import EventList from './EventList';
 import DiarySection from './DiarySection';
 import ThemeSelector from '../Theme/ThemeSelector';
+import SidebarResizeControl from '../Common/SidebarResizeControl';
 import { formatDate } from '@utils/calendar';
 import styles from './Sidebar.module.scss';
 
@@ -93,6 +94,7 @@ const Sidebar: React.FC = () => {
           <ThemeSelector />
         )}
       </div>
+      <SidebarResizeControl />
     </aside>
   );
 };
