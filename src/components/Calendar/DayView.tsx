@@ -65,25 +65,25 @@ const DayView: React.FC = () => {
       let top = 0;
       if (!startsBeforeToday && event.startTime) {
         const [hours, minutes] = event.startTime.split(':').map(Number);
-        top = (hours * 60 + minutes) * (60 / 60); // 60px per hour
+        top = (hours * 60 + minutes) * (80 / 60); // 80px per hour
       }
 
       // 높이 계산
-      let height = 1440; // 전체 24시간 (24 * 60px)
+      let height = 1920; // 전체 24시간 (24 * 80px)
       if (!startsBeforeToday && !endsAfterToday && event.startTime && event.endTime) {
         // 오늘 시작하고 오늘 끝나는 경우
         const [startHours, startMinutes] = event.startTime.split(':').map(Number);
         const [endHours, endMinutes] = event.endTime.split(':').map(Number);
         const duration = (endHours * 60 + endMinutes) - (startHours * 60 + startMinutes);
-        height = duration * (60 / 60);
+        height = duration * (80 / 60);
       } else if (!startsBeforeToday && event.startTime) {
         // 오늘 시작하지만 다른 날에 끝나는 경우
         const [startHours, startMinutes] = event.startTime.split(':').map(Number);
-        height = 1440 - (startHours * 60 + startMinutes);
+        height = (1440 - (startHours * 60 + startMinutes)) * (80 / 60);
       } else if (!endsAfterToday && event.endTime) {
         // 이전에 시작했지만 오늘 끝나는 경우
         const [endHours, endMinutes] = event.endTime.split(':').map(Number);
-        height = (endHours * 60 + endMinutes);
+        height = (endHours * 60 + endMinutes) * (80 / 60);
       }
 
       return {
@@ -99,13 +99,13 @@ const DayView: React.FC = () => {
     if (!event.startTime) return null;
 
     const [hours, minutes] = event.startTime.split(':').map(Number);
-    const top = (hours * 60 + minutes) * (60 / 60); // 60px per hour
+    const top = (hours * 60 + minutes) * (80 / 60); // 80px per hour
 
-    let height = 60; // 기본 높이
+    let height = 80; // 기본 높이
     if (event.endTime) {
       const [endHours, endMinutes] = event.endTime.split(':').map(Number);
       const duration = (endHours * 60 + endMinutes) - (hours * 60 + minutes);
-      height = duration * (60 / 60);
+      height = duration * (80 / 60);
     }
 
     return { top, height, isMultiDay: false };

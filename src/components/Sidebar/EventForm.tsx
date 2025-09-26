@@ -22,10 +22,10 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const setSelectedEvent = useSetRecoilState(selectedEventState);
   const [title, setTitle] = useState(event?.title || "");
   const [startDate, setStartDate] = useState<Date>(
-    event?.date || date
+    event?.date ? new Date(event.date) : date
   );
   const [endDate, setEndDate] = useState<Date>(
-    event?.endDate || date
+    event?.endDate ? new Date(event.endDate) : event?.date ? new Date(event.date) : date
   );
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [startTime, setStartTime] = useState(event?.startTime || "");
@@ -34,7 +34,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const [color, setColor] = useState(event?.color || "#FFB6C1");
   const [isAllDay, setIsAllDay] = useState(event?.isAllDay || false);
   const [isMultiDay, setIsMultiDay] = useState(
-    !!event?.endDate && event.date !== event.endDate
+    !!event?.endDate && new Date(event.date).getTime() !== new Date(event.endDate).getTime()
   );
   const [isRecurring, setIsRecurring] = useState(!!event?.recurrence);
   const [recurrence, setRecurrence] = useState<RecurrenceRule>(
@@ -389,15 +389,6 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
                 onClick={() => setColor(colorOption)}
               />
             ))}
-            <button
-              type="button"
-              className={styles.customColorButton}
-              onClick={() => setShowColorPicker(!showColorPicker)}
-              style={{ backgroundColor: color }}
-              title="커스텀 색상 선택"
-            >
-              +
-            </button>
           </div>
           {showColorPicker && (
             <div className={styles.colorPickerPopover}>
@@ -405,10 +396,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
                 className={styles.colorPickerCover}
                 onClick={() => setShowColorPicker(false)}
               />
-              <HexColorPicker
-                color={color}
-                onChange={setColor}
-              />
+              <HexColorPicker color={color} onChange={setColor} />
             </div>
           )}
         </div>

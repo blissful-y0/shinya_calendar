@@ -123,42 +123,48 @@
 }
 
 .allDayEvent {
-  padding: 2px $spacing-xs;
+  padding: 4px $spacing-xs; // Increased padding
   border-radius: $border-radius-small;
-  font-size: 11px;
+  font-size: 12px; // Slightly larger font
   color: white;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-height: 22px; // Minimum height
+  display: flex;
+  align-items: center;
 }
 
 .timeGrid {
   position: relative;
   display: flex;
-  min-height: 1440px; // 24 hours * 60px per hour
+  min-height: 1920px; // 24 hours * 80px per hour
   overflow-y: auto;
 }
 
 .hoursColumn {
   width: 60px;
   border-right: 1px solid var(--color-border);
-  min-height: 1440px; // 24 hours * 60px per hour
+  min-height: 1920px; // 24 hours * 80px per hour
 }
 
 .hourLabel {
-  height: 60px;
+  height: 80px; // Increased from 60px
   padding: $spacing-xs;
   font-size: $font-size-small;
   color: var(--color-text-secondary);
   border-bottom: 1px solid var(--color-border);
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .daysGrid {
   flex: 1;
   position: relative;
-  min-height: 1440px; // 24 hours * 60px per hour
+  min-height: 1920px; // 24 hours * 80px per hour
 }
 
 .dayColumn {
@@ -187,7 +193,7 @@
 }
 
 .hourLine {
-  height: 60px;
+  height: 80px; // Increased from 60px
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -196,20 +202,21 @@
   top: 0;
   left: 0;
   right: 0;
-  min-height: 1440px; // 24 hours * 60px per hour
+  min-height: 1920px; // 24 hours * 80px per hour
 }
 
 .timedEvent {
   position: absolute;
-  padding: 2px 4px;
+  padding: 4px 6px; // Increased padding
   margin: 0 2px;
   border-radius: 4px;
   color: white;
   overflow: hidden;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 12px; // Slightly larger font
   transition: all $transition-fast;
   box-shadow: $shadow-small;
+  min-height: 22px; // Minimum height to prevent text cutoff
 
   &:hover {
     z-index: 10;
@@ -224,6 +231,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .eventTitle {
@@ -231,6 +239,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.3;
+  margin-top: 1px;
 }
 
 .multiDay {

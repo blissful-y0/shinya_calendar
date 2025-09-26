@@ -5,6 +5,7 @@ import { DDay } from '@types';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import { MdClose, MdEdit, MdDelete, MdCheck, MdCalendarToday } from 'react-icons/md';
+import CustomDatePicker from './CustomDatePicker';
 import styles from './DDayModal.module.scss';
 
 interface DDayModalProps {
@@ -21,7 +22,7 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
   // Form states
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [targetDate, setTargetDate] = useState('');
+  const [targetDate, setTargetDate] = useState<Date | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +33,7 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
       id: editingDDay?.id || uuidv4(),
       title: title.trim(),
       description: description.trim(),
-      targetDate: new Date(targetDate),
+      targetDate: targetDate,
       isActive: false,
       createdAt: editingDDay?.createdAt || new Date()
     };
@@ -56,7 +57,7 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
   const resetForm = () => {
     setTitle('');
     setDescription('');
-    setTargetDate('');
+    setTargetDate(null);
     setShowForm(false);
     setEditingDDay(null);
   };
@@ -65,7 +66,7 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
     setEditingDDay(dday);
     setTitle(dday.title);
     setDescription(dday.description || '');
-    setTargetDate(format(dday.targetDate, 'yyyy-MM-dd'));
+    setTargetDate(new Date(dday.targetDate));
     setShowForm(true);
   };
 
@@ -128,13 +129,11 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="modal-dday-date">날짜</label>
-                <input
-                  id="modal-dday-date"
-                  type="date"
-                  value={targetDate}
-                  onChange={(e) => setTargetDate(e.target.value)}
-                  required
+                <label>날짜</label>
+                <CustomDatePicker
+                  selected={targetDate}
+                  onChange={(date) => setTargetDate(date)}
+                  placeholderText="D-Day 날짜를 선택하세요"
                 />
               </div>
 

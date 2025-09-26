@@ -138,13 +138,13 @@ const WeekView: React.FC = () => {
     if (!event.startTime) return null;
 
     const [hours, minutes] = event.startTime.split(':').map(Number);
-    const top = (hours * 60 + minutes);
+    const top = (hours * 60 + minutes) * (80 / 60); // Convert minutes to pixels (80px per hour)
 
-    let height = 60;
+    let height = 80; // Default height (1 hour)
     if (event.endTime) {
       const [endHours, endMinutes] = event.endTime.split(':').map(Number);
       const duration = (endHours * 60 + endMinutes) - (hours * 60 + minutes);
-      height = duration;
+      height = duration * (80 / 60); // Convert minutes to pixels
     }
 
     const left = dayIndex * (100 / 7);

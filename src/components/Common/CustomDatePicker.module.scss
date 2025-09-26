@@ -161,11 +161,11 @@
     color: var(--color-text);
     padding: $spacing-xs $spacing-sm;
     transition: all $transition-fast;
+  }
 
-    &:hover {
-      background: var(--color-accent) !important;
-      color: var(--color-primary) !important;
-    }
+  :global(.react-datepicker__time-list-item:hover) {
+    background: var(--color-accent) !important;
+    color: var(--color-primary) !important;
   }
 
   :global(.react-datepicker__time-list-item--selected) {

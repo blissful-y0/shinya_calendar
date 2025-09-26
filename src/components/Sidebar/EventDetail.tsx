@@ -21,7 +21,11 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
   };
 
   const handleDelete = () => {
-    if (confirm("이 이벤트를 삭제하시겠습니까?")) {
+    const confirmMessage = event.recurrence
+      ? "이 반복 이벤트를 삭제하시겠습니까?\n(모든 반복 일정이 삭제됩니다)"
+      : "이 이벤트를 삭제하시겠습니까?";
+
+    if (confirm(confirmMessage)) {
       setEvents((prev) => prev.filter((e) => e.id !== event.id));
       setSelectedEvent(null);
       toast.success("이벤트가 삭제되었습니다");
@@ -58,11 +62,11 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
             <div className={styles.detailValue}>
               {event.endDate && event.date !== event.endDate ? (
                 <>
-                  {format(event.date, "yyyy년 MM월 dd일", { locale: ko })} ~{" "}
-                  {format(event.endDate, "yyyy년 MM월 dd일", { locale: ko })}
+                  {format(new Date(event.date), "yyyy년 MM월 dd일", { locale: ko })} ~{" "}
+                  {format(new Date(event.endDate), "yyyy년 MM월 dd일", { locale: ko })}
                 </>
               ) : (
-                format(event.date, "yyyy년 MM월 dd일 EEEE", { locale: ko })
+                format(new Date(event.date), "yyyy년 MM월 dd일 EEEE", { locale: ko })
               )}
             </div>
           </div>
