@@ -64,8 +64,8 @@ const StickerPanel: React.FC = () => {
       id: uuidv4(),
       image: uploadedSticker.image,
       name: uploadedSticker.name,
-      x: 50 - 7.5, // 중앙 위치 (50% - width/2)
-      y: 50 - 7.5, // 중앙 위치 (50% - height/2)
+      x: 42.5, // 중앙 위치 (50% - width/2 = 50 - 15/2 = 42.5)
+      y: 42.5, // 중앙 위치 (50% - height/2 = 50 - 15/2 = 42.5)
       width: 15, // 화면 너비의 15%
       height: 15, // 화면 너비의 15% (비율 유지)
       zIndex: Date.now(),

@@ -52,7 +52,15 @@ const StickerCanvas: React.FC = () => {
   const getStickerPixelPosition = (sticker: Sticker) => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) {
-      return { x: 0, y: 0, width: 100, height: 100 };
+      // 캔버스가 없을 때도 대략적인 위치를 계산 (window 기준)
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      return {
+        x: percentToPixel(sticker.x, windowWidth),
+        y: percentToPixel(sticker.y, windowHeight),
+        width: percentToPixel(sticker.width, windowWidth),
+        height: percentToPixel(sticker.height, windowWidth) // 비율 유지를 위해 width 기준
+      };
     }
 
     return {
@@ -159,12 +167,16 @@ const StickerCanvas: React.FC = () => {
       const deltaX = e.clientX - resizing.startX;
       const deltaY = e.clientY - resizing.startY;
       const delta = Math.max(deltaX, deltaY); // 비율 유지를 위해 더 큰 값 사용
-      const newWidthPx = Math.max(30, Math.min(resizing.startWidth + delta, 300));
-      const newHeightPx = Math.max(30, Math.min(resizing.startHeight + delta, 300));
+      const newWidthPx = Math.max(30, resizing.startWidth + delta);
+      const newHeightPx = Math.max(30, resizing.startHeight + delta);
 
       // 픽셀을 퍼센트로 변환
-      const percentWidth = pixelToPercent(newWidthPx, rect.width);
-      const percentHeight = pixelToPercent(newHeightPx, rect.width); // 비율 유지를 위해 width 기준
+      let percentWidth = pixelToPercent(newWidthPx, rect.width);
+      let percentHeight = pixelToPercent(newHeightPx, rect.width); // 비율 유지를 위해 width 기준
+
+      // 최대 크기 제한 (화면의 50%)
+      percentWidth = Math.min(percentWidth, 50);
+      percentHeight = Math.min(percentHeight, 50);
 
       setStickers(prev =>
         prev.map(s =>
