@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '@hooks/useTheme';
-import { Theme } from '@types/index';
+import { Theme } from '@types';
 import { v4 as uuidv4 } from 'uuid';
 import styles from './ThemeSelector.module.scss';
 
@@ -16,7 +16,9 @@ const ThemeSelector: React.FC = () => {
     surface: '#FFFFFF',
     text: '#4A4A4A',
     textSecondary: '#8B8B8B',
-    border: '#F5E6E0'
+    border: '#F5E6E0',
+    danger: '#FF6B6B',
+    dangerLight: '#FFE5E5'
   });
   const [isPreviewing, setIsPreviewing] = useState(false);
 

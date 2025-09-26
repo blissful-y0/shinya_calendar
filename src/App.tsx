@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, currentThemeState, bannerImageState } from "@store/atoms";
 import TitleBar from "@components/Layout/TitleBar";
@@ -23,7 +23,7 @@ function App() {
   const [stickers, setStickers] = useRecoilState(stickersState);
   const [currentTheme, setCurrentTheme] = useRecoilState(currentThemeState);
   const [bannerImage, setBannerImage] = useRecoilState(bannerImageState);
-  const { currentTheme: themeFromHook } = useTheme();
+  useTheme(); // Apply theme automatically
   const previousStickersRef = useRef(stickers);
   const isEditModeStartingRef = useRef(false);
 

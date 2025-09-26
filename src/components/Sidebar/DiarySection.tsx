@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { diaryEntriesState } from "@store/atoms";
-import { DiaryEntry } from "@types/index";
+import { DiaryEntry } from "@types";
 import { v4 as uuidv4 } from "uuid";
 import styles from "./DiarySection.module.scss";
 

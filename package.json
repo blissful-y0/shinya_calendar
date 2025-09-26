@@ -3,9 +3,19 @@
   "version": "0.1.0",
   "description": "A cute calendar and diary app built with Electron",
   "main": "dist-electron/main.js",
+  "author": {
+    "name": "bliss",
+    "email": "blissful.y0@gmail.com"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
+    "prebuild": "tsc && vite build",
+    "build": "yarn prebuild && electron-builder",
+    "build:win": "yarn prebuild && electron-builder --win",
+    "build:mac": "yarn prebuild && electron-builder --mac",
+    "build:linux": "yarn prebuild && electron-builder --linux",
+    "build:all": "concurrently \"yarn build:win\" \"yarn build:mac\"",
     "preview": "vite preview",
     "electron": "electron .",
     "electron:dev": "concurrently \"yarn dev\" \"wait-on http://localhost:5173 && electron .\"",
@@ -48,20 +58,64 @@
     "appId": "com.shinya.calendar",
     "productName": "Shinya Calendar",
     "directories": {
-      "output": "dist"
+      "output": "release"
     },
     "files": [
       "dist",
-      "dist-electron"
+      "dist-electron",
+      "!**/*.{ts,map,spec.js,test.js}"
     ],
     "mac": {
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "identity": null,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": true,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Shinya Calendar",
+      "runAfterFinish": true
     },
     "linux": {
-      "target": "AppImage"
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     }
   }
 }

@@ -1,22 +1,5 @@
 // Electron Store를 사용하는 유틸리티 함수들
 
-interface ElectronAPI {
-  store: {
-    get: (key: string) => Promise<any>;
-    set: (key: string, value: any) => Promise<void>;
-    delete: (key: string) => Promise<void>;
-    clear: () => Promise<void>;
-    has: (key: string) => Promise<boolean>;
-  };
-  getAppPath: () => Promise<string>;
-}
-
-declare global {
-  interface Window {
-    electronAPI: ElectronAPI;
-  }
-}
-
 // Electron 환경인지 체크
 const isElectron = () => {
   return typeof window !== 'undefined' && window.electronAPI !== undefined;

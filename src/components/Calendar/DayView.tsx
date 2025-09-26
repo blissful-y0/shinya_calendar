@@ -2,7 +2,7 @@ import React from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedDateState, eventsState, diaryEntriesState } from '@store/atoms';
 import { formatDate, isSameDayAs } from '@utils/calendar';
-import { Event } from '@types/index';
+import { Event } from '@types';
 import { MdCreate } from 'react-icons/md';
 import styles from './DayView.module.scss';
 

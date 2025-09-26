@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { dDaysState, activeDDayState, modalActiveState } from '@store/atoms';
-import { DDay } from '@types/index';
+import { DDay } from '@types';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import { MdClose, MdEdit, MdDelete, MdCheck, MdCalendarToday } from 'react-icons/md';

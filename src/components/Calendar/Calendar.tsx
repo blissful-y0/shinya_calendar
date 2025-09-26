@@ -15,7 +15,7 @@ import {
   isCurrentDay,
   weekDays
 } from '@utils/calendar';
-import { Event, DiaryEntry } from '@types/index';
+import { Event, DiaryEntry } from '@types';
 import { MdCreate } from 'react-icons/md';
 import styles from './Calendar.module.scss';
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { eventsState } from '@store/atoms';
-import { Event } from '@types/index';
+import { Event } from '@types';
 import EventForm from './EventForm';
 import styles from './EventList.module.scss';
 
