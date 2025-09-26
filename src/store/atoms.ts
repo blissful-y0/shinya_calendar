@@ -338,7 +338,23 @@ export const stickerVisibilityState = atom<boolean>({
   key: 'stickerVisibility',
   default: true,
   effects: [
-    electronStore<boolean>('stickerVisibility')
+    ({ setSelf, onSet }) => {
+      // Electron Store에서 저장된 값 불러오기
+      electronStore.get('stickerVisibility').then(savedValue => {
+        if (savedValue !== null && savedValue !== undefined) {
+          setSelf(savedValue);
+        }
+      }).catch(error => {
+        console.error('Failed to load sticker visibility:', error);
+      });
+
+      // 값 변경 시 Electron Store에 저장
+      onSet((newValue, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('stickerVisibility', newValue);
+        }
+      });
+    }
   ]
 });
 

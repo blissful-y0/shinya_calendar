@@ -30,6 +30,6 @@
       "@services/*": ["src/services/*"]
     }
   },
-  "include": ["src", "electron"],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

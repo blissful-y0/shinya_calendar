@@ -12,7 +12,11 @@
       "Bash(for file in /Users/bliss/Documents/shinya_calendar/src/**/*.module.scss)",
       "Bash(do)",
       "Bash(done)",
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "Bash(yarn dev)",
+      "Bash(npm run dev:*)",
+      "Bash(pkill:*)",
+      "Bash(yarn:*)"
     ],
     "deny": [],
     "ask": []
