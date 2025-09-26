@@ -66,8 +66,8 @@ const StickerPanel: React.FC = () => {
       name: uploadedSticker.name,
       x: Math.random() * 30 + 10, // 10% ~ 40% 사이의 랜덤 위치
       y: Math.random() * 30 + 10, // 10% ~ 40% 사이의 랜덤 위치
-      width: 15, // 화면 너비의 15%
-      height: 15, // 화면 너비의 15% (비율 유지)
+      width: 5, // 화면 너비의 5%
+      height: 5, // 화면 너비의 5% (비율 유지)
       zIndex: Date.now(),
       rotation: 0
     };
