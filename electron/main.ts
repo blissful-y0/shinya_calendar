@@ -22,10 +22,10 @@ function createWindow() {
       webgl: true,
       experimentalFeatures: true
     },
-    // OS별 타이틀바 스타일
-    titleBarStyle: isMac ? 'hiddenInset' : 'default',
-    // Windows에서는 frame 옵션 사용
-    frame: !isWindows,
+    // 커스텀 타이틀바를 위해 기본 타이틀바 숨김
+    titleBarStyle: 'hidden',
+    // macOS에서 트래픽 라이트 버튼 위치 조정
+    trafficLightPosition: { x: 15, y: 13 },
     backgroundColor: '#faf8f5',
     show: false
   });

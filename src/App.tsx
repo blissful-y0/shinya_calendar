@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { sidebarOpenState, viewModeState } from '@store/atoms';
+import TitleBar from '@components/Layout/TitleBar';
 import Header from '@components/Common/Header';
 import Calendar from '@components/Calendar/Calendar';
 import DayView from '@components/Calendar/DayView';
@@ -34,6 +35,7 @@ function App() {
 
   return (
     <div className={styles.app}>
+      <TitleBar />
       <Header />
       <div className={styles.mainContent}>
         {sidebarOpen ? (
