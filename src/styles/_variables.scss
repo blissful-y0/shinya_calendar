@@ -1,5 +1,5 @@
 // 폰트 관련 변수를 fonts 모듈에서 가져오기
-@use 'fonts' as *;
+@use "fonts" as *;
 
 // 폰트 패밀리
 $font-primary: $font-stack-korean;

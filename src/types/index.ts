@@ -1,13 +1,24 @@
 export interface Event {
   id: string;
   title: string;
-  date: Date;
+  date: Date; // Start date for multi-day events
+  endDate?: Date; // End date for multi-day events
   startTime?: string;
   endTime?: string;
   color: string;
   description?: string;
   tags?: string[];
   reminder?: boolean;
+  isAllDay?: boolean; // All-day event flag
+  recurrence?: RecurrenceRule; // Recurring event settings
+}
+
+export interface RecurrenceRule {
+  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  interval?: number; // Every N days/weeks/months
+  endDate?: Date; // When recurrence ends
+  occurrences?: number; // Number of occurrences
+  excludeDates?: Date[]; // Dates to exclude from recurrence
 }
 
 export interface DiaryEntry {

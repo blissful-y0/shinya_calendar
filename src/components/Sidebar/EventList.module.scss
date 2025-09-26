@@ -1,5 +1,5 @@
-@use '@styles/variables' as *;
-@use '@styles/mixins' as *;
+@use "@styles/variables" as *;
+@use "@styles/mixins" as *;
 
 .eventList {
   display: flex;
@@ -51,6 +51,32 @@
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: $spacing-xs;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.recurringBadge {
+  display: inline-block;
+  padding: 2px 6px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: $border-radius-small;
+  font-size: $font-size-xs;
+  font-weight: normal;
+}
+
+.eventDateRange {
+  font-size: $font-size-small;
+  color: var(--color-primary);
+  margin-bottom: $spacing-xs;
+}
+
+.recurrenceInfo {
+  font-size: $font-size-small;
+  color: var(--color-text-secondary);
+  margin-bottom: $spacing-xs;
+  font-style: italic;
 }
 
 .eventTime {
@@ -97,7 +123,7 @@
   color: var(--color-text-secondary);
 
   &:hover {
-    background: #FFE4E1;
-    color: #FF6B6B;
+    background: #ffe4e1;
+    color: #ff6b6b;
   }
 }
