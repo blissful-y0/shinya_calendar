@@ -5,10 +5,12 @@
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
-    "build:win": "yarn vite build && electron-builder --win",
-    "build:mac": "yarn vite build && electron-builder --mac",
-    "build:linux": "yarn vite build && electron-builder --linux",
+    "prebuild": "tsc && vite build",
+    "build": "yarn prebuild && electron-builder",
+    "build:win": "yarn prebuild && electron-builder --win",
+    "build:mac": "yarn prebuild && electron-builder --mac",
+    "build:linux": "yarn prebuild && electron-builder --linux",
+    "build:all": "concurrently \"yarn build:win\" \"yarn build:mac\" \"yarn build:linux\"",
     "preview": "vite preview",
     "electron": "electron .",
     "electron:dev": "concurrently \"yarn dev\" \"wait-on http://localhost:5173 && electron .\"",
@@ -55,18 +57,23 @@
     },
     "files": [
       "dist",
-      "dist-electron"
+      "dist-electron",
+      "!**/*.{ts,map,spec.js,test.js}"
     ],
     "mac": {
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ]
     },
     "win": {
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64", "ia32"]
         }
       ]
     },
@@ -77,10 +84,20 @@
       "deleteAppDataOnUninstall": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Shinya Calendar"
+      "shortcutName": "Shinya Calendar",
+      "runAfterFinish": true
     },
     "linux": {
-      "target": "AppImage"
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ]
     }
   }
 }
