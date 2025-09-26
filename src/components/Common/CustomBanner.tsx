@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { bannerImageState, stickerEditModeState } from "@store/atoms";
-import { MdPhoto, MdClose, MdCrop } from 'react-icons/md';
-import BannerCropModal from './BannerCropModal';
+import { MdPhoto, MdClose, MdCrop } from "react-icons/md";
+import BannerCropModal from "./BannerCropModal";
 import styles from "./CustomBanner.module.scss";
 
 const CustomBanner: React.FC = () => {
@@ -33,7 +33,7 @@ const CustomBanner: React.FC = () => {
     }
     // Reset input value to allow selecting the same file again
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -93,13 +93,6 @@ const CustomBanner: React.FC = () => {
                 title="이미지 변경"
               >
                 <MdPhoto />
-              </button>
-              <button
-                className={styles.cropButton}
-                onClick={handleCropImage}
-                title="이미지 크롭"
-              >
-                <MdCrop />
               </button>
               <button
                 className={styles.removeButton}
