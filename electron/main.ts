@@ -3,6 +3,9 @@ import path from "path";
 import os from "os";
 import Store from "electron-store";
 
+// GPU 관련 문제 해결을 위해 하드웨어 가속 비활성화
+app.disableHardwareAcceleration();
+
 // Electron Store 초기화
 const store = new Store();
 
