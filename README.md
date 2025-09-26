@@ -104,10 +104,30 @@ master (main)
 ### Pull Request 체크리스트
 
 - [ ] 코드가 프로젝트 스타일 가이드를 따르는가?
-- [ ] 모든 테스트가 통과하는가?
+- [ ] 모든 테스트가 통과하는가? (`yarn test:run`)
+- [ ] 테스트 커버리지가 80% 이상인가? (`yarn test:coverage`)
+- [ ] 새로운 기능에 대한 테스트를 작성했는가?
+- [ ] TypeScript 에러가 없는가? (`yarn typecheck`)
 - [ ] 새로운 기능에 대한 문서를 추가했는가?
 - [ ] 커밋 메시지가 규칙을 따르는가?
 - [ ] 관련 이슈를 참조했는가?
+
+### 테스트 (TDD)
+
+이 프로젝트는 **Test-Driven Development (TDD)** 를 따릅니다.
+
+```bash
+# 테스트 실행
+yarn test
+
+# 테스트 커버리지 확인
+yarn test:coverage
+
+# 특정 테스트 실행
+yarn test calendar
+```
+
+**중요**: PR 제출 전 반드시 [TESTING.md](TESTING.md)의 모든 체크리스트를 확인하세요.
 
 ## 📁 프로젝트 구조
 
