@@ -1,6 +1,7 @@
 import { atom } from 'recoil';
 import { Event, DiaryEntry, Theme, DDay } from '@types/index';
 import { startOfMonth } from 'date-fns';
+import { electronStore } from '@utils/electronStore';
 
 export const defaultTheme: Theme = {
   id: 'pastel-pink',
@@ -68,21 +69,19 @@ export const currentThemeState = atom<Theme>({
   default: defaultTheme,
   effects: [
     ({ setSelf, onSet }) => {
-      // localStorage에서 저장된 테마 불러오기
-      const savedTheme = localStorage.getItem('currentTheme');
-      if (savedTheme) {
-        try {
-          const parsedTheme = JSON.parse(savedTheme);
-          setSelf(parsedTheme);
-        } catch (error) {
-          console.error('Failed to load theme:', error);
+      // Electron Store에서 저장된 테마 불러오기
+      electronStore.get('currentTheme').then(savedTheme => {
+        if (savedTheme) {
+          setSelf(savedTheme);
         }
-      }
+      }).catch(error => {
+        console.error('Failed to load theme:', error);
+      });
 
-      // 테마 변경 시 localStorage에 저장
+      // 테마 변경 시 Electron Store에 저장
       onSet((newTheme, _, isReset) => {
         if (!isReset) {
-          localStorage.setItem('currentTheme', JSON.stringify(newTheme));
+          electronStore.set('currentTheme', newTheme);
         }
       });
     }
@@ -94,21 +93,19 @@ export const customThemesState = atom<Theme[]>({
   default: [],
   effects: [
     ({ setSelf, onSet }) => {
-      // localStorage에서 저장된 커스텀 테마 목록 불러오기
-      const savedCustomThemes = localStorage.getItem('customThemes');
-      if (savedCustomThemes) {
-        try {
-          const parsedThemes = JSON.parse(savedCustomThemes);
-          setSelf(parsedThemes);
-        } catch (error) {
-          console.error('Failed to load custom themes:', error);
+      // Electron Store에서 저장된 커스텀 테마 목록 불러오기
+      electronStore.get('customThemes').then(savedThemes => {
+        if (savedThemes) {
+          setSelf(savedThemes);
         }
-      }
+      }).catch(error => {
+        console.error('Failed to load custom themes:', error);
+      });
 
-      // 커스텀 테마 변경 시 localStorage에 저장
+      // 커스텀 테마 변경 시 Electron Store에 저장
       onSet((newThemes, _, isReset) => {
         if (!isReset) {
-          localStorage.setItem('customThemes', JSON.stringify(newThemes));
+          electronStore.set('customThemes', newThemes);
         }
       });
     }
@@ -120,21 +117,19 @@ export const eventsState = atom<Event[]>({
   default: [],
   effects: [
     ({ setSelf, onSet }) => {
-      // localStorage에서 저장된 이벤트 목록 불러오기
-      const savedEvents = localStorage.getItem('events');
-      if (savedEvents) {
-        try {
-          const parsedEvents = JSON.parse(savedEvents);
-          setSelf(parsedEvents);
-        } catch (error) {
-          console.error('Failed to load events:', error);
+      // Electron Store에서 저장된 이벤트 목록 불러오기
+      electronStore.get('events').then(savedEvents => {
+        if (savedEvents) {
+          setSelf(savedEvents);
         }
-      }
+      }).catch(error => {
+        console.error('Failed to load events:', error);
+      });
 
-      // 이벤트 변경 시 localStorage에 저장
+      // 이벤트 변경 시 Electron Store에 저장
       onSet((newEvents, _, isReset) => {
         if (!isReset) {
-          localStorage.setItem('events', JSON.stringify(newEvents));
+          electronStore.set('events', newEvents);
         }
       });
     }
@@ -146,21 +141,19 @@ export const diaryEntriesState = atom<DiaryEntry[]>({
   default: [],
   effects: [
     ({ setSelf, onSet }) => {
-      // localStorage에서 저장된 일기 목록 불러오기
-      const savedDiaries = localStorage.getItem('diaryEntries');
-      if (savedDiaries) {
-        try {
-          const parsedDiaries = JSON.parse(savedDiaries);
-          setSelf(parsedDiaries);
-        } catch (error) {
-          console.error('Failed to load diary entries:', error);
+      // Electron Store에서 저장된 일기 목록 불러오기
+      electronStore.get('diaryEntries').then(savedDiaries => {
+        if (savedDiaries) {
+          setSelf(savedDiaries);
         }
-      }
+      }).catch(error => {
+        console.error('Failed to load diary entries:', error);
+      });
 
-      // 일기 변경 시 localStorage에 저장
+      // 일기 변경 시 Electron Store에 저장
       onSet((newDiaries, _, isReset) => {
         if (!isReset) {
-          localStorage.setItem('diaryEntries', JSON.stringify(newDiaries));
+          electronStore.set('diaryEntries', newDiaries);
         }
       });
     }
@@ -187,16 +180,17 @@ export const sidebarWidthState = atom<number>({
   default: 320, // 기본 너비 (px)
   effects: [
     ({ setSelf, onSet }) => {
-      // localStorage에서 저장된 너비 불러오기
-      const savedWidth = localStorage.getItem('sidebarWidth');
-      if (savedWidth) {
-        setSelf(parseInt(savedWidth));
-      }
+      // Electron Store에서 저장된 너비 불러오기
+      electronStore.get('sidebarWidth').then(savedWidth => {
+        if (savedWidth) {
+          setSelf(savedWidth);
+        }
+      });
 
-      // 너비 변경 시 localStorage에 저장
+      // 너비 변경 시 Electron Store에 저장
       onSet((newWidth, _, isReset) => {
         if (!isReset && typeof newWidth === 'number') {
-          localStorage.setItem('sidebarWidth', newWidth.toString());
+          electronStore.set('sidebarWidth', newWidth);
         }
       });
     }
@@ -213,27 +207,25 @@ export const dDaysState = atom<DDay[]>({
   default: [],
   effects: [
     ({ setSelf, onSet }) => {
-      // localStorage에서 저장된 D-Day 목록 불러오기
-      const savedDDays = localStorage.getItem('dDays');
-      if (savedDDays) {
-        try {
-          const parsed = JSON.parse(savedDDays);
+      // Electron Store에서 저장된 D-Day 목록 불러오기
+      electronStore.get('dDays').then(savedDDays => {
+        if (savedDDays) {
           // Date 객체 복원
-          const restored = parsed.map((dday: any) => ({
+          const restored = savedDDays.map((dday: any) => ({
             ...dday,
             targetDate: new Date(dday.targetDate),
             createdAt: new Date(dday.createdAt)
           }));
           setSelf(restored);
-        } catch (error) {
-          console.error('Failed to load D-Days:', error);
         }
-      }
+      }).catch(error => {
+        console.error('Failed to load D-Days:', error);
+      });
 
-      // D-Day 변경 시 localStorage에 저장
+      // D-Day 변경 시 Electron Store에 저장
       onSet((newDDays, _, isReset) => {
         if (!isReset) {
-          localStorage.setItem('dDays', JSON.stringify(newDDays));
+          electronStore.set('dDays', newDDays);
         }
       });
     }
@@ -245,34 +237,26 @@ export const activeDDayState = atom<DDay | null>({
   default: null,
   effects: [
     ({ setSelf, onSet }) => {
-      // localStorage에서 활성 D-Day ID 불러오기
-      const activeDDayId = localStorage.getItem('activeDDayId');
-      if (activeDDayId) {
-        const savedDDays = localStorage.getItem('dDays');
-        if (savedDDays) {
-          try {
-            const parsed = JSON.parse(savedDDays);
-            const activeDDay = parsed.find((d: any) => d.id === activeDDayId);
-            if (activeDDay) {
-              setSelf({
-                ...activeDDay,
-                targetDate: new Date(activeDDay.targetDate),
-                createdAt: new Date(activeDDay.createdAt)
-              });
-            }
-          } catch (error) {
-            console.error('Failed to load active D-Day:', error);
-          }
+      // Electron Store에서 활성 D-Day 불러오기
+      electronStore.get('activeDDay').then(savedActiveDDay => {
+        if (savedActiveDDay) {
+          setSelf({
+            ...savedActiveDDay,
+            targetDate: new Date(savedActiveDDay.targetDate),
+            createdAt: new Date(savedActiveDDay.createdAt)
+          });
         }
-      }
+      }).catch(error => {
+        console.error('Failed to load active D-Day:', error);
+      });
 
-      // 활성 D-Day 변경 시 localStorage에 저장
+      // 활성 D-Day 변경 시 Electron Store에 저장
       onSet((newActiveDDay, _, isReset) => {
         if (!isReset) {
           if (newActiveDDay) {
-            localStorage.setItem('activeDDayId', newActiveDDay.id);
+            electronStore.set('activeDDay', newActiveDDay);
           } else {
-            localStorage.removeItem('activeDDayId');
+            electronStore.delete('activeDDay');
           }
         }
       });
@@ -286,19 +270,22 @@ export const bannerImageState = atom<string | null>({
   default: null,
   effects: [
     ({ setSelf, onSet }) => {
-      // localStorage에서 저장된 배너 이미지 불러오기
-      const savedBanner = localStorage.getItem('bannerImage');
-      if (savedBanner) {
-        setSelf(savedBanner);
-      }
+      // Electron Store에서 저장된 배너 이미지 불러오기
+      electronStore.get('bannerImage').then(savedBanner => {
+        if (savedBanner) {
+          setSelf(savedBanner);
+        }
+      }).catch(error => {
+        console.error('Failed to load banner image:', error);
+      });
 
-      // 배너 이미지 변경 시 localStorage에 저장
+      // 배너 이미지 변경 시 Electron Store에 저장
       onSet((newBanner, _, isReset) => {
         if (!isReset) {
           if (newBanner) {
-            localStorage.setItem('bannerImage', newBanner);
+            electronStore.set('bannerImage', newBanner);
           } else {
-            localStorage.removeItem('bannerImage');
+            electronStore.delete('bannerImage');
           }
         }
       });

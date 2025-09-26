@@ -1,6 +1,10 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import os from 'os';
+import Store from 'electron-store';
+
+// Electron Store 초기화
+const store = new Store();
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -59,6 +63,27 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+// Store API handlers
+ipcMain.handle('store-get', (_, key: string) => {
+  return store.get(key);
+});
+
+ipcMain.handle('store-set', (_, key: string, value: any) => {
+  store.set(key, value);
+});
+
+ipcMain.handle('store-delete', (_, key: string) => {
+  store.delete(key);
+});
+
+ipcMain.handle('store-clear', () => {
+  store.clear();
+});
+
+ipcMain.handle('store-has', (_, key: string) => {
+  return store.has(key);
 });
 
 ipcMain.handle('get-app-path', () => {
