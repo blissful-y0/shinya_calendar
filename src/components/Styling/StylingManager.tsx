@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
-import { stickerEditModeState, modalActiveState, stickersState, stickerLayoutsState, uploadedStickersState } from '@store/atoms';
+import { stickerEditModeState, modalActiveState, stickersState, stickerLayoutsState, uploadedStickersState, stickerVisibilityState } from '@store/atoms';
 import { MdBrush, MdClose, MdImage, MdEdit, MdEditOff, MdDelete, MdPhotoLibrary, MdRestore, MdFolder, MdMoreVert } from 'react-icons/md';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -23,6 +23,7 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
   const [stickerLayouts, setStickerLayouts] = useRecoilState(stickerLayoutsState);
   const [uploadedStickers, setUploadedStickers] = useRecoilState(uploadedStickersState);
   const [layoutMenuId, setLayoutMenuId] = useState<string | null>(null);
+  const setStickerVisibility = useSetRecoilState(stickerVisibilityState);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -38,8 +39,9 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
 
   const toggleStickerEditMode = () => {
     setStickerEditMode(!stickerEditMode);
-    // 편집 시작 시 스타일링 매니저 창 닫기
+    // 편집 시작 시 스타일링 매니저 창 닫기 및 스티커 오버레이 강제 ON
     if (!stickerEditMode) {
+      setStickerVisibility(true); // 편집 모드 시작 시 스티커 오버레이 강제로 ON
       onClose();
     }
   };
