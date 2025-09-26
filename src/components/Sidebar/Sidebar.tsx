@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import React, { useState, useEffect } from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   selectedDateState,
+  selectedEventState,
   eventsState,
   diaryEntriesState,
   sidebarOpenState
@@ -18,10 +19,30 @@ import styles from './Sidebar.module.scss';
 const Sidebar: React.FC = () => {
   const [sidebarOpen] = useRecoilState(sidebarOpenState);
   const selectedDate = useRecoilValue(selectedDateState);
+  const setSelectedEvent = useSetRecoilState(selectedEventState);
   const events = useRecoilValue(eventsState);
   const diaryEntries = useRecoilValue(diaryEntriesState);
   const [activeTab, setActiveTab] = useState<'events' | 'diary'>('events');
   const [showEventForm, setShowEventForm] = useState(false);
+
+  // 날짜가 변경되면 선택된 이벤트 초기화
+  useEffect(() => {
+    setSelectedEvent(null);
+  }, [selectedDate, setSelectedEvent]);
+
+  // 탭이 변경되면 선택된 이벤트 초기화
+  const handleTabChange = (tab: 'events' | 'diary') => {
+    setActiveTab(tab);
+    setSelectedEvent(null);
+  };
+
+  // 이벤트 추가 폼을 열 때 선택된 이벤트 초기화
+  const handleToggleEventForm = () => {
+    setShowEventForm(!showEventForm);
+    if (!showEventForm) {
+      setSelectedEvent(null);
+    }
+  };
 
   // 반복 이벤트를 포함하여 선택된 날짜의 이벤트 가져오기
   // 선택된 날짜 기준 3개월 범위로 반복 이벤트 계산
@@ -48,13 +69,13 @@ const Sidebar: React.FC = () => {
         <div className={styles.tabs}>
           <button
             className={`${styles.tab} ${activeTab === 'events' ? styles.active : ''}`}
-            onClick={() => setActiveTab('events')}
+            onClick={() => handleTabChange('events')}
           >
             이벤트
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'diary' ? styles.active : ''}`}
-            onClick={() => setActiveTab('diary')}
+            onClick={() => handleTabChange('diary')}
           >
             일기
           </button>
@@ -67,7 +88,7 @@ const Sidebar: React.FC = () => {
             <div className={styles.actionBar}>
               <button
                 className={styles.addButton}
-                onClick={() => setShowEventForm(!showEventForm)}
+                onClick={handleToggleEventForm}
               >
                 {showEventForm ? '취소' : '+ 이벤트 추가'}
               </button>

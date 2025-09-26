@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSetRecoilState } from "recoil";
-import { eventsState } from "@store/atoms";
+import { eventsState, selectedEventState } from "@store/atoms";
 import { Event, RecurrenceRule, ReminderTime } from "@types";
 import { v4 as uuidv4 } from "uuid";
 import { format, isAfter } from "date-fns";
@@ -16,6 +16,7 @@ interface EventFormProps {
 
 const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const setEvents = useSetRecoilState(eventsState);
+  const setSelectedEvent = useSetRecoilState(selectedEventState);
   const [title, setTitle] = useState(event?.title || "");
   const [startDate, setStartDate] = useState(
     format(event?.date || date, "yyyy-MM-dd")
@@ -115,6 +116,8 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     // 성공 메시지 표시
     toast.success(event ? '이벤트가 수정되었습니다' : '이벤트가 추가되었습니다');
 
+    // 선택된 이벤트 초기화
+    setSelectedEvent(null);
     onClose();
   };
 

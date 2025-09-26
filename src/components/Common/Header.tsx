@@ -1,8 +1,9 @@
 import React from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import {
   currentMonthState,
   selectedDateState,
+  selectedEventState,
   sidebarOpenState,
   viewModeState,
   stickerVisibilityState,
@@ -17,6 +18,7 @@ const Header: React.FC = () => {
   const [selectedDate, setSelectedDate] = useRecoilState(selectedDateState);
   const [sidebarOpen, setSidebarOpen] = useRecoilState(sidebarOpenState);
   const [viewMode, setViewMode] = useRecoilState(viewModeState);
+  const setSelectedEvent = useSetRecoilState(selectedEventState);
   const [stickerVisibility, setStickerVisibility] = useRecoilState(
     stickerVisibilityState
   );
@@ -61,7 +63,9 @@ const Header: React.FC = () => {
     } else if (viewMode === "week") {
       return format(selectedDate, "yyyy년 M월", { locale: ko });
     } else {
-      return `${currentMonth.getFullYear()}년 ${monthNames[currentMonth.getMonth()]}`;
+      return `${currentMonth.getFullYear()}년 ${
+        monthNames[currentMonth.getMonth()]
+      }`;
     }
   };
 
@@ -100,14 +104,17 @@ const Header: React.FC = () => {
           onClick={() => setStickerVisibility(!stickerVisibility)}
           title={stickerVisibility ? "스티커 숨기기" : "스티커 보이기"}
         >
-          ☆
+          {stickerVisibility ? "ON" : "OFF"}
         </button>
         <div className={styles.viewToggle}>
           <button
             className={`${styles.viewButton} ${
               viewMode === "day" ? styles.active : ""
             }`}
-            onClick={() => setViewMode("day")}
+            onClick={() => {
+              setViewMode("day");
+              setSelectedEvent(null);
+            }}
           >
             일
           </button>
@@ -115,7 +122,10 @@ const Header: React.FC = () => {
             className={`${styles.viewButton} ${
               viewMode === "week" ? styles.active : ""
             }`}
-            onClick={() => setViewMode("week")}
+            onClick={() => {
+              setViewMode("week");
+              setSelectedEvent(null);
+            }}
           >
             주
           </button>
@@ -123,7 +133,10 @@ const Header: React.FC = () => {
             className={`${styles.viewButton} ${
               viewMode === "month" ? styles.active : ""
             }`}
-            onClick={() => setViewMode("month")}
+            onClick={() => {
+              setViewMode("month");
+              setSelectedEvent(null);
+            }}
           >
             월
           </button>

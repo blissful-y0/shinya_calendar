@@ -50,12 +50,7 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
         <div className={styles.detailContent}>
           <div className={styles.detailGroup}>
             <label>제목</label>
-            <div className={styles.detailValue}>
-              {event.title}
-              {event.recurrence && (
-                <span className={styles.recurringBadge}>반복</span>
-              )}
-            </div>
+            <div className={styles.detailValue}>{event.title}</div>
           </div>
 
           <div className={styles.detailGroup}>
@@ -98,14 +93,6 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
                 {event.recurrence.frequency === "yearly" && "매년"}
                 {event.recurrence.interval && event.recurrence.interval > 1 && (
                   <> {event.recurrence.interval}번마다</>
-                )}
-                {event.recurrence.endDate && (
-                  <div className={styles.recurrenceEnd}>
-                    종료:{" "}
-                    {format(event.recurrence.endDate, "yyyy년 MM월 dd일", {
-                      locale: ko,
-                    })}
-                  </div>
                 )}
               </div>
             </div>
