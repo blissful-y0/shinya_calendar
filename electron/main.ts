@@ -13,6 +13,11 @@ function createWindow() {
   const isMac = process.platform === 'darwin';
   const isWindows = process.platform === 'win32';
 
+  // Disable hardware acceleration to avoid IMK issues on macOS
+  if (isMac) {
+    app.disableHardwareAcceleration();
+  }
+
   // 저장된 창 상태 복원
   const savedWindowState = store.get('windowState') as any;
   const defaultBounds = { width: 1400, height: 900, x: undefined, y: undefined };
@@ -163,33 +168,56 @@ ipcMain.handle('get-platform', () => {
   return process.platform;
 });
 
-// Notification handler
-ipcMain.handle('show-notification', (_, options: {
+// Notification handler with error handling
+ipcMain.handle('show-notification', async (_, options: {
   title: string;
   body: string;
   icon?: string;
   silent?: boolean;
 }) => {
-  if (Notification.isSupported()) {
-    const notification = new Notification({
+  try {
+    if (!Notification.isSupported()) {
+      console.log('Notifications not supported on this system');
+      return false;
+    }
+
+    // Create notification with platform-specific handling
+    const notificationOptions: Electron.NotificationConstructorOptions = {
       title: options.title,
       body: options.body,
-      icon: options.icon,
       silent: options.silent || false
-    });
+    };
 
+    // Add icon only if provided and valid
+    if (options.icon) {
+      notificationOptions.icon = options.icon;
+    }
+
+    const notification = new Notification(notificationOptions);
+
+    // Show notification
     notification.show();
 
+    // Handle click event
     notification.on('click', () => {
       if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore();
+        if (mainWindow.isMinimized()) {
+          mainWindow.restore();
+        }
         mainWindow.focus();
       }
     });
 
+    // Handle errors
+    notification.on('failed', (event, error) => {
+      console.error('Notification failed:', error);
+    });
+
     return true;
+  } catch (error) {
+    console.error('Error showing notification:', error);
+    return false;
   }
-  return false;
 });
 
 // Window resize API handler

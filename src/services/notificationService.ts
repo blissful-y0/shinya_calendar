@@ -93,10 +93,13 @@ class NotificationService {
     const now = new Date();
     const timeUntilNotification = notificationTime.getTime() - now.getTime();
 
-    // Only schedule if the notification is in the future
-    if (timeUntilNotification > 0) {
-      const timeoutId = setTimeout(() => {
-        this.sendNotification(event);
+    // Only schedule if the notification is in the future and within 24 hours
+    // to avoid potential memory issues with very distant events
+    const maxDelay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+    if (timeUntilNotification > 0 && timeUntilNotification <= maxDelay) {
+      const timeoutId = setTimeout(async () => {
+        await this.sendNotification(event);
         this.scheduledNotifications.delete(event.id);
       }, timeUntilNotification);
 
@@ -122,30 +125,40 @@ class NotificationService {
   /**
    * Send a notification using Electron's notification API
    */
-  private sendNotification(event: Event) {
-    const title = event.title;
-    let body = '';
+  private async sendNotification(event: Event) {
+    try {
+      const title = event.title;
+      let body = '';
 
-    if (event.isAllDay) {
-      body = '오늘 하루 종일 진행되는 이벤트입니다.';
-    } else if (event.startTime && event.endTime) {
-      body = `${event.startTime} - ${event.endTime}`;
-    } else if (event.startTime) {
-      body = `${event.startTime}에 시작합니다.`;
-    }
+      if (event.isAllDay) {
+        body = '오늘 하루 종일 진행되는 이벤트입니다.';
+      } else if (event.startTime && event.endTime) {
+        body = `${event.startTime} - ${event.endTime}`;
+      } else if (event.startTime) {
+        body = `${event.startTime}에 시작합니다.`;
+      }
 
-    if (event.description) {
-      body += `\n${event.description}`;
-    }
+      if (event.description) {
+        body += `\n${event.description}`;
+      }
 
-    // Send notification through Electron IPC
-    if (window.electronAPI?.showNotification) {
-      window.electronAPI.showNotification({
-        title,
-        body,
-        icon: undefined, // Can add an icon path here if needed
-        silent: false
-      });
+      // Send notification through Electron IPC with error handling
+      if (window.electronAPI?.showNotification) {
+        const result = await window.electronAPI.showNotification({
+          title,
+          body,
+          icon: undefined, // Can add an icon path here if needed
+          silent: false
+        });
+
+        if (!result) {
+          console.warn(`Failed to show notification for event: ${event.title}`);
+        }
+      } else {
+        console.warn('Notification API not available');
+      }
+    } catch (error) {
+      console.error('Error sending notification:', error);
     }
   }
 
