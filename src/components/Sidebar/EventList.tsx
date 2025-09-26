@@ -8,6 +8,7 @@ import { ko } from "date-fns/locale";
 import toast from "react-hot-toast";
 import EventForm from "./EventForm";
 import EventDetail from "./EventDetail";
+import RecurringEventDeleteModal from "@components/Common/RecurringEventDeleteModal";
 import styles from "./EventList.module.scss";
 
 interface EventListProps {
@@ -18,6 +19,8 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
   const setEvents = useSetRecoilState(eventsState);
   const [selectedEvent, setSelectedEvent] = useRecoilState(selectedEventState);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [deletingEvent, setDeletingEvent] = useState<Event | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleEventClick = (event: Event) => {
     setSelectedEvent(event);
@@ -28,11 +31,54 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     setSelectedEvent(null);
   };
 
-  const handleDelete = (eventId: string) => {
-    if (confirm('이 이벤트를 삭제하시겠습니까?')) {
-      setEvents((prev) => prev.filter((e) => e.id !== eventId));
-      toast.success('이벤트가 삭제되었습니다');
+  const handleDelete = (event: Event) => {
+    // 반복 이벤트인 경우 모달 표시
+    if (event.recurrence || event.baseEventId) {
+      setDeletingEvent(event);
+      setShowDeleteModal(true);
+    } else {
+      // 일반 이벤트는 바로 삭제 확인
+      if (confirm('이 이벤트를 삭제하시겠습니까?')) {
+        setEvents((prev) => prev.filter((e) => e.id !== event.id));
+        toast.success('이벤트가 삭제되었습니다');
+      }
     }
+  };
+
+  const handleDeleteSingle = () => {
+    if (!deletingEvent) return;
+
+    // 단일 인스턴스만 삭제 (excludeDates에 추가)
+    const targetId = deletingEvent.baseEventId || deletingEvent.id;
+    const dateToExclude = deletingEvent.date.toISOString();
+
+    setEvents((prev) => prev.map((e) => {
+      if (e.id === targetId) {
+        return {
+          ...e,
+          recurrence: e.recurrence ? {
+            ...e.recurrence,
+            excludeDates: [...(e.recurrence.excludeDates || []), dateToExclude]
+          } : undefined
+        };
+      }
+      return e;
+    }));
+
+    setShowDeleteModal(false);
+    setDeletingEvent(null);
+    toast.success('선택한 이벤트가 삭제되었습니다');
+  };
+
+  const handleDeleteAll = () => {
+    if (!deletingEvent) return;
+
+    // 전체 시리즈 삭제
+    const targetId = deletingEvent.baseEventId || deletingEvent.id;
+    setEvents((prev) => prev.filter((e) => e.id !== targetId));
+    setShowDeleteModal(false);
+    setDeletingEvent(null);
+    toast.success('모든 반복 이벤트가 삭제되었습니다');
   };
 
   const formatTime = (time?: string) => {
@@ -44,14 +90,18 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     return `${ampm} ${displayHour}:${minutes}`;
   };
 
-  if (selectedEvent && events.some(e => e.id === selectedEvent.id)) {
-    const event = events.find(e => e.id === selectedEvent.id)!;
-    return (
-      <EventDetail
-        event={event}
-        onEdit={() => handleEdit(event)}
-      />
-    );
+  if (selectedEvent) {
+    // 선택된 이벤트를 events 배열에서 찾기
+    // 반복 이벤트의 경우 전달된 events prop에 인스턴스가 포함되어 있음
+    const event = events.find(e => e.id === selectedEvent.id);
+    if (event) {
+      return (
+        <EventDetail
+          event={event}
+          onEdit={() => handleEdit(event)}
+        />
+      );
+    }
   }
 
   if (editingEvent) {
@@ -140,7 +190,7 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
               className={styles.deleteButton}
               onClick={(e) => {
                 e.stopPropagation();
-                handleDelete(event.id);
+                handleDelete(event);
               }}
             >
               삭제
@@ -148,6 +198,20 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
           </div>
         </div>
       ))}
+
+      {deletingEvent && (
+        <RecurringEventDeleteModal
+          isOpen={showDeleteModal}
+          eventTitle={deletingEvent.title}
+          eventDate={deletingEvent.date}
+          onDeleteSingle={handleDeleteSingle}
+          onDeleteAll={handleDeleteAll}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setDeletingEvent(null);
+          }}
+        />
+      )}
     </div>
   );
 };

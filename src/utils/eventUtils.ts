@@ -31,13 +31,14 @@ export function generateRecurringEvents(baseEvent: Event, startRange: Date, endR
       const eventInstance: Event = {
         ...baseEvent,
         id: `${baseEvent.id}-${count}`,
+        baseEventId: baseEvent.id,
         date: new Date(currentDate),
         endDate: daysDiff > 0 ? addDays(currentDate, daysDiff) : undefined
       };
 
       // Check if this instance is excluded
       if (!baseEvent.recurrence.excludeDates?.some(excludeDate =>
-        isSameDay(excludeDate, currentDate)
+        isSameDay(new Date(excludeDate), currentDate)
       )) {
         events.push(eventInstance);
       }

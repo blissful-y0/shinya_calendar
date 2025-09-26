@@ -66,30 +66,48 @@
   text-align: center;
 }
 
-.deleteTheme {
+.themeActions {
   position: absolute;
   top: 4px;
   right: 4px;
-  width: 20px;
-  height: 20px;
-  border: none;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
-  color: var(--color-text-secondary);
-  transition: all $transition-fast;
+  display: flex;
+  gap: 4px;
   opacity: 0;
+  transition: opacity $transition-fast;
 
   .themeCard:hover & {
     opacity: 1;
   }
+}
+
+.editTheme,
+.deleteTheme {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: all $transition-fast;
+  font-size: 14px;
 
   &:hover {
-    background: #FFE4E1;
-    color: #FF6B6B;
+    background: var(--color-accent);
+    transform: scale(1.1);
   }
+}
+
+.editTheme:hover {
+  color: var(--color-primary);
+}
+
+.deleteTheme:hover {
+  background: #FFE4E1;
+  color: #FF6B6B;
 }
 
 .createButton {
@@ -204,28 +222,85 @@
 .colorControl {
   display: flex;
   gap: $spacing-xs;
+  position: relative;
+}
 
-  input[type="color"] {
-    width: 40px;
-    height: 32px;
-    border: 1px solid var(--color-border);
-    border-radius: $border-radius-small;
-    cursor: pointer;
+.colorButton {
+  width: 40px;
+  height: 32px;
+  border: 2px solid var(--color-border);
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  transition: all $transition-fast;
+  position: relative;
+
+  &:hover {
+    border-color: var(--color-primary);
+    transform: scale(1.05);
   }
 
-  input[type="text"] {
-    flex: 1;
-    padding: $spacing-xs;
-    border: 1px solid var(--color-border);
-    border-radius: $border-radius-small;
-    font-size: $font-size-small;
-    color: var(--color-text);
-    background: var(--color-surface);
+  &:active {
+    transform: scale(0.95);
+  }
+}
 
-    &:focus {
-      outline: none;
-      border-color: var(--color-primary);
-    }
+.colorText {
+  flex: 1;
+  padding: $spacing-xs;
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  font-size: $font-size-small;
+  color: var(--color-text);
+  background: var(--color-surface);
+  font-family: 'Monaco', 'Menlo', monospace;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+}
+
+.colorPickerPopover {
+  position: absolute;
+  z-index: 2000;
+  top: 40px;
+  left: 0;
+}
+
+.colorPickerCover {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+// React Colorful 커스텀 스타일
+.colorInput {
+  :global(.react-colorful) {
+    width: 200px;
+    height: 200px;
+    border-radius: $border-radius;
+    box-shadow: $shadow-large;
+    border: 2px solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  :global(.react-colorful__saturation) {
+    border-radius: $border-radius-small;
+  }
+
+  :global(.react-colorful__hue) {
+    margin-top: 12px;
+    height: 12px;
+    border-radius: 6px;
+  }
+
+  :global(.react-colorful__pointer) {
+    width: 20px;
+    height: 20px;
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 }
 

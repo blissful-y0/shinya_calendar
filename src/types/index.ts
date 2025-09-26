@@ -1,5 +1,6 @@
 export interface Event {
   id: string;
+  baseEventId?: string; // Original event ID for recurring instances
   title: string;
   date: Date; // Start date for multi-day events
   endDate?: Date; // End date for multi-day events
@@ -22,7 +23,7 @@ export interface RecurrenceRule {
   interval?: number; // Every N days/weeks/months
   endDate?: Date; // When recurrence ends
   occurrences?: number; // Number of occurrences
-  excludeDates?: Date[]; // Dates to exclude from recurrence
+  excludeDates?: string[]; // ISO date strings to exclude from recurrence
 }
 
 export interface DiaryEntry {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useTheme } from "@hooks/useTheme";
 import { Theme } from "@types";
 import { v4 as uuidv4 } from "uuid";
+import { HexColorPicker } from "react-colorful";
+import { MdEdit, MdDelete } from "react-icons/md";
 import styles from "./ThemeSelector.module.scss";
 
 const ThemeSelector: React.FC = () => {
@@ -10,12 +12,15 @@ const ThemeSelector: React.FC = () => {
     allThemes,
     selectTheme,
     createCustomTheme,
+    updateCustomTheme,
     deleteCustomTheme,
     previewTheme,
     resetPreview,
   } = useTheme();
   const [showCustomForm, setShowCustomForm] = useState(false);
+  const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
   const [customThemeName, setCustomThemeName] = useState("");
+  const [activeColorPicker, setActiveColorPicker] = useState<string | null>(null);
   const [customColors, setCustomColors] = useState({
     primary: "#FFB6C1",
     secondary: "#FFC0CB",
@@ -45,27 +50,47 @@ const ThemeSelector: React.FC = () => {
     }
   }, [customColors, showCustomForm, isPreviewing, previewTheme]);
 
-  const handleCreateCustomTheme = () => {
+  const handleSaveTheme = () => {
     if (!customThemeName.trim()) return;
 
-    const newTheme: Theme = {
-      id: uuidv4(),
-      name: customThemeName,
-      colors: customColors,
-    };
+    if (editingTheme) {
+      // Update existing theme
+      updateCustomTheme(editingTheme.id, {
+        name: customThemeName,
+        colors: customColors,
+      });
+    } else {
+      // Create new theme
+      const newTheme: Theme = {
+        id: uuidv4(),
+        name: customThemeName,
+        colors: customColors,
+      };
+      createCustomTheme(newTheme);
+      selectTheme(newTheme.id);
+    }
 
-    createCustomTheme(newTheme);
     setShowCustomForm(false);
+    setEditingTheme(null);
     setCustomThemeName("");
     setIsPreviewing(false);
-    selectTheme(newTheme.id);
+    setActiveColorPicker(null);
   };
 
   const handleCancelCustomForm = () => {
     setShowCustomForm(false);
+    setEditingTheme(null);
     setCustomThemeName("");
     setIsPreviewing(false);
+    setActiveColorPicker(null);
     resetPreview();
+  };
+
+  const handleEditTheme = (theme: Theme) => {
+    setEditingTheme(theme);
+    setCustomThemeName(theme.name);
+    setCustomColors(theme.colors);
+    setShowCustomForm(true);
   };
 
   const togglePreview = () => {
@@ -106,15 +131,30 @@ const ThemeSelector: React.FC = () => {
         </div>
         <div className={styles.themeName}>{theme.name}</div>
         {!theme.id.includes("pastel") && (
-          <button
-            className={styles.deleteTheme}
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteCustomTheme(theme.id);
-            }}
-          >
-            ×
-          </button>
+          <div className={styles.themeActions}>
+            <button
+              className={styles.editTheme}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditTheme(theme);
+              }}
+              title="테마 수정"
+            >
+              <MdEdit />
+            </button>
+            <button
+              className={styles.deleteTheme}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (confirm(`"${theme.name}" 테마를 삭제하시겠습니까?`)) {
+                  deleteCustomTheme(theme.id);
+                }
+              }}
+              title="테마 삭제"
+            >
+              <MdDelete />
+            </button>
+          </div>
         )}
       </div>
     );
@@ -151,7 +191,9 @@ const ThemeSelector: React.FC = () => {
         </button>
       ) : (
         <div className={styles.customForm}>
-          <h4 className={styles.formTitle}>커스텀 테마 만들기</h4>
+          <h4 className={styles.formTitle}>
+            {editingTheme ? "테마 수정" : "커스텀 테마 만들기"}
+          </h4>
 
           <div className={styles.formGroup}>
             <label>테마 이름</label>
@@ -191,17 +233,14 @@ const ThemeSelector: React.FC = () => {
                   {key === "text" && "텍스트"}
                   {key === "textSecondary" && "보조 텍스트"}
                   {key === "border" && "테두리"}
+                  {key === "danger" && "위험"}
+                  {key === "dangerLight" && "위험 (연한)"}
                 </label>
                 <div className={styles.colorControl}>
-                  <input
-                    type="color"
-                    value={value}
-                    onChange={(e) =>
-                      setCustomColors((prev) => ({
-                        ...prev,
-                        [key]: e.target.value,
-                      }))
-                    }
+                  <button
+                    className={styles.colorButton}
+                    style={{ backgroundColor: value }}
+                    onClick={() => setActiveColorPicker(activeColorPicker === key ? null : key)}
                   />
                   <input
                     type="text"
@@ -212,7 +251,22 @@ const ThemeSelector: React.FC = () => {
                         [key]: e.target.value,
                       }))
                     }
+                    className={styles.colorText}
                   />
+                  {activeColorPicker === key && (
+                    <div className={styles.colorPickerPopover}>
+                      <div className={styles.colorPickerCover} onClick={() => setActiveColorPicker(null)} />
+                      <HexColorPicker
+                        color={value}
+                        onChange={(color) =>
+                          setCustomColors((prev) => ({
+                            ...prev,
+                            [key]: color,
+                          }))
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -227,10 +281,10 @@ const ThemeSelector: React.FC = () => {
             </button>
             <button
               className={styles.saveButton}
-              onClick={handleCreateCustomTheme}
+              onClick={handleSaveTheme}
               disabled={!customThemeName.trim()}
             >
-              테마 생성
+              {editingTheme ? "테마 수정" : "테마 생성"}
             </button>
           </div>
         </div>

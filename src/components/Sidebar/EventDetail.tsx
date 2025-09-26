@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { selectedEventState, eventsState } from "@store/atoms";
 import { Event } from "@types";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import toast from "react-hot-toast";
+import RecurringEventDeleteModal from "@components/Common/RecurringEventDeleteModal";
 import styles from "./EventDetail.module.scss";
 
 interface EventDetailProps {
@@ -15,17 +16,56 @@ interface EventDetailProps {
 const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
   const [selectedEvent, setSelectedEvent] = useRecoilState(selectedEventState);
   const setEvents = useSetRecoilState(eventsState);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleClose = () => {
     setSelectedEvent(null);
   };
 
   const handleDelete = () => {
-    if (confirm("이 이벤트를 삭제하시겠습니까?")) {
-      setEvents((prev) => prev.filter((e) => e.id !== event.id));
-      setSelectedEvent(null);
-      toast.success("이벤트가 삭제되었습니다");
+    // 반복 이벤트인 경우 모달 표시
+    if (event.recurrence || event.baseEventId) {
+      setShowDeleteModal(true);
+    } else {
+      // 일반 이벤트는 바로 삭제 확인
+      if (confirm("이 이벤트를 삭제하시겠습니까?")) {
+        setEvents((prev) => prev.filter((e) => e.id !== event.id));
+        setSelectedEvent(null);
+        toast.success("이벤트가 삭제되었습니다");
+      }
     }
+  };
+
+  const handleDeleteSingle = () => {
+    // 단일 인스턴스만 삭제 (excludeDates에 추가)
+    const targetId = event.baseEventId || event.id;
+    const dateToExclude = event.date.toISOString();
+
+    setEvents((prev) => prev.map((e) => {
+      if (e.id === targetId) {
+        return {
+          ...e,
+          recurrence: e.recurrence ? {
+            ...e.recurrence,
+            excludeDates: [...(e.recurrence.excludeDates || []), dateToExclude]
+          } : undefined
+        };
+      }
+      return e;
+    }));
+
+    setShowDeleteModal(false);
+    setSelectedEvent(null);
+    toast.success("선택한 이벤트가 삭제되었습니다");
+  };
+
+  const handleDeleteAll = () => {
+    // 전체 시리즈 삭제
+    const targetId = event.baseEventId || event.id;
+    setEvents((prev) => prev.filter((e) => e.id !== targetId));
+    setShowDeleteModal(false);
+    setSelectedEvent(null);
+    toast.success("모든 반복 이벤트가 삭제되었습니다");
   };
 
   const formatTime = (time?: string) => {
@@ -58,11 +98,11 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
             <div className={styles.detailValue}>
               {event.endDate && event.date !== event.endDate ? (
                 <>
-                  {format(event.date, "yyyy년 MM월 dd일", { locale: ko })} ~{" "}
-                  {format(event.endDate, "yyyy년 MM월 dd일", { locale: ko })}
+                  {format(new Date(event.date), "yyyy년 MM월 dd일", { locale: ko })} ~{" "}
+                  {format(new Date(event.endDate), "yyyy년 MM월 dd일", { locale: ko })}
                 </>
               ) : (
-                format(event.date, "yyyy년 MM월 dd일 EEEE", { locale: ko })
+                format(new Date(event.date), "yyyy년 MM월 dd일 EEEE", { locale: ko })
               )}
             </div>
           </div>
@@ -129,6 +169,15 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
           삭제
         </button>
       </div>
+
+      <RecurringEventDeleteModal
+        isOpen={showDeleteModal}
+        eventTitle={event.title}
+        eventDate={event.date}
+        onDeleteSingle={handleDeleteSingle}
+        onDeleteAll={handleDeleteAll}
+        onCancel={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 };

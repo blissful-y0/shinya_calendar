@@ -1,0 +1,189 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.datePickerWrapper {
+  width: 100%;
+}
+
+.datePickerInput {
+  width: 100%;
+  padding: $spacing-sm;
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: $font-size-base;
+  font-family: inherit;
+  transition: all $transition-fast;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.datePickerPopper {
+  z-index: 1000 !important;
+}
+
+.datePickerCalendar {
+  font-family: inherit;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: $border-radius;
+  box-shadow: $shadow-large;
+  padding: $spacing-sm;
+
+  // 헤더 스타일
+  :global(.react-datepicker__header) {
+    background: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    padding: $spacing-sm 0;
+  }
+
+  // 요일 헤더
+  :global(.react-datepicker__day-names) {
+    margin-top: $spacing-xs;
+  }
+
+  :global(.react-datepicker__day-name) {
+    color: var(--color-text-secondary);
+    font-size: $font-size-small;
+    font-weight: $font-weight-medium;
+    width: 36px;
+    line-height: 36px;
+    margin: 0;
+  }
+
+  // 월 년도 선택
+  :global(.react-datepicker__current-month) {
+    color: var(--color-text);
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    margin-bottom: $spacing-xs;
+  }
+
+  // 날짜 버튼
+  :global(.react-datepicker__day) {
+    color: var(--color-text);
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    margin: 2px;
+    border-radius: $border-radius-small;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: var(--color-accent);
+      color: var(--color-primary);
+    }
+  }
+
+  // 선택된 날짜
+  :global(.react-datepicker__day--selected) {
+    background: var(--color-primary) !important;
+    color: white !important;
+    font-weight: $font-weight-medium;
+
+    &:hover {
+      background: var(--color-secondary) !important;
+    }
+  }
+
+  // 오늘 날짜
+  :global(.react-datepicker__day--today) {
+    background: var(--color-accent);
+    font-weight: $font-weight-medium;
+  }
+
+  // 비활성화된 날짜
+  :global(.react-datepicker__day--disabled) {
+    color: var(--color-text-secondary);
+    opacity: 0.4;
+    cursor: not-allowed;
+
+    &:hover {
+      background: transparent;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  // 다른 달 날짜
+  :global(.react-datepicker__day--outside-month) {
+    color: var(--color-text-secondary);
+    opacity: 0.5;
+  }
+
+  // 네비게이션 버튼
+  :global(.react-datepicker__navigation) {
+    top: 12px;
+    width: 24px;
+    height: 24px;
+    border: none;
+
+    &:hover {
+      background: var(--color-accent);
+      border-radius: 50%;
+    }
+  }
+
+  :global(.react-datepicker__navigation-icon) {
+    &::before {
+      border-color: var(--color-text);
+      width: 8px;
+      height: 8px;
+      top: 6px;
+    }
+  }
+
+  // 시간 선택
+  :global(.react-datepicker__time-container) {
+    border-left: 1px solid var(--color-border);
+  }
+
+  :global(.react-datepicker__time) {
+    background: var(--color-background);
+  }
+
+  :global(.react-datepicker__time-list-item) {
+    color: var(--color-text);
+    padding: $spacing-xs $spacing-sm;
+    transition: all $transition-fast;
+  }
+
+  :global(.react-datepicker__time-list-item:hover) {
+    background: var(--color-accent) !important;
+    color: var(--color-primary) !important;
+  }
+
+  :global(.react-datepicker__time-list-item--selected) {
+    background: var(--color-primary) !important;
+    color: white !important;
+    font-weight: $font-weight-medium;
+  }
+}
+
+// 주말 색상
+.sunday {
+  :global(.react-datepicker__day) {
+    color: #FF6B6B;
+  }
+}
+
+.saturday {
+  :global(.react-datepicker__day) {
+    color: #4A90E2;
+  }
+}

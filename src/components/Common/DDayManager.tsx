@@ -4,6 +4,7 @@ import { dDaysState, activeDDayState } from '@store/atoms';
 import { DDay } from '@types';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
+import CustomDatePicker from './CustomDatePicker';
 import styles from './DDayManager.module.scss';
 
 const DDayManager: React.FC = () => {
@@ -15,7 +16,7 @@ const DDayManager: React.FC = () => {
   // Form states
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [targetDate, setTargetDate] = useState('');
+  const [targetDate, setTargetDate] = useState<Date | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +27,7 @@ const DDayManager: React.FC = () => {
       id: editingDDay?.id || uuidv4(),
       title: title.trim(),
       description: description.trim(),
-      targetDate: new Date(targetDate),
+      targetDate: targetDate,
       isActive: false,
       createdAt: editingDDay?.createdAt || new Date()
     };
@@ -46,7 +47,7 @@ const DDayManager: React.FC = () => {
   const resetForm = () => {
     setTitle('');
     setDescription('');
-    setTargetDate('');
+    setTargetDate(null);
     setShowForm(false);
     setEditingDDay(null);
   };
@@ -55,7 +56,7 @@ const DDayManager: React.FC = () => {
     setEditingDDay(dday);
     setTitle(dday.title);
     setDescription(dday.description || '');
-    setTargetDate(format(dday.targetDate, 'yyyy-MM-dd'));
+    setTargetDate(new Date(dday.targetDate));
     setShowForm(true);
   };
 
@@ -97,13 +98,11 @@ const DDayManager: React.FC = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="dday-date">날짜</label>
-            <input
-              id="dday-date"
-              type="date"
-              value={targetDate}
-              onChange={(e) => setTargetDate(e.target.value)}
-              required
+            <label>날짜</label>
+            <CustomDatePicker
+              selected={targetDate}
+              onChange={(date) => setTargetDate(date)}
+              placeholderText="D-Day 날짜를 선택하세요"
             />
           </div>
 

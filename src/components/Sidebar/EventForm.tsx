@@ -3,9 +3,12 @@ import { useSetRecoilState } from "recoil";
 import { eventsState, selectedEventState } from "@store/atoms";
 import { Event, RecurrenceRule, ReminderTime } from "@types";
 import { v4 as uuidv4 } from "uuid";
-import { format, isAfter } from "date-fns";
+import { format, isAfter, parse } from "date-fns";
 import { ko } from "date-fns/locale";
 import toast from "react-hot-toast";
+import CustomDatePicker from "@components/Common/CustomDatePicker";
+import CustomTimePicker from "@components/Common/CustomTimePicker";
+import { HexColorPicker } from "react-colorful";
 import styles from "./EventForm.module.scss";
 
 interface EventFormProps {
@@ -18,21 +21,20 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const setEvents = useSetRecoilState(eventsState);
   const setSelectedEvent = useSetRecoilState(selectedEventState);
   const [title, setTitle] = useState(event?.title || "");
-  const [startDate, setStartDate] = useState(
-    format(event?.date || date, "yyyy-MM-dd")
+  const [startDate, setStartDate] = useState<Date>(
+    event?.date ? new Date(event.date) : date
   );
-  const [endDate, setEndDate] = useState(
-    event?.endDate
-      ? format(event.endDate, "yyyy-MM-dd")
-      : format(date, "yyyy-MM-dd")
+  const [endDate, setEndDate] = useState<Date>(
+    event?.endDate ? new Date(event.endDate) : event?.date ? new Date(event.date) : date
   );
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const [startTime, setStartTime] = useState(event?.startTime || "");
   const [endTime, setEndTime] = useState(event?.endTime || "");
   const [description, setDescription] = useState(event?.description || "");
   const [color, setColor] = useState(event?.color || "#FFB6C1");
   const [isAllDay, setIsAllDay] = useState(event?.isAllDay || false);
   const [isMultiDay, setIsMultiDay] = useState(
-    !!event?.endDate && event.date !== event.endDate
+    !!event?.endDate && new Date(event.date).getTime() !== new Date(event.endDate).getTime()
   );
   const [isRecurring, setIsRecurring] = useState(!!event?.recurrence);
   const [recurrence, setRecurrence] = useState<RecurrenceRule>(
@@ -70,10 +72,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
 
     // 날짜 유효성 검사
     if (isMultiDay) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-
-      if (isAfter(start, end)) {
+      if (isAfter(startDate, endDate)) {
         toast.error("시작 날짜가 종료 날짜보다 늦을 수 없습니다");
         return;
       }
@@ -96,8 +95,8 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     const newEvent: Event = {
       id: event?.id || uuidv4(),
       title: title.trim(),
-      date: new Date(startDate),
-      endDate: isMultiDay ? new Date(endDate) : undefined,
+      date: startDate,
+      endDate: isMultiDay ? endDate : undefined,
       startTime: !isAllDay ? startTime : undefined,
       endTime: !isAllDay ? endTime : undefined,
       description,
@@ -113,7 +112,9 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
 
     setEvents((prev) => {
       if (event) {
-        return prev.map((e) => (e.id === event.id ? newEvent : e));
+        // 반복 이벤트의 경우 baseEventId 사용, 없으면 원본 ID 추출
+        const targetId = event.baseEventId || event.id;
+        return prev.map((e) => (e.id === targetId ? newEvent : e));
       }
       return [...prev, newEvent];
     });
@@ -161,25 +162,21 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
 
       <div className={styles.dateGroup}>
         <div className={styles.formGroup}>
-          <label htmlFor="startDate">{isMultiDay ? "시작 날짜" : "날짜"}</label>
-          <input
-            id="startDate"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
+          <label>{isMultiDay ? "시작 날짜" : "날짜"}</label>
+          <CustomDatePicker
+            selected={startDate}
+            onChange={(date) => date && setStartDate(date)}
+            placeholderText="날짜를 선택하세요"
           />
         </div>
         {isMultiDay && (
           <div className={styles.formGroup}>
-            <label htmlFor="endDate">종료 날짜</label>
-            <input
-              id="endDate"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              min={startDate}
-              required
+            <label>종료 날짜</label>
+            <CustomDatePicker
+              selected={endDate}
+              onChange={(date) => date && setEndDate(date)}
+              placeholderText="종료 날짜를 선택하세요"
+              minDate={startDate}
             />
           </div>
         )}
@@ -199,21 +196,19 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       {!isAllDay && (
         <div className={styles.timeGroup}>
           <div className={styles.formGroup}>
-            <label htmlFor="startTime">시작 시간</label>
-            <input
-              id="startTime"
-              type="time"
+            <label>시작 시간</label>
+            <CustomTimePicker
               value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              onChange={setStartTime}
+              placeholderText="시작 시간 선택"
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="endTime">종료 시간</label>
-            <input
-              id="endTime"
-              type="time"
+            <label>종료 시간</label>
+            <CustomTimePicker
               value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              onChange={setEndTime}
+              placeholderText="종료 시간 선택"
             />
           </div>
         </div>
@@ -294,24 +289,17 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
             </div>
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="recurrenceEnd">반복 종료</label>
-            <input
-              id="recurrenceEnd"
-              type="date"
-              value={
-                recurrence.endDate
-                  ? format(recurrence.endDate, "yyyy-MM-dd")
-                  : ""
-              }
-              onChange={(e) =>
+            <label>반복 종료</label>
+            <CustomDatePicker
+              selected={recurrence.endDate || null}
+              onChange={(date) =>
                 setRecurrence({
                   ...recurrence,
-                  endDate: e.target.value
-                    ? new Date(e.target.value)
-                    : undefined,
+                  endDate: date || undefined,
                 })
               }
-              min={startDate}
+              placeholderText="반복 종료일 선택 (선택사항)"
+              minDate={startDate}
             />
           </div>
         </div>
@@ -390,18 +378,29 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
 
       <div className={styles.formGroup}>
         <label>색상</label>
-        <div className={styles.colorOptions}>
-          {colorOptions.map((colorOption) => (
-            <button
-              key={colorOption}
-              type="button"
-              className={`${styles.colorOption} ${
-                color === colorOption ? styles.selected : ""
-              }`}
-              style={{ backgroundColor: colorOption }}
-              onClick={() => setColor(colorOption)}
-            />
-          ))}
+        <div className={styles.colorSection}>
+          <div className={styles.colorOptions}>
+            {colorOptions.map((colorOption) => (
+              <button
+                key={colorOption}
+                type="button"
+                className={`${styles.colorOption} ${
+                  color === colorOption ? styles.selected : ""
+                }`}
+                style={{ backgroundColor: colorOption }}
+                onClick={() => setColor(colorOption)}
+              />
+            ))}
+          </div>
+          {showColorPicker && (
+            <div className={styles.colorPickerPopover}>
+              <div
+                className={styles.colorPickerCover}
+                onClick={() => setShowColorPicker(false)}
+              />
+              <HexColorPicker color={color} onChange={setColor} />
+            </div>
+          )}
         </div>
       </div>
 
