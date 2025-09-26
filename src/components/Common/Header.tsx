@@ -41,7 +41,7 @@ const Header: React.FC = () => {
           ←
         </button>
         <div className={styles.currentMonth}>
-          <h2>{monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}</h2>
+          <h2>{currentMonth.getFullYear()}년 {monthNames[currentMonth.getMonth()]}</h2>
         </div>
         <button
           className={styles.navButton}
@@ -53,7 +53,7 @@ const Header: React.FC = () => {
           className={styles.todayButton}
           onClick={handleToday}
         >
-          Today
+          오늘
         </button>
       </div>
 
@@ -63,19 +63,19 @@ const Header: React.FC = () => {
             className={`${styles.viewButton} ${viewMode === 'day' ? styles.active : ''}`}
             onClick={() => setViewMode('day')}
           >
-            Day
+            일
           </button>
           <button
             className={`${styles.viewButton} ${viewMode === 'week' ? styles.active : ''}`}
             onClick={() => setViewMode('week')}
           >
-            Week
+            주
           </button>
           <button
             className={`${styles.viewButton} ${viewMode === 'month' ? styles.active : ''}`}
             onClick={() => setViewMode('month')}
           >
-            Month
+            월
           </button>
         </div>
       </div>

@@ -53,20 +53,20 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   return (
     <form className={styles.eventForm} onSubmit={handleSubmit}>
       <div className={styles.formGroup}>
-        <label htmlFor="title">Event Title</label>
+        <label htmlFor="title">이벤트 제목</label>
         <input
           id="title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter event title"
+          placeholder="이벤트 제목을 입력하세요"
           required
         />
       </div>
 
       <div className={styles.timeGroup}>
         <div className={styles.formGroup}>
-          <label htmlFor="startTime">Start Time</label>
+          <label htmlFor="startTime">시작 시간</label>
           <input
             id="startTime"
             type="time"
@@ -75,7 +75,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
           />
         </div>
         <div className={styles.formGroup}>
-          <label htmlFor="endTime">End Time</label>
+          <label htmlFor="endTime">종료 시간</label>
           <input
             id="endTime"
             type="time"
@@ -86,18 +86,18 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       </div>
 
       <div className={styles.formGroup}>
-        <label htmlFor="description">Description</label>
+        <label htmlFor="description">설명</label>
         <textarea
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Add description (optional)"
+          placeholder="설명 추가 (선택사항)"
           rows={3}
         />
       </div>
 
       <div className={styles.formGroup}>
-        <label>Color</label>
+        <label>색상</label>
         <div className={styles.colorOptions}>
           {colorOptions.map(colorOption => (
             <button
@@ -113,10 +113,10 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
 
       <div className={styles.formActions}>
         <button type="button" className={styles.cancelButton} onClick={onClose}>
-          Cancel
+          취소
         </button>
         <button type="submit" className={styles.saveButton}>
-          {event ? 'Update' : 'Save'} Event
+          {event ? '수정' : '저장'}
         </button>
       </div>
     </form>

@@ -37,26 +37,26 @@ const Sidebar: React.FC = () => {
     <aside className={styles.sidebar}>
       <div className={styles.sidebarHeader}>
         <h3 className={styles.dateTitle}>
-          {formatDate(selectedDate, 'EEEE, MMMM d, yyyy')}
+          {formatDate(selectedDate, 'yyyy년 M월 d일 EEEE')}
         </h3>
         <div className={styles.tabs}>
           <button
             className={`${styles.tab} ${activeTab === 'events' ? styles.active : ''}`}
             onClick={() => setActiveTab('events')}
           >
-            Events
+            이벤트
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'diary' ? styles.active : ''}`}
             onClick={() => setActiveTab('diary')}
           >
-            Diary
+            일기
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'theme' ? styles.active : ''}`}
             onClick={() => setActiveTab('theme')}
           >
-            Theme
+            테마
           </button>
         </div>
       </div>
@@ -69,7 +69,7 @@ const Sidebar: React.FC = () => {
                 className={styles.addButton}
                 onClick={() => setShowEventForm(!showEventForm)}
               >
-                {showEventForm ? 'Cancel' : '+ Add Event'}
+                {showEventForm ? '취소' : '+ 이벤트 추가'}
               </button>
             </div>
             {showEventForm && (

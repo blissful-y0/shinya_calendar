@@ -4,7 +4,9 @@
       "Bash(yarn create:*)",
       "Bash(npx create-electron-vite:*)",
       "Bash(yarn install)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(yarn add:*)"
     ],
     "deny": [],
     "ask": []

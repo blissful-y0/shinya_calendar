@@ -21,9 +21,9 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     if (!time) return '';
     const [hours, minutes] = time.split(':');
     const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const ampm = hour >= 12 ? '오후' : '오전';
     const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+    return `${ampm} ${displayHour}:${minutes}`;
   };
 
   if (editingEvent) {
@@ -39,8 +39,8 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
   if (events.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <p>No events for this day</p>
-        <span>Click "Add Event" to create one</span>
+        <p>이 날짜에 이벤트가 없습니다</p>
+        <span>"이벤트 추가"를 클릭하여 생성하세요</span>
       </div>
     );
   }
@@ -70,13 +70,13 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
               className={styles.editButton}
               onClick={() => setEditingEvent(event)}
             >
-              Edit
+              수정
             </button>
             <button
               className={styles.deleteButton}
               onClick={() => handleDelete(event.id)}
             >
-              Delete
+              삭제
             </button>
           </div>
         </div>

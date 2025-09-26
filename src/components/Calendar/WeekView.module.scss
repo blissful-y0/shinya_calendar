@@ -1,0 +1,230 @@
+@import '@styles/variables.scss';
+
+.weekView {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: $border-radius-large;
+  overflow: hidden;
+}
+
+.weekHeader {
+  display: flex;
+  background: var(--color-background);
+  border-bottom: 2px solid var(--color-border);
+  min-height: 80px;
+}
+
+.timeColumn {
+  width: 60px;
+  border-right: 1px solid var(--color-border);
+}
+
+.dayHeader {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm;
+  border-right: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all $transition-fast;
+  position: relative;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:hover {
+    background: var(--color-accent);
+  }
+
+  &.selected {
+    background: var(--color-primary);
+    color: white;
+
+    .dayName,
+    .dayNumber {
+      color: white;
+    }
+  }
+
+  &.today {
+    .dayNumber {
+      background: var(--color-primary);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+.dayName {
+  font-size: $font-size-small;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: $spacing-xs;
+}
+
+.dayNumber {
+  font-size: $font-size-large;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.diaryDot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 12px;
+}
+
+.weekContent {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
+.allDayRow {
+  display: flex;
+  min-height: 60px;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.allDayLabel {
+  width: 60px;
+  padding: $spacing-sm;
+  font-size: $font-size-small;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-right: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.allDayCell {
+  flex: 1;
+  padding: $spacing-xs;
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.allDayEvent {
+  padding: 2px $spacing-xs;
+  border-radius: $border-radius-small;
+  font-size: 11px;
+  color: white;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeGrid {
+  position: relative;
+  display: flex;
+  height: 1440px; // 24 hours * 60px
+}
+
+.hoursColumn {
+  width: 60px;
+  border-right: 1px solid var(--color-border);
+}
+
+.hourLabel {
+  height: 60px;
+  padding: $spacing-xs;
+  font-size: $font-size-small;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.daysGrid {
+  flex: 1;
+  position: relative;
+}
+
+.dayColumn {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: calc(100% / 7);
+  border-right: 1px solid var(--color-border);
+
+  &:last-child {
+    border-right: none;
+  }
+
+  @for $i from 0 through 6 {
+    &:nth-child(#{$i + 1}) {
+      left: calc(100% / 7 * #{$i});
+    }
+  }
+}
+
+.gridLines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.hourLine {
+  height: 60px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.eventsLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.timedEvent {
+  position: absolute;
+  padding: 2px 4px;
+  margin: 0 2px;
+  border-radius: 4px;
+  color: white;
+  overflow: hidden;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all $transition-fast;
+  box-shadow: $shadow-small;
+
+  &:hover {
+    z-index: 10;
+    transform: scale(1.02);
+    box-shadow: $shadow-medium;
+  }
+}
+
+.eventTime {
+  font-weight: 500;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eventTitle {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

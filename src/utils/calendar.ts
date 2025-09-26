@@ -11,6 +11,7 @@ import {
   addMonths,
   subMonths
 } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 export const getCalendarDays = (date: Date) => {
   const monthStart = startOfMonth(date);
@@ -29,7 +30,7 @@ export const getDaysInWeek = (date: Date) => {
 };
 
 export const formatDate = (date: Date, formatStr: string = 'yyyy-MM-dd') => {
-  return format(date, formatStr);
+  return format(date, formatStr, { locale: ko });
 };
 
 export const isCurrentMonth = (date: Date, currentMonth: Date) => {
@@ -52,8 +53,13 @@ export const getPreviousMonth = (date: Date) => {
   return subMonths(date, 1);
 };
 
-export const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+export const weekDaysEnglish = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const monthNames = [
+  '1월', '2월', '3월', '4월', '5월', '6월',
+  '7월', '8월', '9월', '10월', '11월', '12월'
+];
+export const monthNamesEnglish = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
