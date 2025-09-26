@@ -153,7 +153,7 @@ shinya_calendar/
 
 메인 메인테이너 
 Shinya
-Discord - ambiguousmorality
+Discord: ambiguousmorality
 
 정기적으로 유지보수에 도움 주실 분 역시 위의 연락처로 연락 주세요
 
