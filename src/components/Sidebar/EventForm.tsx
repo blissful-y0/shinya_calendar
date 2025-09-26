@@ -45,6 +45,9 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const [reminderTime, setReminderTime] = useState<ReminderTime>(
     event?.reminderTime || "10min"
   );
+  const [reminderForAllOccurrences, setReminderForAllOccurrences] = useState(
+    event?.reminderForAllOccurrences || false
+  );
 
   const colorOptions = [
     "#FFB6C1",
@@ -103,6 +106,8 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       recurrence: isRecurring ? recurrence : undefined,
       reminder,
       reminderTime: reminder ? reminderTime : undefined,
+      reminderForAllOccurrences:
+        reminder && isRecurring ? reminderForAllOccurrences : undefined,
       tags: [],
     };
 
@@ -114,7 +119,9 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     });
 
     // 성공 메시지 표시
-    toast.success(event ? '이벤트가 수정되었습니다' : '이벤트가 추가되었습니다');
+    toast.success(
+      event ? "이벤트가 수정되었습니다" : "이벤트가 추가되었습니다"
+    );
 
     // 선택된 이벤트 초기화
     setSelectedEvent(null);
@@ -320,10 +327,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
           />
           알림 설정
           {!startTime && !isAllDay && (
-            <span className={styles.disabledNote}>
-              {" "}
-              (시간 설정 필요)
-            </span>
+            <span className={styles.disabledNote}> (시간 설정 필요)</span>
           )}
         </label>
       </div>
@@ -337,7 +341,9 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
               value={reminderTime}
               onChange={(e) => setReminderTime(e.target.value as ReminderTime)}
             >
-              <option value="now">{isAllDay ? '자정 (00:00)' : '이벤트 시작 시'}</option>
+              <option value="now">
+                {isAllDay ? "자정 (00:00)" : "이벤트 시작 시"}
+              </option>
               {!isAllDay && (
                 <>
                   <option value="5min">5분 전</option>
@@ -348,10 +354,25 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
               )}
             </select>
           </div>
-          {isAllDay && (
-            <p className={styles.reminderNote}>
-              하루 종일 이벤트는 자정에 알림이 울립니다.
-            </p>
+
+          {isRecurring && reminder && (
+            <div className={styles.formGroup}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={reminderForAllOccurrences}
+                  onChange={(e) =>
+                    setReminderForAllOccurrences(e.target.checked)
+                  }
+                />
+                모든 반복 일정에 알림 적용
+              </label>
+              <p className={styles.reminderNote}>
+                {reminderForAllOccurrences
+                  ? "반복되는 모든 일정에 알림이 설정됩니다."
+                  : "첫 번째 일정에만 알림이 설정됩니다."}
+              </p>
+            </div>
           )}
         </div>
       )}

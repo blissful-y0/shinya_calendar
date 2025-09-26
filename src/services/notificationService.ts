@@ -1,10 +1,12 @@
 import { Event, ReminderTime } from '@types';
-import { isBefore, isAfter, addMinutes, subMinutes, subHours, startOfDay, parseISO } from 'date-fns';
+import { isBefore, isAfter, addMinutes, subMinutes, subHours, startOfDay, parseISO, addDays, endOfDay } from 'date-fns';
+import { generateRecurringEvents } from '@utils/eventUtils';
 
 interface ScheduledNotification {
   eventId: string;
   timeoutId: NodeJS.Timeout;
   scheduledTime: Date;
+  instanceDate?: Date; // For recurring event instances
 }
 
 class NotificationService {
@@ -43,10 +45,11 @@ class NotificationService {
   /**
    * Calculate notification time based on event and reminder settings
    */
-  private calculateNotificationTime(event: Event): Date | null {
+  private calculateNotificationTime(event: Event, instanceDate?: Date): Date | null {
     if (!event.reminder || !event.reminderTime) return null;
 
-    const eventDate = new Date(event.date);
+    // Use instance date for recurring events, otherwise use event date
+    const eventDate = instanceDate ? new Date(instanceDate) : new Date(event.date);
 
     // For all-day events, set time to midnight (00:00)
     let eventTime: Date;
@@ -84,10 +87,26 @@ class NotificationService {
   scheduleNotification(event: Event) {
     if (!event.reminder) return;
 
-    // Cancel existing notification for this event
-    this.cancelNotification(event.id);
+    // If it's a recurring event and reminderForAllOccurrences is true,
+    // schedule notifications for all upcoming instances
+    if (event.recurrence && event.reminderForAllOccurrences) {
+      this.scheduleRecurringNotifications(event);
+    } else {
+      // Schedule notification for single event or first occurrence only
+      this.scheduleSingleNotification(event);
+    }
+  }
 
-    const notificationTime = this.calculateNotificationTime(event);
+  /**
+   * Schedule notification for a single event instance
+   */
+  private scheduleSingleNotification(event: Event, instanceDate?: Date, notificationKey?: string) {
+    const key = notificationKey || event.id;
+
+    // Cancel existing notification for this key
+    this.cancelNotification(key);
+
+    const notificationTime = this.calculateNotificationTime(event, instanceDate);
     if (!notificationTime) return;
 
     const now = new Date();
@@ -99,16 +118,43 @@ class NotificationService {
 
     if (timeUntilNotification > 0 && timeUntilNotification <= maxDelay) {
       const timeoutId = setTimeout(async () => {
-        await this.sendNotification(event);
-        this.scheduledNotifications.delete(event.id);
+        await this.sendNotification(event, instanceDate);
+        this.scheduledNotifications.delete(key);
       }, timeUntilNotification);
 
-      this.scheduledNotifications.set(event.id, {
+      this.scheduledNotifications.set(key, {
         eventId: event.id,
         timeoutId,
-        scheduledTime: notificationTime
+        scheduledTime: notificationTime,
+        instanceDate
       });
     }
+  }
+
+  /**
+   * Schedule notifications for all recurring event instances
+   */
+  private scheduleRecurringNotifications(event: Event) {
+    if (!event.recurrence) return;
+
+    // Clear any existing notifications for this event
+    // Remove all notifications that start with this event ID
+    Array.from(this.scheduledNotifications.keys()).forEach(key => {
+      if (key.startsWith(event.id)) {
+        this.cancelNotification(key);
+      }
+    });
+
+    // Generate recurring instances for the next 30 days
+    const now = new Date();
+    const rangeEnd = addDays(now, 30);
+    const instances = generateRecurringEvents(event, now, rangeEnd);
+
+    // Schedule notification for each instance
+    instances.forEach((instance, index) => {
+      const notificationKey = `${event.id}-${index}`;
+      this.scheduleSingleNotification(event, instance.date, notificationKey);
+    });
   }
 
   /**
@@ -125,17 +171,27 @@ class NotificationService {
   /**
    * Send a notification using Electron's notification API
    */
-  private async sendNotification(event: Event) {
+  private async sendNotification(event: Event, instanceDate?: Date) {
     try {
       const title = event.title;
       let body = '';
 
+      // Add date info for recurring events
+      if (event.recurrence && instanceDate) {
+        const dateStr = instanceDate.toLocaleDateString('ko-KR', {
+          month: 'long',
+          day: 'numeric',
+          weekday: 'short'
+        });
+        body = `${dateStr} - `;
+      }
+
       if (event.isAllDay) {
-        body = '오늘 하루 종일 진행되는 이벤트입니다.';
+        body += '하루 종일 진행되는 이벤트입니다.';
       } else if (event.startTime && event.endTime) {
-        body = `${event.startTime} - ${event.endTime}`;
+        body += `${event.startTime} - ${event.endTime}`;
       } else if (event.startTime) {
-        body = `${event.startTime}에 시작합니다.`;
+        body += `${event.startTime}에 시작합니다.`;
       }
 
       if (event.description) {
@@ -186,6 +242,9 @@ class NotificationService {
         this.scheduleNotification(event);
       }
     });
+
+    // Re-check for any upcoming recurring events in the next 24 hours
+    this.checkUpcomingEvents();
   }
 }
 

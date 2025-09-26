@@ -10,6 +10,7 @@ export interface Event {
   tags?: string[];
   reminder?: boolean;
   reminderTime?: ReminderTime; // When to send reminder
+  reminderForAllOccurrences?: boolean; // Apply reminder to all recurring instances
   isAllDay?: boolean; // All-day event flag
   recurrence?: RecurrenceRule; // Recurring event settings
 }
