@@ -36,10 +36,10 @@ function createWindow() {
       webgl: true,
       experimentalFeatures: true
     },
-    // 커스텀 타이틀바를 위해 기본 타이틀바 숨김
-    titleBarStyle: 'hidden',
+    // Windows에서는 frameless, macOS에서는 hidden 사용
+    ...(isWindows ? { frame: false } : { titleBarStyle: 'hidden' }),
     // macOS에서 트래픽 라이트 버튼 위치 조정
-    trafficLightPosition: { x: 15, y: 13 },
+    ...(isMac ? { trafficLightPosition: { x: 15, y: 13 } } : {}),
     backgroundColor: '#faf8f5',
     show: false
   });
@@ -127,6 +127,40 @@ ipcMain.handle('store-has', (_, key: string) => {
 
 ipcMain.handle('get-app-path', () => {
   return app.getPath('userData');
+});
+
+// Window control handlers
+ipcMain.handle('minimize-window', () => {
+  if (mainWindow) {
+    mainWindow.minimize();
+  }
+});
+
+ipcMain.handle('maximize-window', () => {
+  if (mainWindow) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.restore();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
+ipcMain.handle('close-window', () => {
+  if (mainWindow) {
+    mainWindow.close();
+  }
+});
+
+ipcMain.handle('is-maximized', () => {
+  if (mainWindow) {
+    return mainWindow.isMaximized();
+  }
+  return false;
+});
+
+ipcMain.handle('get-platform', () => {
+  return process.platform;
 });
 
 // Window resize API handler

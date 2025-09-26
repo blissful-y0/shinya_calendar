@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, currentThemeState, bannerImageState } from "@store/atoms";
 import TitleBar from "@components/Layout/TitleBar";
+import WindowTitleBar from "@components/Common/WindowTitleBar";
 import Header from "@components/Common/Header";
 import Calendar from "@components/Calendar/Calendar";
 import DayView from "@components/Calendar/DayView";
@@ -136,6 +137,7 @@ function App() {
 
   return (
     <div className={styles.app}>
+      <WindowTitleBar />
       <TitleBar />
       <Header />
       <div className={styles.mainContent}>

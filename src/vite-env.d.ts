@@ -3,6 +3,11 @@
 interface ElectronAPI {
   getAppPath: () => Promise<string>;
   resizeWindow: (width: number, height: number) => Promise<{ width: number; height: number }>;
+  minimizeWindow: () => Promise<void>;
+  maximizeWindow: () => Promise<void>;
+  closeWindow: () => Promise<void>;
+  isMaximized: () => Promise<boolean>;
+  getPlatform: () => Promise<string>;
   onAppBeforeQuit: (callback: () => void) => void;
   removeAppBeforeQuitListener: (callback: () => void) => void;
   store: {

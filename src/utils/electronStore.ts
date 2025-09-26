@@ -2,7 +2,7 @@
 
 // Electron 환경인지 체크
 const isElectron = () => {
-  return typeof window !== 'undefined' && window.electronAPI !== undefined;
+  return typeof window !== "undefined" && window.electronAPI !== undefined;
 };
 
 // Store 유틸리티 함수들
@@ -12,9 +12,11 @@ export const electronStore = {
       try {
         return await window.electronAPI.store.get(key);
       } catch (error) {
-        console.error('Error getting from electron store:', error);
+        console.error("Error getting from electron store:", error);
         // 폴백으로 localStorage 사용
-        return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)!) : null;
+        return localStorage.getItem(key)
+          ? JSON.parse(localStorage.getItem(key)!)
+          : null;
       }
     }
     // Electron이 아닌 환경에서는 localStorage 사용
@@ -29,7 +31,7 @@ export const electronStore = {
         // localStorage에도 백업으로 저장
         localStorage.setItem(key, JSON.stringify(value));
       } catch (error) {
-        console.error('Error setting to electron store:', error);
+        console.error("Error setting to electron store:", error);
         localStorage.setItem(key, JSON.stringify(value));
       }
     } else {
@@ -43,7 +45,7 @@ export const electronStore = {
         await window.electronAPI.store.delete(key);
         localStorage.removeItem(key);
       } catch (error) {
-        console.error('Error deleting from electron store:', error);
+        console.error("Error deleting from electron store:", error);
         localStorage.removeItem(key);
       }
     } else {
@@ -56,7 +58,7 @@ export const electronStore = {
       try {
         return await window.electronAPI.store.has(key);
       } catch (error) {
-        console.error('Error checking electron store:', error);
+        console.error("Error checking electron store:", error);
         return localStorage.getItem(key) !== null;
       }
     }
@@ -69,11 +71,11 @@ export const electronStore = {
         await window.electronAPI.store.clear();
         localStorage.clear();
       } catch (error) {
-        console.error('Error clearing electron store:', error);
+        console.error("Error clearing electron store:", error);
         localStorage.clear();
       }
     } else {
       localStorage.clear();
     }
-  }
+  },
 };
