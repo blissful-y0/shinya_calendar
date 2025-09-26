@@ -15,8 +15,10 @@ import {
   isCurrentDay,
   weekDays
 } from '@utils/calendar';
+import { getEventsForDate as getEventsForDateUtil } from '@utils/eventUtils';
 import { Event, DiaryEntry } from '@types';
 import { MdCreate } from 'react-icons/md';
+import { startOfMonth, endOfMonth, addMonths } from 'date-fns';
 import styles from './Calendar.module.scss';
 
 const Calendar: React.FC = () => {
@@ -29,9 +31,11 @@ const Calendar: React.FC = () => {
   const calendarDays = getCalendarDays(currentMonth);
 
   const getEventsForDate = (date: Date): Event[] => {
-    return events.filter(event =>
-      isSameDayAs(new Date(event.date), date)
-    );
+    // Get the range for the current view (current month + padding)
+    const rangeStart = startOfMonth(addMonths(currentMonth, -1));
+    const rangeEnd = endOfMonth(addMonths(currentMonth, 1));
+
+    return getEventsForDateUtil(events, date, rangeStart, rangeEnd);
   };
 
   const hasDiaryEntry = (date: Date): boolean => {

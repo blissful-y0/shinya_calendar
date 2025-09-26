@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { eventsState } from '@store/atoms';
 import { Event } from '@types';
+import { formatEventTime } from '@utils/eventUtils';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import EventForm from './EventForm';
 import styles from './EventList.module.scss';
 
@@ -54,11 +57,32 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
             style={{ backgroundColor: event.color }}
           />
           <div className={styles.eventContent}>
-            <h4 className={styles.eventTitle}>{event.title}</h4>
-            {(event.startTime || event.endTime) && (
+            <h4 className={styles.eventTitle}>
+              {event.title}
+              {event.recurrence && <span className={styles.recurringBadge}>반복</span>}
+            </h4>
+            {event.endDate && event.date !== event.endDate && (
+              <p className={styles.eventDateRange}>
+                {format(event.date, 'MM/dd', { locale: ko })} ~ {format(event.endDate, 'MM/dd', { locale: ko })}
+              </p>
+            )}
+            {(event.startTime || event.endTime || event.isAllDay) && (
               <p className={styles.eventTime}>
-                {formatTime(event.startTime)}
-                {event.endTime && ` - ${formatTime(event.endTime)}`}
+                {event.isAllDay ? '하루 종일' : (
+                  <>
+                    {formatTime(event.startTime)}
+                    {event.endTime && ` - ${formatTime(event.endTime)}`}
+                  </>
+                )}
+              </p>
+            )}
+            {event.recurrence && (
+              <p className={styles.recurrenceInfo}>
+                {event.recurrence.frequency === 'daily' && `매일`}
+                {event.recurrence.frequency === 'weekly' && `매주`}
+                {event.recurrence.frequency === 'monthly' && `매월`}
+                {event.recurrence.frequency === 'yearly' && `매년`}
+                {event.recurrence.interval && event.recurrence.interval > 1 && ` ${event.recurrence.interval}번마다`}
               </p>
             )}
             {event.description && (

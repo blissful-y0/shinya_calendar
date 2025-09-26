@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { useSetRecoilState } from 'recoil';
-import { eventsState } from '@store/atoms';
-import { Event } from '@types';
-import { v4 as uuidv4 } from 'uuid';
-import styles from './EventForm.module.scss';
+import React, { useState } from "react";
+import { useSetRecoilState } from "recoil";
+import { eventsState } from "@store/atoms";
+import { Event, RecurrenceRule } from "@types";
+import { v4 as uuidv4 } from "uuid";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+import styles from "./EventForm.module.scss";
 
 interface EventFormProps {
   date: Date;
@@ -13,15 +15,40 @@ interface EventFormProps {
 
 const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const setEvents = useSetRecoilState(eventsState);
-  const [title, setTitle] = useState(event?.title || '');
-  const [startTime, setStartTime] = useState(event?.startTime || '');
-  const [endTime, setEndTime] = useState(event?.endTime || '');
-  const [description, setDescription] = useState(event?.description || '');
-  const [color, setColor] = useState(event?.color || '#FFB6C1');
+  const [title, setTitle] = useState(event?.title || "");
+  const [startDate, setStartDate] = useState(
+    format(event?.date || date, "yyyy-MM-dd")
+  );
+  const [endDate, setEndDate] = useState(
+    event?.endDate
+      ? format(event.endDate, "yyyy-MM-dd")
+      : format(date, "yyyy-MM-dd")
+  );
+  const [startTime, setStartTime] = useState(event?.startTime || "");
+  const [endTime, setEndTime] = useState(event?.endTime || "");
+  const [description, setDescription] = useState(event?.description || "");
+  const [color, setColor] = useState(event?.color || "#FFB6C1");
+  const [isAllDay, setIsAllDay] = useState(event?.isAllDay || false);
+  const [isMultiDay, setIsMultiDay] = useState(
+    !!event?.endDate && event.date !== event.endDate
+  );
+  const [isRecurring, setIsRecurring] = useState(!!event?.recurrence);
+  const [recurrence, setRecurrence] = useState<RecurrenceRule>(
+    event?.recurrence || {
+      frequency: "daily",
+      interval: 1,
+    }
+  );
 
   const colorOptions = [
-    '#FFB6C1', '#FFC0CB', '#FFE4B5', '#E6E6FA',
-    '#B0E0E6', '#98FB98', '#F0E68C', '#DDA0DD'
+    "#FFB6C1",
+    "#FFC0CB",
+    "#FFE4B5",
+    "#E6E6FA",
+    "#B0E0E6",
+    "#98FB98",
+    "#F0E68C",
+    "#DDA0DD",
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -32,17 +59,20 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     const newEvent: Event = {
       id: event?.id || uuidv4(),
       title: title.trim(),
-      date,
-      startTime,
-      endTime,
+      date: new Date(startDate),
+      endDate: isMultiDay ? new Date(endDate) : undefined,
+      startTime: !isAllDay ? startTime : undefined,
+      endTime: !isAllDay ? endTime : undefined,
       description,
       color,
-      tags: []
+      isAllDay,
+      recurrence: isRecurring ? recurrence : undefined,
+      tags: [],
     };
 
-    setEvents(prev => {
+    setEvents((prev) => {
       if (event) {
-        return prev.map(e => e.id === event.id ? newEvent : e);
+        return prev.map((e) => (e.id === event.id ? newEvent : e));
       }
       return [...prev, newEvent];
     });
@@ -64,26 +94,158 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
         />
       </div>
 
-      <div className={styles.timeGroup}>
-        <div className={styles.formGroup}>
-          <label htmlFor="startTime">시작 시간</label>
+      <div className={styles.formGroup}>
+        <label className={styles.checkboxLabel}>
           <input
-            id="startTime"
-            type="time"
-            value={startTime}
-            onChange={(e) => setStartTime(e.target.value)}
+            type="checkbox"
+            checked={isMultiDay}
+            onChange={(e) => setIsMultiDay(e.target.checked)}
           />
-        </div>
-        <div className={styles.formGroup}>
-          <label htmlFor="endTime">종료 시간</label>
-          <input
-            id="endTime"
-            type="time"
-            value={endTime}
-            onChange={(e) => setEndTime(e.target.value)}
-          />
-        </div>
+          종료 날짜 설정
+        </label>
       </div>
+
+      <div className={styles.dateGroup}>
+        <div className={styles.formGroup}>
+          <label htmlFor="startDate">{isMultiDay ? "시작 날짜" : "날짜"}</label>
+          <input
+            id="startDate"
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            required
+          />
+        </div>
+        {isMultiDay && (
+          <div className={styles.formGroup}>
+            <label htmlFor="endDate">종료 날짜</label>
+            <input
+              id="endDate"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              min={startDate}
+              required
+            />
+          </div>
+        )}
+      </div>
+
+      <div className={styles.formGroup}>
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            checked={isAllDay}
+            onChange={(e) => setIsAllDay(e.target.checked)}
+          />
+          하루 종일
+        </label>
+      </div>
+
+      {!isAllDay && (
+        <div className={styles.timeGroup}>
+          <div className={styles.formGroup}>
+            <label htmlFor="startTime">시작 시간</label>
+            <input
+              id="startTime"
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="endTime">종료 시간</label>
+            <input
+              id="endTime"
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className={styles.formGroup}>
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            checked={isRecurring}
+            onChange={(e) => setIsRecurring(e.target.checked)}
+          />
+          반복 이벤트
+        </label>
+      </div>
+
+      {isRecurring && (
+        <div className={styles.recurrenceGroup}>
+          <div className={styles.formGroup}>
+            <label htmlFor="frequency">반복 주기</label>
+            <select
+              id="frequency"
+              value={recurrence.frequency}
+              onChange={(e) =>
+                setRecurrence({
+                  ...recurrence,
+                  frequency: e.target.value as
+                    | "daily"
+                    | "weekly"
+                    | "monthly"
+                    | "yearly",
+                })
+              }
+            >
+              <option value="daily">매일</option>
+              <option value="weekly">매주</option>
+              <option value="monthly">매월</option>
+              <option value="yearly">매년</option>
+            </select>
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="interval">반복 간격</label>
+            <div className={styles.intervalInput}>
+              <input
+                id="interval"
+                type="number"
+                min="1"
+                value={recurrence.interval || 1}
+                onChange={(e) =>
+                  setRecurrence({
+                    ...recurrence,
+                    interval: parseInt(e.target.value) || 1,
+                  })
+                }
+              />
+              <span>
+                {recurrence.frequency === "daily" && "일마다"}
+                {recurrence.frequency === "weekly" && "주마다"}
+                {recurrence.frequency === "monthly" && "개월마다"}
+                {recurrence.frequency === "yearly" && "년마다"}
+              </span>
+            </div>
+          </div>
+          <div className={styles.formGroup}>
+            <label htmlFor="recurrenceEnd">반복 종료</label>
+            <input
+              id="recurrenceEnd"
+              type="date"
+              value={
+                recurrence.endDate
+                  ? format(recurrence.endDate, "yyyy-MM-dd")
+                  : ""
+              }
+              onChange={(e) =>
+                setRecurrence({
+                  ...recurrence,
+                  endDate: e.target.value
+                    ? new Date(e.target.value)
+                    : undefined,
+                })
+              }
+              min={startDate}
+            />
+          </div>
+        </div>
+      )}
 
       <div className={styles.formGroup}>
         <label htmlFor="description">설명</label>
@@ -99,11 +261,13 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       <div className={styles.formGroup}>
         <label>색상</label>
         <div className={styles.colorOptions}>
-          {colorOptions.map(colorOption => (
+          {colorOptions.map((colorOption) => (
             <button
               key={colorOption}
               type="button"
-              className={`${styles.colorOption} ${color === colorOption ? styles.selected : ''}`}
+              className={`${styles.colorOption} ${
+                color === colorOption ? styles.selected : ""
+              }`}
               style={{ backgroundColor: colorOption }}
               onClick={() => setColor(colorOption)}
             />
@@ -116,7 +280,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
           취소
         </button>
         <button type="submit" className={styles.saveButton}>
-          {event ? '수정' : '저장'}
+          {event ? "수정" : "저장"}
         </button>
       </div>
     </form>
