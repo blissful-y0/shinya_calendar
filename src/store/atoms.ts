@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { Event, DiaryEntry, Theme } from '@types/index';
+import { Event, DiaryEntry, Theme, DDay } from '@types/index';
 import { startOfMonth } from 'date-fns';
 
 export const defaultTheme: Theme = {
@@ -122,4 +122,76 @@ export const sidebarWidthState = atom<number>({
 export const viewModeState = atom<'month' | 'week' | 'day'>({
   key: 'viewMode',
   default: 'month'
+});
+
+export const dDaysState = atom<DDay[]>({
+  key: 'dDays',
+  default: [],
+  effects: [
+    ({ setSelf, onSet }) => {
+      // localStorage에서 저장된 D-Day 목록 불러오기
+      const savedDDays = localStorage.getItem('dDays');
+      if (savedDDays) {
+        try {
+          const parsed = JSON.parse(savedDDays);
+          // Date 객체 복원
+          const restored = parsed.map((dday: any) => ({
+            ...dday,
+            targetDate: new Date(dday.targetDate),
+            createdAt: new Date(dday.createdAt)
+          }));
+          setSelf(restored);
+        } catch (error) {
+          console.error('Failed to load D-Days:', error);
+        }
+      }
+
+      // D-Day 변경 시 localStorage에 저장
+      onSet((newDDays, _, isReset) => {
+        if (!isReset) {
+          localStorage.setItem('dDays', JSON.stringify(newDDays));
+        }
+      });
+    }
+  ]
+});
+
+export const activeDDayState = atom<DDay | null>({
+  key: 'activeDDay',
+  default: null,
+  effects: [
+    ({ setSelf, onSet }) => {
+      // localStorage에서 활성 D-Day ID 불러오기
+      const activeDDayId = localStorage.getItem('activeDDayId');
+      if (activeDDayId) {
+        const savedDDays = localStorage.getItem('dDays');
+        if (savedDDays) {
+          try {
+            const parsed = JSON.parse(savedDDays);
+            const activeDDay = parsed.find((d: any) => d.id === activeDDayId);
+            if (activeDDay) {
+              setSelf({
+                ...activeDDay,
+                targetDate: new Date(activeDDay.targetDate),
+                createdAt: new Date(activeDDay.createdAt)
+              });
+            }
+          } catch (error) {
+            console.error('Failed to load active D-Day:', error);
+          }
+        }
+      }
+
+      // 활성 D-Day 변경 시 localStorage에 저장
+      onSet((newActiveDDay, _, isReset) => {
+        if (!isReset) {
+          if (newActiveDDay) {
+            localStorage.setItem('activeDDayId', newActiveDDay.id);
+          } else {
+            localStorage.removeItem('activeDDayId');
+          }
+        }
+      });
+    }
+  ]
 });

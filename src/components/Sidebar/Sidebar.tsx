@@ -10,7 +10,8 @@ import EventForm from './EventForm';
 import EventList from './EventList';
 import DiarySection from './DiarySection';
 import ThemeSelector from '../Theme/ThemeSelector';
-import SidebarResizeControl from '../Common/SidebarResizeControl';
+import DDayDisplay from '../Common/DDayDisplay';
+import DDayManager from '../Common/DDayManager';
 import { formatDate } from '@utils/calendar';
 import styles from './Sidebar.module.scss';
 
@@ -19,7 +20,7 @@ const Sidebar: React.FC = () => {
   const selectedDate = useRecoilValue(selectedDateState);
   const events = useRecoilValue(eventsState);
   const diaryEntries = useRecoilValue(diaryEntriesState);
-  const [activeTab, setActiveTab] = useState<'events' | 'diary' | 'theme'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'diary' | 'dday' | 'theme'>('events');
   const [showEventForm, setShowEventForm] = useState(false);
 
   const selectedDateEvents = events.filter(event =>
@@ -52,6 +53,12 @@ const Sidebar: React.FC = () => {
             onClick={() => setActiveTab('diary')}
           >
             일기
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'dday' ? styles.active : ''}`}
+            onClick={() => setActiveTab('dday')}
+          >
+            D-Day
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'theme' ? styles.active : ''}`}
@@ -90,11 +97,17 @@ const Sidebar: React.FC = () => {
           />
         )}
 
+        {activeTab === 'dday' && (
+          <>
+            <DDayDisplay />
+            <DDayManager />
+          </>
+        )}
+
         {activeTab === 'theme' && (
           <ThemeSelector />
         )}
       </div>
-      <SidebarResizeControl />
     </aside>
   );
 };

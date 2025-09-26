@@ -42,12 +42,12 @@
 
 .tab {
   flex: 1;
-  padding: $spacing-xs $spacing-sm;
+  padding: $spacing-xs;
   border: none;
   background: transparent;
   border-radius: $border-radius-small - 2px;
   cursor: pointer;
-  font-size: $font-size-small;
+  font-size: $font-size-xs;
   font-weight: 500;
   color: var(--color-text-secondary);
   transition: all $transition-fast;

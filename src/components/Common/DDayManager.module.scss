@@ -1,0 +1,244 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.ddayManager {
+  padding: $spacing-md;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.title {
+  font-size: $font-size-medium;
+  font-weight: $font-weight-semibold;
+  color: var(--color-text);
+}
+
+.addButton {
+  padding: $spacing-xs $spacing-md;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: $border-radius-small;
+  font-size: $font-size-small;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-secondary);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.form {
+  background: var(--color-background);
+  padding: $spacing-md;
+  border-radius: $border-radius;
+  margin-bottom: $spacing-md;
+}
+
+.formGroup {
+  margin-bottom: $spacing-md;
+
+  label {
+    display: block;
+    font-size: $font-size-small;
+    font-weight: $font-weight-medium;
+    color: var(--color-text-secondary);
+    margin-bottom: $spacing-xs;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: $spacing-sm;
+    border: 1px solid var(--color-border);
+    border-radius: $border-radius-small;
+    font-size: $font-size-base;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: all $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+    }
+
+    &::placeholder {
+      color: var(--color-text-secondary);
+      opacity: 0.5;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 50px;
+  }
+}
+
+.formActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.cancelButton,
+.saveButton {
+  flex: 1;
+  padding: $spacing-sm;
+  border: none;
+  border-radius: $border-radius-small;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-fast;
+}
+
+.cancelButton {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+
+  &:hover {
+    background: var(--color-background);
+  }
+}
+
+.saveButton {
+  background: var(--color-primary);
+  color: white;
+
+  &:hover {
+    background: var(--color-secondary);
+  }
+}
+
+.ddayList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-xl $spacing-md;
+  color: var(--color-text-secondary);
+
+  p {
+    font-size: $font-size-base;
+    margin-bottom: $spacing-xs;
+  }
+
+  span {
+    font-size: $font-size-small;
+    opacity: 0.7;
+  }
+}
+
+.ddayItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: $spacing-md;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius;
+  transition: all $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-small;
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg,
+      rgba(var(--color-primary), 0.05) 0%,
+      rgba(var(--color-primary), 0.1) 100%);
+  }
+}
+
+.ddayInfo {
+  flex: 1;
+}
+
+.ddayItemTitle {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: var(--color-text);
+  margin-bottom: $spacing-xs;
+}
+
+.ddayItemDate {
+  font-size: $font-size-small;
+  color: var(--color-primary);
+  margin-bottom: $spacing-xs;
+}
+
+.ddayItemDesc {
+  font-size: $font-size-small;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.ddayActions {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.activateButton,
+.editButton,
+.deleteButton {
+  padding: $spacing-xs $spacing-sm;
+  border: none;
+  border-radius: $border-radius-small;
+  font-size: $font-size-xs;
+  cursor: pointer;
+  transition: all $transition-fast;
+}
+
+.activateButton {
+  background: var(--color-accent);
+  color: var(--color-text);
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: white;
+  }
+
+  &:disabled {
+    background: var(--color-primary);
+    color: white;
+    cursor: not-allowed;
+  }
+}
+
+.editButton {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+
+  &:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+}
+
+.deleteButton {
+  background: transparent;
+  color: var(--color-text-secondary);
+
+  &:hover {
+    background: #FFE4E1;
+    color: #FF6B6B;
+  }
+}

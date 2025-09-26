@@ -41,3 +41,12 @@ export interface CalendarDate {
   events: Event[];
   hasDiary: boolean;
 }
+
+export interface DDay {
+  id: string;
+  title: string;
+  description?: string;
+  targetDate: Date;
+  isActive: boolean;
+  createdAt: Date;
+}
