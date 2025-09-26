@@ -36,13 +36,7 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
     tired: "😴",
   };
 
-  const weatherOptions = [
-    "☀️ Sunny",
-    "☁️ Cloudy",
-    "🌧️ Rainy",
-    "❄️ Snowy",
-    "🌈 Rainbow",
-  ];
+  const weatherOptions = ["맑음", "흐림", "비", "눈"];
 
   const handleSave = () => {
     if (!content.trim()) return;

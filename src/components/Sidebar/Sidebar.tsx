@@ -36,6 +36,8 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside className={styles.sidebar}>
+      <DDayWidget />
+      <div className={styles.divider}></div>
       <div className={styles.sidebarHeader}>
         <h3 className={styles.dateTitle}>
           {formatDate(selectedDate, 'yyyy년 M월 d일 EEEE')}
@@ -94,7 +96,6 @@ const Sidebar: React.FC = () => {
           <ThemeSelector />
         )}
       </div>
-      <DDayWidget />
     </aside>
   );
 };

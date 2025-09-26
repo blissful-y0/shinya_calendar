@@ -1,5 +1,5 @@
-@use '@styles/variables' as *;
-@use '@styles/mixins' as *;
+@use "@styles/variables" as *;
+@use "@styles/mixins" as *;
 
 .sidebar {
   width: 100%; // ResizableLayout이 너비를 제어하므로 100%로 설정
@@ -17,6 +17,32 @@
   }
   to {
     transform: translateX(0);
+  }
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-surface);
+  position: relative;
+  margin: $spacing-sm $spacing-lg;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-border) 20%,
+      var(--color-primary) 50%,
+      var(--color-border) 80%,
+      transparent 100%
+    );
+    opacity: 0.6;
   }
 }
 
