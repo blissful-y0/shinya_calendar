@@ -11,6 +11,8 @@ import EventList from './EventList';
 import DiarySection from './DiarySection';
 import DDayWidget from '../Common/DDayWidget';
 import { formatDate } from '@utils/calendar';
+import { getEventsForDate } from '@utils/eventUtils';
+import { startOfMonth, endOfMonth, addMonths } from 'date-fns';
 import styles from './Sidebar.module.scss';
 
 const Sidebar: React.FC = () => {
@@ -21,9 +23,11 @@ const Sidebar: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'events' | 'diary'>('events');
   const [showEventForm, setShowEventForm] = useState(false);
 
-  const selectedDateEvents = events.filter(event =>
-    formatDate(new Date(event.date)) === formatDate(selectedDate)
-  );
+  // 반복 이벤트를 포함하여 선택된 날짜의 이벤트 가져오기
+  // 선택된 날짜 기준 3개월 범위로 반복 이벤트 계산
+  const rangeStart = startOfMonth(addMonths(selectedDate, -1));
+  const rangeEnd = endOfMonth(addMonths(selectedDate, 2));
+  const selectedDateEvents = getEventsForDate(events, selectedDate, rangeStart, rangeEnd);
 
   const selectedDateDiary = diaryEntries.find(entry =>
     formatDate(new Date(entry.date)) === formatDate(selectedDate)

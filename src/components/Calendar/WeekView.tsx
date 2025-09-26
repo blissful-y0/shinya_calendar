@@ -2,6 +2,8 @@ import React from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedDateState, eventsState, diaryEntriesState } from '@store/atoms';
 import { getDaysInWeek, formatDate, isSameDayAs, isCurrentDay } from '@utils/calendar';
+import { getEventsForDate } from '@utils/eventUtils';
+import { startOfMonth, endOfMonth, addMonths } from 'date-fns';
 import { MdCreate } from 'react-icons/md';
 import styles from './WeekView.module.scss';
 
@@ -13,15 +15,17 @@ const WeekView: React.FC = () => {
   const weekDays = getDaysInWeek(selectedDate);
   const weekDayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
-  const getEventsForDate = (date: Date) => {
-    return events.filter(event =>
-      isSameDayAs(new Date(event.date), date)
-    ).sort((a, b) => {
-      if (a.startTime && b.startTime) {
-        return a.startTime.localeCompare(b.startTime);
-      }
-      return 0;
-    });
+  const getEventsForDateLocal = (date: Date) => {
+    // 반복 이벤트를 포함하여 해당 날짜의 이벤트 가져오기
+    const rangeStart = startOfMonth(addMonths(date, -1));
+    const rangeEnd = endOfMonth(addMonths(date, 1));
+    return getEventsForDate(events, date, rangeStart, rangeEnd)
+      .sort((a, b) => {
+        if (a.startTime && b.startTime) {
+          return a.startTime.localeCompare(b.startTime);
+        }
+        return 0;
+      });
   };
 
   const hasDiaryEntry = (date: Date) => {
@@ -88,7 +92,7 @@ const WeekView: React.FC = () => {
         <div className={styles.allDayRow}>
           <div className={styles.allDayLabel}>종일</div>
           {weekDays.map((date) => {
-            const dayEvents = getEventsForDate(date).filter(e => !e.startTime);
+            const dayEvents = getEventsForDateLocal(date).filter(e => !e.startTime);
             return (
               <div key={date.toISOString()} className={styles.allDayCell}>
                 {dayEvents.map(event => (
@@ -127,7 +131,7 @@ const WeekView: React.FC = () => {
 
             <div className={styles.eventsLayer}>
               {weekDays.map((date, dayIndex) => {
-                const dayEvents = getEventsForDate(date).filter(e => e.startTime);
+                const dayEvents = getEventsForDateLocal(date).filter(e => e.startTime);
                 return dayEvents.map(event => {
                   const position = getEventPosition(event, dayIndex);
                   if (!position) return null;
