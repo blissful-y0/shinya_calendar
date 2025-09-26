@@ -8,6 +8,7 @@ import DayView from "@components/Calendar/DayView";
 import WeekView from "@components/Calendar/WeekView";
 import Sidebar from "@components/Sidebar/Sidebar";
 import ResizableLayout from "@components/Common/ResizableLayout";
+import CustomBanner from "@components/Common/CustomBanner";
 import { useTheme } from "@hooks/useTheme";
 import styles from "./App.module.scss";
 
@@ -40,10 +41,16 @@ function App() {
       <div className={styles.mainContent}>
         {sidebarOpen ? (
           <ResizableLayout sidebar={<Sidebar />} minWidth={280} maxWidth={600}>
-            <div className={styles.calendarContainer}>{renderView()}</div>
+            <div className={styles.calendarContainer}>
+              <CustomBanner />
+              {renderView()}
+            </div>
           </ResizableLayout>
         ) : (
-          <div className={styles.calendarContainer}>{renderView()}</div>
+          <div className={styles.calendarContainer}>
+            <CustomBanner />
+            {renderView()}
+          </div>
         )}
       </div>
     </div>

@@ -195,3 +195,29 @@ export const activeDDayState = atom<DDay | null>({
     }
   ]
 });
+
+// 배너 이미지 상태
+export const bannerImageState = atom<string | null>({
+  key: 'bannerImage',
+  default: null,
+  effects: [
+    ({ setSelf, onSet }) => {
+      // localStorage에서 저장된 배너 이미지 불러오기
+      const savedBanner = localStorage.getItem('bannerImage');
+      if (savedBanner) {
+        setSelf(savedBanner);
+      }
+
+      // 배너 이미지 변경 시 localStorage에 저장
+      onSet((newBanner, _, isReset) => {
+        if (!isReset) {
+          if (newBanner) {
+            localStorage.setItem('bannerImage', newBanner);
+          } else {
+            localStorage.removeItem('bannerImage');
+          }
+        }
+      });
+    }
+  ]
+});
