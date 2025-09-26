@@ -25,7 +25,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   maxDate,
   showTimeSelect = false,
   timeIntervals = 30,
-  dateFormat = showTimeSelect ? 'yyyy년 MM월 dd일 HH:mm' : 'yyyy년 MM월 dd일',
+  dateFormat = showTimeSelect ? 'yyyy년 MM월 dd일 h:mm aa' : 'yyyy년 MM월 dd일',
   className = '',
   disabled = false,
 }) => {
