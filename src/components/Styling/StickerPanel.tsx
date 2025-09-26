@@ -8,10 +8,10 @@ import styles from './StickerPanel.module.scss';
 export interface Sticker {
   id: string;
   image: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  x: number; // 퍼센트 값 (0-100)
+  y: number; // 퍼센트 값 (0-100)
+  width: number; // 퍼센트 값 (0-100)
+  height: number; // 퍼센트 값 (0-100)
   zIndex: number;
   name: string;
   rotation: number; // 회전 각도 (degrees)
@@ -65,8 +65,10 @@ const StickerPanel: React.FC = () => {
     const newSticker: Sticker = {
       ...uploadedSticker,
       id: uuidv4(),
-      x: Math.random() * 200 + 50,
-      y: Math.random() * 200 + 50,
+      x: Math.random() * 30 + 10, // 10% ~ 40% 사이의 랜덤 위치
+      y: Math.random() * 30 + 10, // 10% ~ 40% 사이의 랜덤 위치
+      width: 10, // 화면 너비의 10%
+      height: 10, // 화면 너비의 10% (비율 유지)
       zIndex: Date.now(),
       rotation: 0
     };

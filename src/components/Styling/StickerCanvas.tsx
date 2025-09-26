@@ -38,6 +38,29 @@ const StickerCanvas: React.FC = () => {
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  // 퍼센트를 픽셀로 변환
+  const percentToPixel = (percent: number, dimension: number) => {
+    return (percent / 100) * dimension;
+  };
+
+  // 픽셀을 퍼센트로 변환
+  const pixelToPercent = (pixel: number, dimension: number) => {
+    return (pixel / dimension) * 100;
+  };
+
+  // 스티커의 실제 픽셀 위치 계산
+  const getStickerPixelPosition = (sticker: Sticker) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return { x: 0, y: 0, width: 100, height: 100 };
+
+    return {
+      x: percentToPixel(sticker.x, rect.width),
+      y: percentToPixel(sticker.y, rect.height),
+      width: percentToPixel(sticker.width, rect.width),
+      height: percentToPixel(sticker.height, rect.width) // 비율 유지를 위해 width 기준
+    };
+  };
+
   const handleMouseDown = (e: React.MouseEvent, sticker: Sticker) => {
     if (!stickerEditMode) return;
 
@@ -45,8 +68,9 @@ const StickerCanvas: React.FC = () => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    const offsetX = e.clientX - rect.left - sticker.x;
-    const offsetY = e.clientY - rect.top - sticker.y;
+    const pixelPos = getStickerPixelPosition(sticker);
+    const offsetX = e.clientX - rect.left - pixelPos.x;
+    const offsetY = e.clientY - rect.top - pixelPos.y;
 
     setDragging({ id: sticker.id, offsetX, offsetY });
     setSelectedSticker(sticker.id);
@@ -65,10 +89,11 @@ const StickerCanvas: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
 
+    const pixelPos = getStickerPixelPosition(sticker);
     setResizing({
       id: sticker.id,
-      startWidth: sticker.width,
-      startHeight: sticker.height,
+      startWidth: pixelPos.width,
+      startHeight: pixelPos.height,
       startX: e.clientX,
       startY: e.clientY
     });
@@ -82,8 +107,9 @@ const StickerCanvas: React.FC = () => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    const centerX = sticker.x + sticker.width / 2;
-    const centerY = sticker.y + sticker.height / 2;
+    const pixelPos = getStickerPixelPosition(sticker);
+    const centerX = pixelPos.x + pixelPos.width / 2;
+    const centerY = pixelPos.y + pixelPos.height / 2;
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
@@ -111,13 +137,17 @@ const StickerCanvas: React.FC = () => {
       const newY = e.clientY - rect.top - dragging.offsetY;
 
       // 캔버스 경계를 벗어나지 않도록 하되, 여유를 둠
-      const boundedX = Math.max(-50, Math.min(newX, rect.width - 50));
-      const boundedY = Math.max(-50, Math.min(newY, rect.height - 50));
+      const boundedX = Math.max(0, Math.min(newX, rect.width - 50));
+      const boundedY = Math.max(0, Math.min(newY, rect.height - 50));
+
+      // 픽셀을 퍼센트로 변환하여 저장
+      const percentX = pixelToPercent(boundedX, rect.width);
+      const percentY = pixelToPercent(boundedY, rect.height);
 
       setStickers(prev =>
         prev.map(s =>
           s.id === dragging.id
-            ? { ...s, x: boundedX, y: boundedY }
+            ? { ...s, x: percentX, y: percentY }
             : s
         )
       );
@@ -127,13 +157,17 @@ const StickerCanvas: React.FC = () => {
       const deltaX = e.clientX - resizing.startX;
       const deltaY = e.clientY - resizing.startY;
       const delta = Math.max(deltaX, deltaY); // 비율 유지를 위해 더 큰 값 사용
-      const newWidth = Math.max(30, Math.min(resizing.startWidth + delta, 300));
-      const newHeight = Math.max(30, Math.min(resizing.startHeight + delta, 300));
+      const newWidthPx = Math.max(30, Math.min(resizing.startWidth + delta, 300));
+      const newHeightPx = Math.max(30, Math.min(resizing.startHeight + delta, 300));
+
+      // 픽셀을 퍼센트로 변환
+      const percentWidth = pixelToPercent(newWidthPx, rect.width);
+      const percentHeight = pixelToPercent(newHeightPx, rect.width); // 비율 유지를 위해 width 기준
 
       setStickers(prev =>
         prev.map(s =>
           s.id === resizing.id
-            ? { ...s, width: newWidth, height: newHeight }
+            ? { ...s, width: percentWidth, height: percentHeight }
             : s
         )
       );
@@ -191,32 +225,19 @@ const StickerCanvas: React.FC = () => {
     }
   }, [stickerEditMode]);
 
-  // 해상도 변경 감지 및 자동 레이아웃 로딩
+  // 윈도우 리사이즈 시 스티커들이 자동으로 비율에 맞게 조정됨
+  // 퍼센트 기반 위치를 사용하므로 별도의 리사이즈 처리가 필요하지 않음
   useEffect(() => {
     const handleResize = () => {
-      const currentResolution = {
-        width: window.innerWidth,
-        height: window.innerHeight
-      };
-
-      // 현재 해상도에 맞는 레이아웃 찾기
-      const matchingLayout = stickerLayouts.find(
-        layout => layout.resolution.width === currentResolution.width &&
-                 layout.resolution.height === currentResolution.height
-      );
-
-      if (matchingLayout) {
-        setStickers(matchingLayout.stickers);
-      }
+      // 강제로 리렌더링을 트리거하여 스티커 위치 재계산
+      // 퍼센트 값은 그대로 유지되고 픽셀 계산만 새로 수행됨
+      setStickers(prev => [...prev]);
     };
-
-    // 초기 로딩
-    handleResize();
 
     // 윈도우 리사이즈 이벤트 리스너
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [stickerLayouts, setStickers]);
+  }, [setStickers]);
 
 
   const handleStickerRightClick = (e: React.MouseEvent, stickerId: string) => {
@@ -255,16 +276,17 @@ const StickerCanvas: React.FC = () => {
         const isDragging = dragging?.id === sticker.id;
         const isResizing = resizing?.id === sticker.id;
         const isRotating = rotating?.id === sticker.id;
+        const pixelPos = getStickerPixelPosition(sticker);
 
         return (
           <div
             key={sticker.id}
             className={`${styles.sticker} ${isDragging ? styles.dragging : ''} ${isSelected && stickerEditMode ? styles.selected : ''} ${!stickerEditMode ? styles.readOnly : ''}`}
             style={{
-              left: sticker.x,
-              top: sticker.y,
-              width: sticker.width,
-              height: sticker.height,
+              left: pixelPos.x,
+              top: pixelPos.y,
+              width: pixelPos.width,
+              height: pixelPos.height,
               zIndex: sticker.zIndex,
               backgroundImage: `url(${sticker.image})`,
               transform: `rotate(${sticker.rotation}deg)`
