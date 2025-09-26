@@ -1,0 +1,77 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.titleBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10000;
+  user-select: none;
+  -webkit-app-region: drag;
+}
+
+.dragRegion {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: $spacing-md;
+}
+
+.title {
+  font-size: $font-size-small;
+  font-weight: $font-weight-medium;
+  color: var(--color-text);
+  pointer-events: none;
+}
+
+.windowControls {
+  display: flex;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+.windowButton {
+  @include button-reset;
+  width: 46px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-hover);
+  }
+
+  &:active {
+    background: var(--color-active);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.closeButton {
+  &:hover {
+    background: #e81123;
+    color: white;
+  }
+
+  &:active {
+    background: #f1707a;
+    color: white;
+  }
+}
