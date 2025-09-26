@@ -35,13 +35,6 @@ function App() {
     const restoreAppState = async () => {
       try {
         if (window.electronAPI?.store) {
-          // 스티커 상태 복원
-          const savedStickers = await window.electronAPI.store.get('currentStickers');
-          if (savedStickers && Array.isArray(savedStickers)) {
-            setStickers(savedStickers);
-            previousStickersRef.current = [...savedStickers];
-          }
-
           // UI 상태 복원
           const savedUIState = await window.electronAPI.store.get('appUIState');
           if (savedUIState) {
@@ -72,9 +65,6 @@ function App() {
     const saveAppState = async () => {
       try {
         if (window.electronAPI?.store) {
-          // 스티커 상태 저장
-          await window.electronAPI.store.set('currentStickers', stickers);
-
           // UI 상태 저장
           await window.electronAPI.store.set('appUIState', {
             sidebarOpen,
@@ -99,7 +89,7 @@ function App() {
         window.electronAPI.removeAppBeforeQuitListener(saveAppState);
       }
     };
-  }, [stickers, sidebarOpen, viewMode, currentTheme, bannerImage]);
+  }, [sidebarOpen, viewMode, currentTheme, bannerImage]);
 
   // 편집 모드 상태 변화 감지
   useEffect(() => {

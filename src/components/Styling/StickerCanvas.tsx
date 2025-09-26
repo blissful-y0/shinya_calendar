@@ -4,7 +4,6 @@ import {
   stickersState,
   stickerEditModeState,
   modalActiveState,
-  stickerLayoutsState,
   stickerVisibilityState,
 } from "@store/atoms";
 import { MdDelete } from "react-icons/md";
@@ -37,7 +36,6 @@ const StickerCanvas: React.FC = () => {
   const stickerEditMode = useRecoilValue(stickerEditModeState);
   const isModalActive = useRecoilValue(modalActiveState);
   const stickerVisibility = useRecoilValue(stickerVisibilityState);
-  const stickerLayouts = useRecoilValue(stickerLayoutsState);
   const [dragging, setDragging] = useState<DraggingState | null>(null);
   const [resizing, setResizing] = useState<ResizingState | null>(null);
   const [rotating, setRotating] = useState<RotatingState | null>(null);
@@ -209,34 +207,6 @@ const StickerCanvas: React.FC = () => {
     }
   }, [stickerEditMode]);
 
-  // 해상도 변경 감지 및 자동 레이아웃 로딩
-  useEffect(() => {
-    const handleResize = () => {
-      const currentResolution = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      };
-
-      // 현재 해상도에 맞는 레이아웃 찾기
-      const matchingLayout = stickerLayouts.find(
-        (layout) =>
-          layout.resolution.width === currentResolution.width &&
-          layout.resolution.height === currentResolution.height
-      );
-
-      if (matchingLayout) {
-        setStickers(matchingLayout.stickers);
-      }
-    };
-
-    // 초기 로딩
-    handleResize();
-
-    // 윈도우 리사이즈 이벤트 리스너
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [stickerLayouts, setStickers]);
-
   const handleStickerRightClick = (e: React.MouseEvent, stickerId: string) => {
     if (!stickerEditMode) return;
 
@@ -271,8 +241,6 @@ const StickerCanvas: React.FC = () => {
       {stickers.map((sticker) => {
         const isSelected = selectedSticker === sticker.id;
         const isDragging = dragging?.id === sticker.id;
-        const isResizing = resizing?.id === sticker.id;
-        const isRotating = rotating?.id === sticker.id;
 
         return (
           <div
