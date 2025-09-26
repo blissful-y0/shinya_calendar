@@ -48,7 +48,10 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "@styles/variables.scss";`
+        api: 'modern-compiler', // Modern API 사용
+        additionalData: `@use "@styles/_variables" as *;
+@use "@styles/_mixins" as *;`,
+        silenceDeprecations: ['legacy-js-api'] // 경고 억제
       }
     }
   }

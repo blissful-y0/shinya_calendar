@@ -1,4 +1,5 @@
-@import '@styles/variables.scss';
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
 
 .eventForm {
   background: var(--color-background);

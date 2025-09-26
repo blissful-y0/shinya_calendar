@@ -26,21 +26,7 @@ $font-stack-mono:
   'Courier New',                   // 범용
   monospace;                       // 최종 폴백
 
-// 폰트 관련 믹스인
-@mixin font-smooth {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-
-// 한글 폰트 최적화 설정
-@mixin korean-text-optimize {
-  word-break: keep-all;           // 한글 단어 단위 줄바꿈
-  line-break: auto;                // 자동 줄바꿈
-  letter-spacing: -0.02em;         // 자간 조정 (한글 가독성 향상)
-}
-
-// 폰트 사이즈 변수
+// 폰트 사이즈 맵
 $font-sizes: (
   'xs': 11px,
   'sm': 12px,
@@ -52,7 +38,7 @@ $font-sizes: (
   'xxxl': 32px
 );
 
-// 폰트 굵기 변수
+// 폰트 굵기 맵
 $font-weights: (
   'thin': 100,
   'light': 300,
@@ -64,7 +50,7 @@ $font-weights: (
   'black': 900
 );
 
-// 줄 높이 변수
+// 줄 높이 맵
 $line-heights: (
   'tight': 1.2,
   'normal': 1.5,

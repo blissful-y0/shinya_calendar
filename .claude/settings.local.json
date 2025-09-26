@@ -8,7 +8,10 @@
       "Bash(git commit:*)",
       "Bash(yarn add:*)",
       "Bash(git checkout:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(for file in /Users/bliss/Documents/shinya_calendar/src/**/*.module.scss)",
+      "Bash(do)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

@@ -1,5 +1,6 @@
-@import './variables.scss';
-@import './fonts.scss';
+@use '_variables' as *;
+@use '_mixins' as *;
+@use '_fonts' as *;
 
 * {
   margin: 0;
