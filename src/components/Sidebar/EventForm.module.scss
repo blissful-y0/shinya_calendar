@@ -91,6 +91,13 @@
   padding: $spacing-md;
   margin-bottom: $spacing-md;
 
+  .reminderNote {
+    margin-top: $spacing-xs;
+    font-size: $font-size-small;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
   select {
     width: 100%;
     padding: $spacing-sm;

@@ -334,13 +334,22 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
               value={reminderTime}
               onChange={(e) => setReminderTime(e.target.value as ReminderTime)}
             >
-              <option value="now">이벤트 시작 시</option>
-              <option value="5min">5분 전</option>
-              <option value="10min">10분 전</option>
-              <option value="30min">30분 전</option>
-              <option value="1hour">1시간 전</option>
+              <option value="now">{isAllDay ? '자정 (00:00)' : '이벤트 시작 시'}</option>
+              {!isAllDay && (
+                <>
+                  <option value="5min">5분 전</option>
+                  <option value="10min">10분 전</option>
+                  <option value="30min">30분 전</option>
+                  <option value="1hour">1시간 전</option>
+                </>
+              )}
             </select>
           </div>
+          {isAllDay && (
+            <p className={styles.reminderNote}>
+              하루 종일 이벤트는 자정에 알림이 울립니다.
+            </p>
+          )}
         </div>
       )}
 

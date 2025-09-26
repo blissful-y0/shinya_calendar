@@ -48,11 +48,11 @@ class NotificationService {
 
     const eventDate = new Date(event.date);
 
-    // For all-day events, set time to 9 AM
+    // For all-day events, set time to midnight (00:00)
     let eventTime: Date;
     if (event.isAllDay) {
       eventTime = startOfDay(eventDate);
-      eventTime.setHours(9, 0, 0, 0);
+      eventTime.setHours(0, 0, 0, 0);
     } else if (event.startTime) {
       const [hours, minutes] = event.startTime.split(':').map(Number);
       eventTime = new Date(eventDate);
@@ -127,7 +127,7 @@ class NotificationService {
     let body = '';
 
     if (event.isAllDay) {
-      body = '오늘 하루 종일 이벤트가 있습니다.';
+      body = '오늘 하루 종일 진행되는 이벤트입니다.';
     } else if (event.startTime && event.endTime) {
       body = `${event.startTime} - ${event.endTime}`;
     } else if (event.startTime) {
