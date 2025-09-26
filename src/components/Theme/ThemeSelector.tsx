@@ -1,24 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { useTheme } from '@hooks/useTheme';
-import { Theme } from '@types';
-import { v4 as uuidv4 } from 'uuid';
-import styles from './ThemeSelector.module.scss';
+import React, { useState, useEffect } from "react";
+import { useTheme } from "@hooks/useTheme";
+import { Theme } from "@types";
+import { v4 as uuidv4 } from "uuid";
+import styles from "./ThemeSelector.module.scss";
 
 const ThemeSelector: React.FC = () => {
-  const { currentTheme, allThemes, selectTheme, createCustomTheme, deleteCustomTheme, previewTheme, resetPreview } = useTheme();
+  const {
+    currentTheme,
+    allThemes,
+    selectTheme,
+    createCustomTheme,
+    deleteCustomTheme,
+    previewTheme,
+    resetPreview,
+  } = useTheme();
   const [showCustomForm, setShowCustomForm] = useState(false);
-  const [customThemeName, setCustomThemeName] = useState('');
+  const [customThemeName, setCustomThemeName] = useState("");
   const [customColors, setCustomColors] = useState({
-    primary: '#FFB6C1',
-    secondary: '#FFC0CB',
-    accent: '#FFE4E1',
-    background: '#FFF8F5',
-    surface: '#FFFFFF',
-    text: '#4A4A4A',
-    textSecondary: '#8B8B8B',
-    border: '#F5E6E0',
-    danger: '#FF6B6B',
-    dangerLight: '#FFE5E5'
+    primary: "#FFB6C1",
+    secondary: "#FFC0CB",
+    accent: "#FFE4E1",
+    background: "#FFF8F5",
+    surface: "#FFFFFF",
+    text: "#4A4A4A",
+    textSecondary: "#8B8B8B",
+    border: "#F5E6E0",
+    danger: "#FF6B6B",
+    dangerLight: "#FFE5E5",
   });
   const [isPreviewing, setIsPreviewing] = useState(false);
 
@@ -43,19 +51,19 @@ const ThemeSelector: React.FC = () => {
     const newTheme: Theme = {
       id: uuidv4(),
       name: customThemeName,
-      colors: customColors
+      colors: customColors,
     };
 
     createCustomTheme(newTheme);
     setShowCustomForm(false);
-    setCustomThemeName('');
+    setCustomThemeName("");
     setIsPreviewing(false);
     selectTheme(newTheme.id);
   };
 
   const handleCancelCustomForm = () => {
     setShowCustomForm(false);
-    setCustomThemeName('');
+    setCustomThemeName("");
     setIsPreviewing(false);
     resetPreview();
   };
@@ -73,7 +81,9 @@ const ThemeSelector: React.FC = () => {
   const renderThemePreview = (theme: Theme) => {
     return (
       <div
-        className={`${styles.themeCard} ${currentTheme.id === theme.id ? styles.selected : ''}`}
+        className={`${styles.themeCard} ${
+          currentTheme.id === theme.id ? styles.selected : ""
+        }`}
         onClick={() => selectTheme(theme.id)}
       >
         <div className={styles.colorPreview}>
@@ -95,7 +105,7 @@ const ThemeSelector: React.FC = () => {
           />
         </div>
         <div className={styles.themeName}>{theme.name}</div>
-        {!theme.id.includes('pastel') && (
+        {!theme.id.includes("pastel") && (
           <button
             className={styles.deleteTheme}
             onClick={(e) => {
@@ -113,17 +123,21 @@ const ThemeSelector: React.FC = () => {
   return (
     <div className={styles.themeSelector}>
       <div className={styles.section}>
-        <h4 className={styles.sectionTitle}>Preset Themes</h4>
+        <h4 className={styles.sectionTitle}>테마 프리셋</h4>
         <div className={styles.themeGrid}>
-          {allThemes.filter(t => t.id.includes('pastel')).map(theme => renderThemePreview(theme))}
+          {allThemes
+            .filter((t) => t.id.includes("pastel"))
+            .map((theme) => renderThemePreview(theme))}
         </div>
       </div>
 
-      {allThemes.filter(t => !t.id.includes('pastel')).length > 0 && (
+      {allThemes.filter((t) => !t.id.includes("pastel")).length > 0 && (
         <div className={styles.section}>
-          <h4 className={styles.sectionTitle}>Custom Themes</h4>
+          <h4 className={styles.sectionTitle}>커스텀 테마</h4>
           <div className={styles.themeGrid}>
-            {allThemes.filter(t => !t.id.includes('pastel')).map(theme => renderThemePreview(theme))}
+            {allThemes
+              .filter((t) => !t.id.includes("pastel"))
+              .map((theme) => renderThemePreview(theme))}
           </div>
         </div>
       )}
@@ -159,7 +173,9 @@ const ThemeSelector: React.FC = () => {
               실시간 미리보기
             </label>
             <span className={styles.previewHint}>
-              {isPreviewing ? '변경사항이 실시간으로 적용됩니다' : '체크하면 색상 변경을 미리 볼 수 있습니다'}
+              {isPreviewing
+                ? "변경사항이 실시간으로 적용됩니다"
+                : "체크하면 색상 변경을 미리 볼 수 있습니다"}
             </span>
           </div>
 
@@ -167,31 +183,35 @@ const ThemeSelector: React.FC = () => {
             {Object.entries(customColors).map(([key, value]) => (
               <div key={key} className={styles.colorInput}>
                 <label>
-                  {key === 'primary' && '주 색상'}
-                  {key === 'secondary' && '보조 색상'}
-                  {key === 'accent' && '강조 색상'}
-                  {key === 'background' && '배경색'}
-                  {key === 'surface' && '표면색'}
-                  {key === 'text' && '텍스트'}
-                  {key === 'textSecondary' && '보조 텍스트'}
-                  {key === 'border' && '테두리'}
+                  {key === "primary" && "주 색상"}
+                  {key === "secondary" && "보조 색상"}
+                  {key === "accent" && "강조 색상"}
+                  {key === "background" && "배경색"}
+                  {key === "surface" && "표면색"}
+                  {key === "text" && "텍스트"}
+                  {key === "textSecondary" && "보조 텍스트"}
+                  {key === "border" && "테두리"}
                 </label>
                 <div className={styles.colorControl}>
                   <input
                     type="color"
                     value={value}
-                    onChange={(e) => setCustomColors(prev => ({
-                      ...prev,
-                      [key]: e.target.value
-                    }))}
+                    onChange={(e) =>
+                      setCustomColors((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
                   />
                   <input
                     type="text"
                     value={value}
-                    onChange={(e) => setCustomColors(prev => ({
-                      ...prev,
-                      [key]: e.target.value
-                    }))}
+                    onChange={(e) =>
+                      setCustomColors((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
                   />
                 </div>
               </div>

@@ -3,7 +3,9 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { selectedDateState, selectedEventState, eventsState, diaryEntriesState } from '@store/atoms';
 import { getDaysInWeek, formatDate, isSameDayAs, isCurrentDay } from '@utils/calendar';
 import { getEventsForDate } from '@utils/eventUtils';
-import { startOfMonth, endOfMonth, addMonths } from 'date-fns';
+import { Event } from '@types';
+import { startOfMonth, endOfMonth, addMonths, startOfDay, endOfDay, isBefore, isAfter, differenceInDays, format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import { MdCreate } from 'react-icons/md';
 import styles from './WeekView.module.scss';
 
@@ -41,7 +43,98 @@ const WeekView: React.FC = () => {
     return `${hour.toString().padStart(2, '0')}:00`;
   };
 
-  const getEventPosition = (event: any, dayIndex: number) => {
+  const getEventPosition = (event: Event, dayIndex: number, currentDate: Date) => {
+    // Multi-day 이벤트 처리
+    if (event.endDate && event.date !== event.endDate) {
+      const weekStart = weekDays[0];
+      const weekEnd = weekDays[6];
+      const eventStart = new Date(event.date);
+      const eventEnd = new Date(event.endDate);
+
+      // 이벤트가 이번 주를 포함하는지 확인
+      const startsBeforeWeek = isBefore(eventStart, weekStart);
+      const endsAfterWeek = isAfter(eventEnd, weekEnd);
+
+      // 현재 날짜에서의 시작 시간 계산
+      const currentDayStart = startOfDay(currentDate);
+      const currentDayEnd = endOfDay(currentDate);
+      const startsBeforeToday = isBefore(eventStart, currentDayStart);
+      const endsAfterToday = isAfter(eventEnd, currentDayEnd);
+
+      // 시작 위치 계산
+      let top = 0;
+      if (!startsBeforeToday && event.startTime) {
+        const [hours, minutes] = event.startTime.split(':').map(Number);
+        top = (hours * 60 + minutes);
+      }
+
+      // 높이 계산
+      let height = 1440; // 전체 24시간
+      if (!startsBeforeToday && !endsAfterToday && event.startTime && event.endTime) {
+        // 오늘 시작하고 오늘 끝나는 경우
+        const [startHours, startMinutes] = event.startTime.split(':').map(Number);
+        const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+        height = (endHours * 60 + endMinutes) - (startHours * 60 + startMinutes);
+      } else if (!startsBeforeToday && event.startTime) {
+        // 오늘 시작하지만 다른 날에 끝나는 경우
+        const [startHours, startMinutes] = event.startTime.split(':').map(Number);
+        height = 1440 - (startHours * 60 + startMinutes);
+      } else if (!endsAfterToday && event.endTime) {
+        // 이전에 시작했지만 오늘 끝나는 경우
+        const [endHours, endMinutes] = event.endTime.split(':').map(Number);
+        height = (endHours * 60 + endMinutes);
+      }
+
+      // 가로 위치와 너비 계산 (여러 날에 걸친 경우)
+      let left = dayIndex * (100 / 7);
+      let width = 100 / 7;
+
+      // 이벤트가 여러 날에 걸쳐있는 경우
+      const eventStartDay = weekDays.findIndex(day => isSameDayAs(day, eventStart));
+      const eventEndDay = weekDays.findIndex(day => isSameDayAs(day, eventEnd));
+
+      if (eventStartDay !== -1 && eventEndDay !== -1 && eventStartDay <= dayIndex && dayIndex <= eventEndDay) {
+        // 이벤트가 현재 주 내에서 여러 날에 걸침
+        if (dayIndex === eventStartDay) {
+          // 시작 날짜
+          const daysSpanning = Math.min(eventEndDay - eventStartDay + 1, 7 - eventStartDay);
+          width = (100 / 7) * daysSpanning;
+        } else {
+          // 중간이나 끝 날짜는 이미 시작 날짜에서 처리됨
+          return null;
+        }
+      } else if (startsBeforeWeek && eventEndDay >= dayIndex) {
+        // 이전 주에서 시작
+        if (dayIndex === 0) {
+          const daysSpanning = Math.min(eventEndDay + 1, 7);
+          left = 0;
+          width = (100 / 7) * daysSpanning;
+        } else {
+          return null;
+        }
+      } else if (endsAfterWeek && eventStartDay <= dayIndex) {
+        // 다음 주로 이어짐
+        if (dayIndex === eventStartDay) {
+          width = (100 / 7) * (7 - eventStartDay);
+        } else {
+          return null;
+        }
+      }
+
+      return {
+        top,
+        height,
+        left,
+        width,
+        isMultiDay: true,
+        continuesFromPrevious: startsBeforeToday,
+        continuesToNext: endsAfterToday,
+        eventStart,
+        eventEnd
+      };
+    }
+
+    // 단일 날짜 이벤트
     if (!event.startTime) return null;
 
     const [hours, minutes] = event.startTime.split(':').map(Number);
@@ -57,7 +150,7 @@ const WeekView: React.FC = () => {
     const left = dayIndex * (100 / 7);
     const width = 100 / 7;
 
-    return { top, height, left, width };
+    return { top, height, left, width, isMultiDay: false };
   };
 
   return (
@@ -136,15 +229,15 @@ const WeekView: React.FC = () => {
 
             <div className={styles.eventsLayer}>
               {weekDays.map((date, dayIndex) => {
-                const dayEvents = getEventsForDateLocal(date).filter(e => e.startTime);
+                const dayEvents = getEventsForDateLocal(date).filter(e => e.startTime || (e.endDate && e.date !== e.endDate));
                 return dayEvents.map(event => {
-                  const position = getEventPosition(event, dayIndex);
+                  const position = getEventPosition(event, dayIndex, date);
                   if (!position) return null;
 
                   return (
                     <div
-                      key={event.id}
-                      className={styles.timedEvent}
+                      key={`${event.id}-${dayIndex}`}
+                      className={`${styles.timedEvent} ${position.isMultiDay ? styles.multiDay : ''}`}
                       style={{
                         top: `${position.top}px`,
                         height: `${position.height}px`,
@@ -158,12 +251,26 @@ const WeekView: React.FC = () => {
                         setSelectedDate(date);
                       }}
                     >
+                      {position.continuesFromPrevious && (
+                        <div className={styles.continueIndicator}>← 이전부터</div>
+                      )}
                       <div className={styles.eventTime}>
-                        {event.startTime}
+                        {position.isMultiDay && position.eventStart && position.eventEnd ? (
+                          <>
+                            {format(position.eventStart, 'M/d HH:mm')}
+                            {' ~ '}
+                            {format(position.eventEnd, 'M/d HH:mm')}
+                          </>
+                        ) : (
+                          event.startTime
+                        )}
                       </div>
                       <div className={styles.eventTitle}>
                         {event.title}
                       </div>
+                      {position.continuesToNext && (
+                        <div className={styles.continueIndicator}>다음으로 →</div>
+                      )}
                     </div>
                   );
                 });
