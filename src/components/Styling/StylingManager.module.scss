@@ -487,3 +487,9 @@
     height: 12px;
   }
 }
+
+.themeContent {
+  padding: $spacing-md;
+  height: 100%;
+  overflow-y: auto;
+}

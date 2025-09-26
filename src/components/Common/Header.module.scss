@@ -1,5 +1,5 @@
-@use '@styles/variables' as *;
-@use '@styles/mixins' as *;
+@use "@styles/variables" as *;
+@use "@styles/mixins" as *;
 
 .header {
   height: $header-height;
@@ -51,7 +51,11 @@
   font-size: $font-size-xlarge;
   font-weight: $font-weight-semibold;
   color: var(--color-text);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -146,6 +150,9 @@
   justify-content: center;
   transition: all $transition-fast;
   opacity: 0.6;
+  font-size: $font-size-small;
+  font-weight: $font-weight-medium;
+  color: var(--color-text-secondary);
 
   &:hover {
     background: var(--color-accent);

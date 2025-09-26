@@ -5,6 +5,7 @@ import { MdBrush, MdClose, MdImage, MdEdit, MdEditOff, MdDelete, MdPhotoLibrary,
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { StickerLayout } from './StickerPanel';
+import ThemeSelector from '../Theme/ThemeSelector';
 import styles from './StylingManager.module.scss';
 
 interface StylingManagerProps {
@@ -245,8 +246,8 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
             </div>
           )}
           {activeMode === 'theme' && (
-            <div className={styles.placeholder}>
-              테마 설정 기능이 곧 이곳으로 이동될 예정입니다.
+            <div className={styles.themeContent}>
+              <ThemeSelector />
             </div>
           )}
         </div>

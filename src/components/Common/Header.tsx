@@ -13,7 +13,9 @@ const Header: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useRecoilState(currentMonthState);
   const [sidebarOpen, setSidebarOpen] = useRecoilState(sidebarOpenState);
   const [viewMode, setViewMode] = useRecoilState(viewModeState);
-  const [stickerVisibility, setStickerVisibility] = useRecoilState(stickerVisibilityState);
+  const [stickerVisibility, setStickerVisibility] = useRecoilState(
+    stickerVisibilityState
+  );
 
   const handlePreviousMonth = () => {
     setCurrentMonth(getPreviousMonth(currentMonth));
@@ -64,7 +66,7 @@ const Header: React.FC = () => {
           onClick={() => setStickerVisibility(!stickerVisibility)}
           title={stickerVisibility ? "스티커 숨기기" : "스티커 보이기"}
         >
-          🌟
+          ☆
         </button>
         <div className={styles.viewToggle}>
           <button
