@@ -112,7 +112,9 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
 
     setEvents((prev) => {
       if (event) {
-        return prev.map((e) => (e.id === event.id ? newEvent : e));
+        // 반복 이벤트의 경우 baseEventId 사용, 없으면 원본 ID 추출
+        const targetId = event.baseEventId || event.id;
+        return prev.map((e) => (e.id === targetId ? newEvent : e));
       }
       return [...prev, newEvent];
     });
