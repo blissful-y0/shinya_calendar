@@ -64,21 +64,30 @@ const Calendar: React.FC = () => {
         </div>
         <div className={styles.dayContent}>
           {dayEvents.length > 0 && (
-            <div className={styles.eventIndicators}>
-              {dayEvents.slice(0, 3).map((event, idx) => (
+            <div className={styles.eventList}>
+              {dayEvents.slice(0, 2).map((event) => (
                 <div
                   key={event.id}
-                  className={styles.eventDot}
-                  style={{ backgroundColor: event.color }}
-                />
+                  className={styles.eventItem}
+                  style={{ borderLeftColor: event.color }}
+                >
+                  <span className={styles.eventTime}>
+                    {event.startTime}
+                  </span>
+                  <span className={styles.eventTitle}>
+                    {event.title}
+                  </span>
+                </div>
               ))}
-              {dayEvents.length > 3 && (
-                <span className={styles.moreEvents}>+{dayEvents.length - 3}</span>
+              {dayEvents.length > 2 && (
+                <div className={styles.moreEvents}>
+                  +{dayEvents.length - 2}개 더
+                </div>
               )}
             </div>
           )}
           {hasDiary && (
-            <div className={styles.diaryIndicator} />
+            <div className={styles.diaryIndicator} title="일기 작성됨">📝</div>
           )}
         </div>
       </div>

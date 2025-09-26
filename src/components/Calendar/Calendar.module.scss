@@ -101,37 +101,72 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: $spacing-xs;
+  gap: 2px;
+  overflow: hidden;
 }
 
-.eventIndicators {
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.eventItem {
   display: flex;
   gap: 2px;
-  flex-wrap: wrap;
   align-items: center;
-}
-
-.eventDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  transition: transform $transition-fast;
+  padding: 2px 4px;
+  background: rgba(255, 255, 255, 0.8);
+  border-left: 3px solid;
+  border-radius: 2px;
+  font-size: 11px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all $transition-fast;
 
   &:hover {
-    transform: scale(1.3);
+    background: var(--color-accent);
+    transform: translateX(2px);
+  }
+
+  .eventTime {
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .eventTitle {
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
   }
 }
 
 .moreEvents {
   font-size: 10px;
   color: var(--color-text-secondary);
-  margin-left: 2px;
+  padding: 2px 4px;
+  text-align: center;
+  background: var(--color-background);
+  border-radius: 2px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-accent);
+  }
 }
 
 .diaryIndicator {
-  width: 100%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--color-secondary), transparent);
-  border-radius: 2px;
+  font-size: 12px;
+  align-self: flex-end;
   margin-top: auto;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+  }
 }
