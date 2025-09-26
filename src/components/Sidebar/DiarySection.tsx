@@ -152,7 +152,7 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="오늘 하루는 어땠나요?"
+          placeholder="텍스트를 입력해 주세요"
           className={styles.contentInput}
           rows={10}
         />
