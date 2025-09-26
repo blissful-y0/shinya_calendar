@@ -53,7 +53,7 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
         showTimeSelectOnly
         timeIntervals={5}
         timeCaption="시간"
-        dateFormat="h:mm aa"
+        dateFormat="aa h:mm"
         locale={ko}
         placeholderText={placeholderText}
         minTime={minTime}
