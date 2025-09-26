@@ -78,19 +78,34 @@ export const currentThemeState = atom<Theme>({
   default: defaultTheme,
   effects: [
     ({ setSelf, onSet }) => {
-      // Electron Store에서 저장된 테마 불러오기
-      electronStore.get('currentTheme').then(savedTheme => {
-        if (savedTheme) {
-          setSelf(savedTheme);
+      // 초기화 시 Electron Store에서 저장된 테마 불러오기
+      const loadTheme = async () => {
+        try {
+          const savedTheme = await electronStore.get('currentTheme');
+          if (savedTheme && savedTheme.id && savedTheme.colors) {
+            // 저장된 테마가 predefined에 있는지 확인
+            const predefinedTheme = predefinedThemes.find(t => t.id === savedTheme.id);
+            if (predefinedTheme) {
+              setSelf(predefinedTheme);
+            } else {
+              // 커스텀 테마인 경우
+              setSelf(savedTheme);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to load theme:', error);
         }
-      }).catch(error => {
-        console.error('Failed to load theme:', error);
-      });
+      };
 
-      // 테마 변경 시 Electron Store에 저장
+      loadTheme();
+
+      // 테마 변경 시 Electron Store에 즉시 저장
       onSet((newTheme, _, isReset) => {
-        if (!isReset) {
-          electronStore.set('currentTheme', newTheme);
+        if (!isReset && newTheme) {
+          // 비동기로 저장하되 에러 처리
+          electronStore.set('currentTheme', newTheme).catch(error => {
+            console.error('Failed to save theme:', error);
+          });
         }
       });
     }

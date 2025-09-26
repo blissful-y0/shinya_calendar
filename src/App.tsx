@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
-import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, currentThemeState, eventsState } from "@store/atoms";
+import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, eventsState } from "@store/atoms";
 import { Toaster } from 'react-hot-toast';
 import { notificationService } from '@services/notificationService';
 import TitleBar from "@components/Layout/TitleBar";
@@ -24,7 +24,6 @@ function App() {
   const stickerEditMode = useRecoilValue(stickerEditModeState);
   const setStickerEditMode = useSetRecoilState(stickerEditModeState);
   const [stickers, setStickers] = useRecoilState(stickersState);
-  const [currentTheme, setCurrentTheme] = useRecoilState(currentThemeState);
   const events = useRecoilValue(eventsState);
   useTheme(); // Apply theme automatically
   const previousStickersRef = useRef(stickers);
@@ -37,7 +36,7 @@ function App() {
     const restoreAppState = async () => {
       try {
         if (window.electronAPI?.store) {
-          // UI 상태 복원
+          // UI 상태 복원 (테마 제외 - atoms.ts의 effect에서 처리)
           const savedUIState = await window.electronAPI.store.get('appUIState');
           if (savedUIState) {
             if (typeof savedUIState.sidebarOpen === 'boolean') {
@@ -45,9 +44,6 @@ function App() {
             }
             if (['month', 'week', 'day'].includes(savedUIState.viewMode)) {
               setViewMode(savedUIState.viewMode);
-            }
-            if (savedUIState.currentTheme) {
-              setCurrentTheme(savedUIState.currentTheme);
             }
           }
         }
@@ -72,11 +68,10 @@ function App() {
     const saveAppState = async () => {
       try {
         if (window.electronAPI?.store) {
-          // UI 상태 저장
+          // UI 상태 저장 (테마 제외 - atoms.ts의 effect에서 처리)
           await window.electronAPI.store.set('appUIState', {
             sidebarOpen,
-            viewMode,
-            currentTheme
+            viewMode
           });
         }
       } catch (error) {
@@ -95,7 +90,7 @@ function App() {
         window.electronAPI.removeAppBeforeQuitListener(saveAppState);
       }
     };
-  }, [sidebarOpen, viewMode, currentTheme]);
+  }, [sidebarOpen, viewMode]);
 
   // Update notifications when events change
   useEffect(() => {
