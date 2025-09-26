@@ -83,7 +83,8 @@
   font-style: italic;
 }
 
-.recurrenceGroup {
+.recurrenceGroup,
+.reminderGroup {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: $border-radius-small;

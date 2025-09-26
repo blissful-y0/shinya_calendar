@@ -17,6 +17,12 @@ interface ElectronAPI {
     clear: () => Promise<void>;
     has: (key: string) => Promise<boolean>;
   };
+  showNotification: (options: {
+    title: string;
+    body: string;
+    icon?: string;
+    silent?: boolean;
+  }) => Promise<boolean>;
 }
 
 interface Window {

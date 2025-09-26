@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Notification } from 'electron';
 import path from 'path';
 import os from 'os';
 import Store from 'electron-store';
@@ -161,6 +161,35 @@ ipcMain.handle('is-maximized', () => {
 
 ipcMain.handle('get-platform', () => {
   return process.platform;
+});
+
+// Notification handler
+ipcMain.handle('show-notification', (_, options: {
+  title: string;
+  body: string;
+  icon?: string;
+  silent?: boolean;
+}) => {
+  if (Notification.isSupported()) {
+    const notification = new Notification({
+      title: options.title,
+      body: options.body,
+      icon: options.icon,
+      silent: options.silent || false
+    });
+
+    notification.show();
+
+    notification.on('click', () => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+      }
+    });
+
+    return true;
+  }
+  return false;
 });
 
 // Window resize API handler

@@ -21,5 +21,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     delete: (key: string) => ipcRenderer.invoke('store-delete', key),
     clear: () => ipcRenderer.invoke('store-clear'),
     has: (key: string) => ipcRenderer.invoke('store-has', key)
-  }
+  },
+
+  // Notification API
+  showNotification: (options: {
+    title: string;
+    body: string;
+    icon?: string;
+    silent?: boolean;
+  }) => ipcRenderer.invoke('show-notification', options)
 });
