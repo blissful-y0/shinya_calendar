@@ -3,8 +3,9 @@ import { useSetRecoilState } from "recoil";
 import { eventsState } from "@store/atoms";
 import { Event, RecurrenceRule } from "@types";
 import { v4 as uuidv4 } from "uuid";
-import { format } from "date-fns";
+import { format, isAfter } from "date-fns";
 import { ko } from "date-fns/locale";
+import toast from "react-hot-toast";
 import styles from "./EventForm.module.scss";
 
 interface EventFormProps {
@@ -54,7 +55,35 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      toast.error("이벤트 제목을 입력해주세요");
+      return;
+    }
+
+    // 날짜 유효성 검사
+    if (isMultiDay) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (isAfter(start, end)) {
+        toast.error("시작 날짜가 종료 날짜보다 늦을 수 없습니다");
+        return;
+      }
+    }
+
+    // 시간 유효성 검사 (하루 종일이 아닌 경우)
+    if (!isAllDay && startTime && endTime && !isMultiDay) {
+      const [startHour, startMin] = startTime.split(":").map(Number);
+      const [endHour, endMin] = endTime.split(":").map(Number);
+
+      if (
+        startHour > endHour ||
+        (startHour === endHour && startMin >= endMin)
+      ) {
+        toast.error("시작 시간이 종료 시간보다 늦을 수 없습니다");
+        return;
+      }
+    }
 
     const newEvent: Event = {
       id: event?.id || uuidv4(),
@@ -76,6 +105,9 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       }
       return [...prev, newEvent];
     });
+
+    // 성공 메시지 표시
+    toast.success(event ? '이벤트가 수정되었습니다' : '이벤트가 추가되었습니다');
 
     onClose();
   };
@@ -118,7 +150,13 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
             id="startDate"
             type="date"
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+              // 종료 날짜가 시작 날짜보다 이전인 경우 자동 조정
+              if (isMultiDay && e.target.value > endDate) {
+                setEndDate(e.target.value);
+              }
+            }}
             required
           />
         </div>
@@ -129,7 +167,15 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
               id="endDate"
               type="date"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={(e) => {
+                const newEndDate = e.target.value;
+                if (newEndDate < startDate) {
+                  toast.error("종료 날짜가 시작 날짜보다 이전일 수 없습니다");
+                  setEndDate(startDate);
+                } else {
+                  setEndDate(newEndDate);
+                }
+              }}
               min={startDate}
               required
             />
@@ -173,8 +219,14 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
 
       <div className={styles.formGroup}>
         <label
-          className={`${styles.checkboxLabel} ${isMultiDay ? styles.disabled : ''}`}
-          title={isMultiDay ? "종료 날짜가 설정된 경우 반복 이벤트를 사용할 수 없습니다" : ""}
+          className={`${styles.checkboxLabel} ${
+            isMultiDay ? styles.disabled : ""
+          }`}
+          title={
+            isMultiDay
+              ? "종료 날짜가 설정된 경우 반복 이벤트를 사용할 수 없습니다"
+              : ""
+          }
         >
           <input
             type="checkbox"
@@ -183,7 +235,12 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
             disabled={isMultiDay}
           />
           반복 이벤트
-          {isMultiDay && <span className={styles.disabledNote}> (종료 날짜 설정 시 사용 불가)</span>}
+          {isMultiDay && (
+            <span className={styles.disabledNote}>
+              {" "}
+              (종료 날짜 설정 시 사용 불가)
+            </span>
+          )}
         </label>
       </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, currentThemeState, bannerImageState } from "@store/atoms";
+import { Toaster } from 'react-hot-toast';
 import TitleBar from "@components/Layout/TitleBar";
 import WindowTitleBar from "@components/Common/WindowTitleBar";
 import Header from "@components/Common/Header";
@@ -127,6 +128,26 @@ function App() {
 
   return (
     <div className={styles.app}>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: 'var(--color-surface)',
+            color: 'var(--color-text)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '8px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          },
+          error: {
+            style: {
+              background: 'var(--color-danger-light)',
+              color: 'var(--color-danger)',
+              border: '1px solid var(--color-danger)',
+            },
+          },
+        }}
+      />
       <WindowTitleBar />
       <TitleBar />
       <Header />

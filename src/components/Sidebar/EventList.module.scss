@@ -1,5 +1,5 @@
-@use '@styles/variables' as *;
-@use '@styles/mixins' as *;
+@use "@styles/variables" as *;
+@use "@styles/mixins" as *;
 
 .eventList {
   display: flex;
@@ -123,7 +123,7 @@
   color: var(--color-text-secondary);
 
   &:hover {
-    background: #FFE4E1;
-    color: #FF6B6B;
+    background: #ffe4e1;
+    color: #ff6b6b;
   }
 }
