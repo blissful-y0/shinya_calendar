@@ -92,7 +92,9 @@ describe('EventForm Component', () => {
     const multiDayCheckbox = screen.getByLabelText('종료 날짜 설정');
     fireEvent.click(multiDayCheckbox);
 
-    const recurringCheckbox = screen.getByLabelText('반복 이벤트');
+    // 반복 이벤트 체크박스를 포함하는 label 요소를 찾아서 disabled 상태 확인
+    const recurringLabel = screen.getByText('반복 이벤트').closest('label');
+    const recurringCheckbox = recurringLabel?.querySelector('input[type="checkbox"]');
     expect(recurringCheckbox).toBeDisabled();
   });
 
