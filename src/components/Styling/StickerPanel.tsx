@@ -15,6 +15,11 @@ export interface Sticker {
   zIndex: number;
   name: string;
   rotation: number; // 회전 각도 (degrees)
+  // Responsive positioning (stored as percentages)
+  xPercent?: number;
+  yPercent?: number;
+  widthPercent?: number;
+  heightPercent?: number;
 }
 
 export interface StickerLayout {
@@ -62,11 +67,23 @@ const StickerPanel: React.FC = () => {
   };
 
   const addStickerToCanvas = (uploadedSticker: Omit<Sticker, 'x' | 'y' | 'zIndex' | 'rotation'>) => {
+    // Generate random position in percentages for responsive behavior
+    const xPercent = Math.random() * 60 + 10; // 10% to 70%
+    const yPercent = Math.random() * 60 + 10; // 10% to 70%
+    const widthPercent = 12; // Default 12% of container width
+    const heightPercent = 12; // Default 12% of container height
+
     const newSticker: Sticker = {
       ...uploadedSticker,
       id: uuidv4(),
-      x: Math.random() * 200 + 50,
-      y: Math.random() * 200 + 50,
+      x: 0, // Will be calculated from percentage
+      y: 0, // Will be calculated from percentage
+      width: 100, // Will be calculated from percentage
+      height: 100, // Will be calculated from percentage
+      xPercent,
+      yPercent,
+      widthPercent,
+      heightPercent,
       zIndex: Date.now(),
       rotation: 0
     };

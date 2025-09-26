@@ -1,7 +1,7 @@
 {
-  "name": "shinya-calendar",
+  "name": "simya-calendar",
   "version": "0.1.0",
-  "description": "A cute calendar and diary app built with Electron",
+  "description": "심야 캘린더",
   "main": "dist-electron/main.js",
   "author": {
     "name": "bliss",
@@ -68,8 +68,8 @@
     "wait-on": "^7.2.0"
   },
   "build": {
-    "appId": "com.shinya.calendar",
-    "productName": "Shinya Calendar",
+    "appId": "com.simya.calendar",
+    "productName": "심야 캘린더",
     "directories": {
       "output": "release"
     },
@@ -113,7 +113,7 @@
       "deleteAppDataOnUninstall": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Shinya Calendar",
+      "shortcutName": "심야 캘린더",
       "runAfterFinish": true
     },
     "linux": {
