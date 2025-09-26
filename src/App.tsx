@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
-import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, currentThemeState, bannerImageState, eventsState } from "@store/atoms";
+import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, currentThemeState, eventsState } from "@store/atoms";
 import { Toaster } from 'react-hot-toast';
 import { notificationService } from '@services/notificationService';
 import TitleBar from "@components/Layout/TitleBar";
@@ -25,7 +25,6 @@ function App() {
   const setStickerEditMode = useSetRecoilState(stickerEditModeState);
   const [stickers, setStickers] = useRecoilState(stickersState);
   const [currentTheme, setCurrentTheme] = useRecoilState(currentThemeState);
-  const [bannerImage, setBannerImage] = useRecoilState(bannerImageState);
   const events = useRecoilValue(eventsState);
   useTheme(); // Apply theme automatically
   const previousStickersRef = useRef(stickers);
@@ -49,9 +48,6 @@ function App() {
             }
             if (savedUIState.currentTheme) {
               setCurrentTheme(savedUIState.currentTheme);
-            }
-            if (typeof savedUIState.bannerImage === 'string' || savedUIState.bannerImage === null) {
-              setBannerImage(savedUIState.bannerImage);
             }
           }
         }
@@ -80,8 +76,7 @@ function App() {
           await window.electronAPI.store.set('appUIState', {
             sidebarOpen,
             viewMode,
-            currentTheme,
-            bannerImage
+            currentTheme
           });
         }
       } catch (error) {
@@ -100,7 +95,7 @@ function App() {
         window.electronAPI.removeAppBeforeQuitListener(saveAppState);
       }
     };
-  }, [sidebarOpen, viewMode, currentTheme, bannerImage]);
+  }, [sidebarOpen, viewMode, currentTheme]);
 
   // Update notifications when events change
   useEffect(() => {

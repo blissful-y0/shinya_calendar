@@ -77,6 +77,7 @@
 
 .hourlyGrid {
   position: relative;
+  min-height: 1440px; // 24 hours * 60px per hour
 }
 
 .hourRow {
@@ -107,7 +108,7 @@
   top: 0;
   left: 80px;
   right: 0;
-  bottom: 0;
+  min-height: 1440px; // 24 hours * 60px per hour
   pointer-events: none;
 }
 

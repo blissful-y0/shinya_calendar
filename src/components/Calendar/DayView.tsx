@@ -2,7 +2,9 @@ import React from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedDateState, eventsState, diaryEntriesState } from '@store/atoms';
 import { formatDate, isSameDayAs } from '@utils/calendar';
+import { getEventsForDate } from '@utils/eventUtils';
 import { Event } from '@types';
+import { startOfMonth, endOfMonth, addMonths } from 'date-fns';
 import { MdCreate } from 'react-icons/md';
 import styles from './DayView.module.scss';
 
@@ -11,14 +13,16 @@ const DayView: React.FC = () => {
   const events = useRecoilValue(eventsState);
   const diaryEntries = useRecoilValue(diaryEntriesState);
 
-  const dayEvents = events.filter(event =>
-    isSameDayAs(new Date(event.date), selectedDate)
-  ).sort((a, b) => {
-    if (a.startTime && b.startTime) {
-      return a.startTime.localeCompare(b.startTime);
-    }
-    return 0;
-  });
+  // 반복 이벤트를 포함하여 선택된 날짜의 이벤트 가져오기
+  const rangeStart = startOfMonth(addMonths(selectedDate, -1));
+  const rangeEnd = endOfMonth(addMonths(selectedDate, 1));
+  const dayEvents = getEventsForDate(events, selectedDate, rangeStart, rangeEnd)
+    .sort((a, b) => {
+      if (a.startTime && b.startTime) {
+        return a.startTime.localeCompare(b.startTime);
+      }
+      return 0;
+    });
 
   const hasDiary = diaryEntries.some(entry =>
     isSameDayAs(new Date(entry.date), selectedDate)

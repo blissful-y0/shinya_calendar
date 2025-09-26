@@ -278,15 +278,17 @@ export const bannerImageState = atom<string | null>({
   key: 'bannerImage',
   default: null,
   effects: [
-    ({ setSelf, onSet }) => {
-      // Electron Store에서 저장된 배너 이미지 불러오기
-      electronStore.get('bannerImage').then(savedBanner => {
-        if (savedBanner) {
-          setSelf(savedBanner);
-        }
-      }).catch(error => {
-        console.error('Failed to load banner image:', error);
-      });
+    ({ setSelf, onSet, trigger }) => {
+      // 초기 로드 시에만 Electron Store에서 불러오기
+      if (trigger === 'get') {
+        electronStore.get('bannerImage').then(savedBanner => {
+          if (savedBanner !== undefined) {
+            setSelf(savedBanner);
+          }
+        }).catch(error => {
+          console.error('Failed to load banner image:', error);
+        });
+      }
 
       // 배너 이미지 변경 시 Electron Store에 저장
       onSet((newBanner, _, isReset) => {
