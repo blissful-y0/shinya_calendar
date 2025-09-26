@@ -4,6 +4,7 @@ import {
   currentMonthState,
   sidebarOpenState,
   viewModeState,
+  stickerVisibilityState,
 } from "@store/atoms";
 import { getNextMonth, getPreviousMonth, monthNames } from "@utils/calendar";
 import styles from "./Header.module.scss";
@@ -12,6 +13,7 @@ const Header: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useRecoilState(currentMonthState);
   const [sidebarOpen, setSidebarOpen] = useRecoilState(sidebarOpenState);
   const [viewMode, setViewMode] = useRecoilState(viewModeState);
+  const [stickerVisibility, setStickerVisibility] = useRecoilState(stickerVisibilityState);
 
   const handlePreviousMonth = () => {
     setCurrentMonth(getPreviousMonth(currentMonth));
@@ -55,6 +57,15 @@ const Header: React.FC = () => {
       </div>
 
       <div className={styles.rightSection}>
+        <button
+          className={`${styles.stickerToggle} ${
+            stickerVisibility ? styles.active : ""
+          }`}
+          onClick={() => setStickerVisibility(!stickerVisibility)}
+          title={stickerVisibility ? "스티커 숨기기" : "스티커 보이기"}
+        >
+          🌟
+        </button>
         <div className={styles.viewToggle}>
           <button
             className={`${styles.viewButton} ${

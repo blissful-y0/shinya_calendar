@@ -1,0 +1,257 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.stickerPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.modeAlert {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: var(--color-accent);
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  color: var(--color-text-secondary);
+  font-size: $font-size-sm;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-primary);
+  }
+}
+
+.section {
+  background: var(--color-surface);
+  border-radius: $border-radius-medium;
+  padding: $spacing-lg;
+  border: 1px solid var(--color-border);
+  transition: opacity $transition-fast;
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.uploadButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  border: 2px dashed var(--color-primary);
+  background: transparent;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: var(--color-primary);
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: var(--color-accent);
+    border-style: solid;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: var(--color-border);
+    color: var(--color-text-secondary);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.stickerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: $spacing-md;
+  min-height: 200px;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+  color: var(--color-text-secondary);
+  text-align: center;
+
+  .emptyIcon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: $spacing-md;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0 0 $spacing-xs 0;
+    font-weight: 500;
+  }
+
+  span {
+    font-size: $font-size-xs;
+    opacity: 0.8;
+  }
+}
+
+.stickerItem {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  border-radius: $border-radius-small;
+  overflow: hidden;
+  transition: transform $transition-fast;
+
+  &:hover:not(.disabled) {
+    transform: translateY(-2px);
+  }
+
+  &.disabled {
+    opacity: 0.5;
+
+    .stickerPreview {
+      cursor: not-allowed;
+
+      &:hover {
+        border-color: var(--color-border) !important;
+        box-shadow: none !important;
+      }
+    }
+
+    .deleteButton {
+      cursor: not-allowed;
+      opacity: 0.5;
+
+      &:hover {
+        background: var(--color-danger-light) !important;
+        color: var(--color-danger) !important;
+      }
+    }
+  }
+}
+
+.stickerPreview {
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.stickerActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-xs;
+}
+
+.stickerName {
+  font-size: $font-size-xs;
+  color: var(--color-text-secondary);
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.deleteButton {
+  padding: $spacing-xs;
+  border: none;
+  background: var(--color-danger-light);
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  color: var(--color-danger);
+  transition: all $transition-fast;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: var(--color-danger);
+    color: white;
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.clearButton {
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid var(--color-danger);
+  background: transparent;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: var(--color-danger);
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) {
+    background: var(--color-danger);
+    color: white;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.info {
+  padding: $spacing-md;
+  background: var(--color-accent);
+  border-radius: $border-radius-small;
+  border-left: 4px solid var(--color-primary);
+
+  p {
+    margin: 0 0 $spacing-xs 0;
+    font-size: $font-size-sm;
+    color: var(--color-text);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .hint {
+    font-size: $font-size-xs;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
+}

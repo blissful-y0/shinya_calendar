@@ -13,11 +13,21 @@ function createWindow() {
   const isMac = process.platform === 'darwin';
   const isWindows = process.platform === 'win32';
 
+  // 저장된 창 상태 복원
+  const savedWindowState = store.get('windowState') as any;
+  const defaultBounds = { width: 1400, height: 900, x: undefined, y: undefined };
+
+  const windowState = savedWindowState ? {
+    width: Math.max(savedWindowState.width || defaultBounds.width, 1024),
+    height: Math.max(savedWindowState.height || defaultBounds.height, 576),
+    x: savedWindowState.x,
+    y: savedWindowState.y
+  } : defaultBounds;
+
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 900,
-    minWidth: 1000,
-    minHeight: 700,
+    ...windowState,
+    minWidth: 1024,
+    minHeight: 576,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -35,7 +45,18 @@ function createWindow() {
   });
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow?.show();
+    if (mainWindow) {
+      // 저장된 창 상태 복원
+      if (savedWindowState) {
+        if (savedWindowState.isMaximized) {
+          mainWindow.maximize();
+        }
+        if (savedWindowState.isFullScreen) {
+          mainWindow.setFullScreen(true);
+        }
+      }
+      mainWindow.show();
+    }
   });
 
   if (process.env.NODE_ENV === 'development') {
@@ -46,6 +67,24 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
+  });
+
+  // 앱 종료 전에 현재 상태 저장 요청
+  mainWindow.on('close', (e) => {
+    if (mainWindow) {
+      // 현재 창 상태 저장
+      const bounds = mainWindow.getBounds();
+      store.set('windowState', {
+        x: bounds.x,
+        y: bounds.y,
+        width: bounds.width,
+        height: bounds.height,
+        isMaximized: mainWindow.isMaximized(),
+        isFullScreen: mainWindow.isFullScreen()
+      });
+
+      mainWindow.webContents.send('app-before-quit');
+    }
   });
 }
 
@@ -88,4 +127,39 @@ ipcMain.handle('store-has', (_, key: string) => {
 
 ipcMain.handle('get-app-path', () => {
   return app.getPath('userData');
+});
+
+// Window resize API handler
+ipcMain.handle('resize-window', (_, width: number, height: number) => {
+  if (mainWindow) {
+    const currentBounds = mainWindow.getBounds();
+
+    // 화면 중앙에 위치하도록 x, y 좌표 계산
+    const { screen } = require('electron');
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width: screenWidth, height: screenHeight } = primaryDisplay.workAreaSize;
+
+    const x = Math.round((screenWidth - width) / 2);
+    const y = Math.round((screenHeight - height) / 2);
+
+    // 최소/최대 크기 제한 확인
+    const minWidth = 1024;
+    const minHeight = 576;
+    const maxWidth = primaryDisplay.bounds.width;
+    const maxHeight = primaryDisplay.bounds.height;
+
+    const finalWidth = Math.max(minWidth, Math.min(width, maxWidth));
+    const finalHeight = Math.max(minHeight, Math.min(height, maxHeight));
+
+    mainWindow.setBounds({
+      x,
+      y,
+      width: finalWidth,
+      height: finalHeight
+    }, true);
+
+    return { width: finalWidth, height: finalHeight };
+  }
+
+  throw new Error('Main window is not available');
 });

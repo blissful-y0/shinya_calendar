@@ -33,6 +33,8 @@ export interface Theme {
     text: string;
     textSecondary: string;
     border: string;
+    danger: string;
+    dangerLight: string;
   };
 }
 

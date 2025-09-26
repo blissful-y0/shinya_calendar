@@ -15,12 +15,23 @@
   display: flex;
   overflow: hidden;
   position: relative;
-  height: calc(100vh - 40px - 60px); // 전체 높이 - TitleBar - Header
+  height: calc(100vh - 40px - 60px); // 전체 높이 - TitleBar - Header (여유공간 제거)
 }
 
 .calendarContainer {
   flex: 1;
-  padding: $spacing-lg;
-  overflow: auto;
+  padding: $spacing-md;
+  overflow: hidden;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  // 작은 화면 최적화
+  @media (max-width: 1200px) {
+    padding: $spacing-sm;
+  }
+
+  @media (max-height: 700px) {
+    padding: $spacing-xs;
+  }
 }

@@ -2,6 +2,11 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   getAppPath: () => ipcRenderer.invoke('get-app-path'),
+  resizeWindow: (width: number, height: number) => ipcRenderer.invoke('resize-window', width, height),
+
+  // 앱 종료 전 이벤트 리스너
+  onAppBeforeQuit: (callback: () => void) => ipcRenderer.on('app-before-quit', callback),
+  removeAppBeforeQuitListener: (callback: () => void) => ipcRenderer.removeListener('app-before-quit', callback),
 
   store: {
     get: (key: string) => ipcRenderer.invoke('store-get', key),

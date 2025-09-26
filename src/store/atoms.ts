@@ -1,5 +1,6 @@
 import { atom } from 'recoil';
 import { Event, DiaryEntry, Theme, DDay } from '@types/index';
+import { Sticker, StickerLayout, UploadedStickerTemplate } from '@components/Styling/StickerPanel';
 import { startOfMonth } from 'date-fns';
 import { electronStore } from '@utils/electronStore';
 
@@ -14,7 +15,9 @@ export const defaultTheme: Theme = {
     surface: '#FFFFFF',
     text: '#4A4A4A',
     textSecondary: '#8B8B8B',
-    border: '#F5E6E0'
+    border: '#F5E6E0',
+    danger: '#FF6B6B',
+    dangerLight: '#FFE0E0'
   }
 };
 
@@ -31,7 +34,9 @@ export const predefinedThemes: Theme[] = [
       surface: '#FFFFFF',
       text: '#4A4A4A',
       textSecondary: '#8B8B8B',
-      border: '#E0E6F5'
+      border: '#E0E6F5',
+      danger: '#FF6B6B',
+      dangerLight: '#FFE0E0'
     }
   },
   {
@@ -45,7 +50,9 @@ export const predefinedThemes: Theme[] = [
       surface: '#FFFFFF',
       text: '#4A4A4A',
       textSecondary: '#8B8B8B',
-      border: '#EDE0F5'
+      border: '#EDE0F5',
+      danger: '#FF6B6B',
+      dangerLight: '#FFE0E0'
     }
   },
   {
@@ -59,7 +66,9 @@ export const predefinedThemes: Theme[] = [
       surface: '#FFFFFF',
       text: '#4A4A4A',
       textSecondary: '#8B8B8B',
-      border: '#E0F5EA'
+      border: '#E0F5EA',
+      danger: '#FF6B6B',
+      dangerLight: '#FFE0E0'
     }
   }
 ];
@@ -287,6 +296,102 @@ export const bannerImageState = atom<string | null>({
           } else {
             electronStore.delete('bannerImage');
           }
+        }
+      });
+    }
+  ]
+});
+
+// 스티커 상태
+export const stickersState = atom<Sticker[]>({
+  key: 'stickers',
+  default: [],
+  effects: [
+    ({ setSelf, onSet }) => {
+      // Electron Store에서 저장된 스티커 목록 불러오기
+      electronStore.get('stickers').then(savedStickers => {
+        if (savedStickers) {
+          setSelf(savedStickers);
+        }
+      }).catch(error => {
+        console.error('Failed to load stickers:', error);
+      });
+
+      // 스티커 변경 시 Electron Store에 저장
+      onSet((newStickers, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('stickers', newStickers);
+        }
+      });
+    }
+  ]
+});
+
+// 스티커 편집 모드 상태
+export const stickerEditModeState = atom<boolean>({
+  key: 'stickerEditMode',
+  default: false
+});
+
+// 스티커 표시/숨김 상태
+export const stickerVisibilityState = atom<boolean>({
+  key: 'stickerVisibility',
+  default: true,
+  effects: [
+    electronStore<boolean>('stickerVisibility')
+  ]
+});
+
+// 모달 활성화 상태 (모달이 열려있을 때 스티커 숨기기용)
+export const modalActiveState = atom<boolean>({
+  key: 'modalActive',
+  default: false
+});
+
+// 업로드된 스티커 템플릿들
+export const uploadedStickersState = atom<UploadedStickerTemplate[]>({
+  key: 'uploadedStickers',
+  default: [],
+  effects: [
+    ({ setSelf, onSet }) => {
+      electronStore.get('uploadedStickers').then(savedTemplates => {
+        if (savedTemplates) {
+          setSelf(savedTemplates);
+        }
+      }).catch(error => {
+        console.error('Failed to load uploaded stickers:', error);
+      });
+
+      onSet((newTemplates, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('uploadedStickers', newTemplates);
+        }
+      });
+    }
+  ]
+});
+
+// 해상도별 스티커 레이아웃들
+export const stickerLayoutsState = atom<StickerLayout[]>({
+  key: 'stickerLayouts',
+  default: [],
+  effects: [
+    ({ setSelf, onSet }) => {
+      electronStore.get('stickerLayouts').then(savedLayouts => {
+        if (savedLayouts) {
+          const restored = savedLayouts.map((layout: any) => ({
+            ...layout,
+            savedAt: new Date(layout.savedAt)
+          }));
+          setSelf(restored);
+        }
+      }).catch(error => {
+        console.error('Failed to load sticker layouts:', error);
+      });
+
+      onSet((newLayouts, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('stickerLayouts', newLayouts);
         }
       });
     }

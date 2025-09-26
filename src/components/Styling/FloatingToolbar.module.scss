@@ -1,0 +1,410 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.floatingToolbar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-large;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px);
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.toolbarContent {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+}
+
+.toolButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-accent);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.saveCompleteButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary-light);
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  color: var(--color-primary);
+  font-size: $font-size-sm;
+  font-weight: 500;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-primary);
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.cancelButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid var(--color-danger);
+  background: var(--color-danger-light);
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  color: var(--color-danger);
+  font-size: $font-size-sm;
+  font-weight: 500;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-danger);
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.uploadPanel {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  max-height: 400px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-medium;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+  z-index: 999;
+  animation: fadeIn 0.2s ease-out;
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+.uploadHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-background);
+
+  h4 {
+    margin: 0;
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+}
+
+.uploadButton {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  border: 2px dashed var(--color-primary);
+  background: transparent;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: var(--color-primary);
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-accent);
+    border-style: solid;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.stickerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.emptyState {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+  color: var(--color-text-secondary);
+  text-align: center;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: $spacing-sm;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+  }
+}
+
+.stickerItem {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  border-radius: $border-radius-small;
+  overflow: hidden;
+  transition: transform $transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.stickerPreview {
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.stickerInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stickerName {
+  font-size: $font-size-xs;
+  color: var(--color-text-secondary);
+  flex: 1;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.removeButton {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-danger);
+    color: white;
+  }
+}
+
+.saveDialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.saveDialogContent {
+  background: var(--color-background);
+  border-radius: $border-radius-large;
+  padding: $spacing-xl;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  width: 90vw;
+  max-width: 400px;
+  animation: slideUpDialog 0.3s ease-out;
+
+  h4 {
+    margin: 0 0 $spacing-lg 0;
+    font-size: $font-size-large;
+    font-weight: 600;
+    color: var(--color-text);
+    text-align: center;
+  }
+}
+
+@keyframes slideUpDialog {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.inputGroup {
+  margin-bottom: $spacing-lg;
+
+  label {
+    display: block;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: $spacing-sm;
+  }
+
+  input {
+    width: 100%;
+    padding: $spacing-md;
+    border: 2px solid var(--color-border);
+    border-radius: $border-radius-medium;
+    font-size: $font-size-base;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: all $transition-fast;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+    }
+
+    &::placeholder {
+      color: var(--color-text-secondary);
+    }
+  }
+}
+
+.dialogActions {
+  display: flex;
+  gap: $spacing-md;
+  justify-content: flex-end;
+}
+
+.cancelButton,
+.confirmButton {
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $border-radius-medium;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+  min-width: 80px;
+}
+
+.cancelButton {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+
+  &:hover {
+    background: var(--color-accent);
+    color: var(--color-text);
+  }
+}
+
+.confirmButton {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@media (max-width: 768px) {
+  .uploadPanel {
+    width: 90vw;
+    max-width: 400px;
+  }
+
+  .stickerGrid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+}

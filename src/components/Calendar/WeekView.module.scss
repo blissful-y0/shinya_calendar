@@ -14,7 +14,7 @@
   display: flex;
   background: var(--color-background);
   border-bottom: 2px solid var(--color-border);
-  min-height: 80px;
+  min-height: 60px;
 }
 
 .timeColumn {
@@ -136,7 +136,7 @@
 .timeGrid {
   position: relative;
   display: flex;
-  height: 1440px; // 24 hours * 60px
+  height: 100%;
 }
 
 .hoursColumn {

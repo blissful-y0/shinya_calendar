@@ -1,5 +1,5 @@
-@use '@styles/variables' as *;
-@use '@styles/mixins' as *;
+@use "@styles/variables" as *;
+@use "@styles/mixins" as *;
 
 .ddayWidget {
   position: sticky;
@@ -23,7 +23,7 @@
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -39,48 +39,49 @@
 
   &.dday {
     &::before {
-      background: #FF1493;
+      background: var(--color-primary);
     }
 
     .ddayBadge {
-      background: #FF1493;
+      background: var(--color-primary);
       animation: pulse 1.5s infinite;
     }
   }
 
   &.soon {
     &::before {
-      background: #FF8C00;
+      background: var(--color-primary);
     }
 
     .ddayBadge {
-      background: #FF8C00;
+      background: var(--color-primary);
     }
   }
 
   &.future {
     &::before {
-      background: #4A90E2;
+      background: var(--color-primary);
     }
 
     .ddayBadge {
-      background: #4A90E2;
+      background: var(--color-primary);
     }
   }
 
   &.past {
     &::before {
-      background: #757575;
+      background: var(--color-primary);
     }
 
     .ddayBadge {
-      background: #757575;
+      background: var(--color-primary);
     }
   }
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {

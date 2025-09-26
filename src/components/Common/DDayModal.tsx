@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { dDaysState, activeDDayState } from '@store/atoms';
+import React, { useState, useEffect } from 'react';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { dDaysState, activeDDayState, modalActiveState } from '@store/atoms';
 import { DDay } from '@types/index';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
@@ -14,6 +14,7 @@ interface DDayModalProps {
 const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
   const [ddays, setDDays] = useRecoilState(dDaysState);
   const [activeDDay, setActiveDDay] = useRecoilState(activeDDayState);
+  const setModalActive = useSetRecoilState(modalActiveState);
   const [showForm, setShowForm] = useState(false);
   const [editingDDay, setEditingDDay] = useState<DDay | null>(null);
 
@@ -80,6 +81,12 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
   const handleSetActive = (dday: DDay) => {
     setActiveDDay(dday);
   };
+
+  // 모달 마운트/언마운트 시 모달 상태 관리
+  useEffect(() => {
+    setModalActive(true);
+    return () => setModalActive(false);
+  }, [setModalActive]);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
