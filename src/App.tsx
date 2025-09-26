@@ -129,7 +129,7 @@ function App() {
   return (
     <div className={styles.app}>
       <Toaster
-        position="top-center"
+        position="top-right"
         toastOptions={{
           duration: 3000,
           style: {

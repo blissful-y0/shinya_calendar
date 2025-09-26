@@ -150,13 +150,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
             id="startDate"
             type="date"
             value={startDate}
-            onChange={(e) => {
-              setStartDate(e.target.value);
-              // 종료 날짜가 시작 날짜보다 이전인 경우 자동 조정
-              if (isMultiDay && e.target.value > endDate) {
-                setEndDate(e.target.value);
-              }
-            }}
+            onChange={(e) => setStartDate(e.target.value)}
             required
           />
         </div>
@@ -167,15 +161,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
               id="endDate"
               type="date"
               value={endDate}
-              onChange={(e) => {
-                const newEndDate = e.target.value;
-                if (newEndDate < startDate) {
-                  toast.error("종료 날짜가 시작 날짜보다 이전일 수 없습니다");
-                  setEndDate(startDate);
-                } else {
-                  setEndDate(newEndDate);
-                }
-              }}
+              onChange={(e) => setEndDate(e.target.value)}
               min={startDate}
               required
             />
