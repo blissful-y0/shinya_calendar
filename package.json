@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
+    "build:win": "yarn vite build && electron-builder --win",
+    "build:mac": "yarn vite build && electron-builder --mac",
+    "build:linux": "yarn vite build && electron-builder --linux",
     "preview": "vite preview",
     "electron": "electron .",
     "electron:dev": "concurrently \"yarn dev\" \"wait-on http://localhost:5173 && electron .\"",
@@ -48,7 +51,7 @@
     "appId": "com.shinya.calendar",
     "productName": "Shinya Calendar",
     "directories": {
-      "output": "dist"
+      "output": "release"
     },
     "files": [
       "dist",
@@ -58,7 +61,23 @@
       "category": "public.app-category.productivity"
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Shinya Calendar"
     },
     "linux": {
       "target": "AppImage"
