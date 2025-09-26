@@ -67,6 +67,9 @@
     ],
     "mac": {
       "category": "public.app-category.productivity",
+      "identity": null,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": true,
       "target": [
         {
           "target": "dmg",
