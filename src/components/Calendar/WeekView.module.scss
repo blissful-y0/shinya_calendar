@@ -96,7 +96,10 @@
   display: flex;
   min-height: 60px;
   background: var(--color-background);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 2px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .allDayLabel {
@@ -142,6 +145,10 @@
 .hoursColumn {
   width: 60px;
   border-right: 1px solid var(--color-border);
+  position: sticky;
+  left: 0;
+  background: var(--color-surface);
+  z-index: 1;
 }
 
 .hourLabel {
@@ -164,6 +171,13 @@
   bottom: 0;
   width: calc(100% / 7);
   border-right: 1px solid var(--color-border);
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 59px,
+    var(--color-border) 59px,
+    var(--color-border) 60px
+  );
 
   &:last-child {
     border-right: none;
@@ -181,11 +195,13 @@
   top: 0;
   left: 0;
   right: 0;
+  pointer-events: none;
 }
 
 .hourLine {
   height: 60px;
   border-bottom: 1px solid var(--color-border);
+  box-sizing: border-box;
 }
 
 .eventsLayer {

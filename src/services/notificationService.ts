@@ -1,5 +1,13 @@
-import { Event, ReminderTime } from '@types';
-import { isBefore, isAfter, addMinutes, subMinutes, subHours, startOfDay, parseISO } from 'date-fns';
+import { Event, ReminderTime } from "@types";
+import {
+  isBefore,
+  isAfter,
+  addMinutes,
+  subMinutes,
+  subHours,
+  startOfDay,
+  parseISO,
+} from "date-fns";
 
 interface ScheduledNotification {
   eventId: string;
@@ -8,24 +16,25 @@ interface ScheduledNotification {
 }
 
 class NotificationService {
-  private scheduledNotifications: Map<string, ScheduledNotification> = new Map();
+  private scheduledNotifications: Map<string, ScheduledNotification> =
+    new Map();
   private checkInterval: NodeJS.Timeout | null = null;
 
   /**
-   * Start the notification service
+   * 알림 서비스 시작
    */
   start() {
-    // Check for notifications every minute
+    // 매 분마다 체크
     this.checkInterval = setInterval(() => {
       this.checkUpcomingEvents();
-    }, 60000); // Check every minute
+    }, 60000);
 
-    // Initial check
+    // 초기 체크
     this.checkUpcomingEvents();
   }
 
   /**
-   * Stop the notification service
+   * 알림 서비스 중지
    */
   stop() {
     if (this.checkInterval) {
@@ -33,45 +42,45 @@ class NotificationService {
       this.checkInterval = null;
     }
 
-    // Clear all scheduled notifications
-    this.scheduledNotifications.forEach(notification => {
+    // 모든 예약된 알림 취소
+    this.scheduledNotifications.forEach((notification) => {
       clearTimeout(notification.timeoutId);
     });
     this.scheduledNotifications.clear();
   }
 
   /**
-   * Calculate notification time based on event and reminder settings
+   * 알림 시간 계산
    */
   private calculateNotificationTime(event: Event): Date | null {
     if (!event.reminder || !event.reminderTime) return null;
 
     const eventDate = new Date(event.date);
 
-    // For all-day events, set time to midnight (00:00)
+    // 종일 이벤트인 경우, 시간을 00:00으로 설정
     let eventTime: Date;
     if (event.isAllDay) {
       eventTime = startOfDay(eventDate);
       eventTime.setHours(0, 0, 0, 0);
     } else if (event.startTime) {
-      const [hours, minutes] = event.startTime.split(':').map(Number);
+      const [hours, minutes] = event.startTime.split(":").map(Number);
       eventTime = new Date(eventDate);
       eventTime.setHours(hours, minutes, 0, 0);
     } else {
       return null;
     }
 
-    // Calculate notification time based on reminder setting
+    // 알림 시간 계산
     switch (event.reminderTime) {
-      case 'now':
+      case "now":
         return eventTime;
-      case '5min':
+      case "5min":
         return subMinutes(eventTime, 5);
-      case '10min':
+      case "10min":
         return subMinutes(eventTime, 10);
-      case '30min':
+      case "30min":
         return subMinutes(eventTime, 30);
-      case '1hour':
+      case "1hour":
         return subHours(eventTime, 1);
       default:
         return eventTime;
@@ -79,12 +88,12 @@ class NotificationService {
   }
 
   /**
-   * Schedule a notification for an event
+   * 알림 예약
    */
   scheduleNotification(event: Event) {
     if (!event.reminder) return;
 
-    // Cancel existing notification for this event
+    // 이벤트에 대한 기존 알림 취소
     this.cancelNotification(event.id);
 
     const notificationTime = this.calculateNotificationTime(event);
@@ -93,9 +102,9 @@ class NotificationService {
     const now = new Date();
     const timeUntilNotification = notificationTime.getTime() - now.getTime();
 
-    // Only schedule if the notification is in the future and within 24 hours
-    // to avoid potential memory issues with very distant events
-    const maxDelay = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    // 알림이 미래이고 24시간 이내인 경우에만 예약
+    // 메모리 문제를 방지하기 위해 24시간 이내의 이벤트만 예약
+    const maxDelay = 24 * 60 * 60 * 1000; // 24시간 이내의 이벤트만 예약
 
     if (timeUntilNotification > 0 && timeUntilNotification <= maxDelay) {
       const timeoutId = setTimeout(async () => {
@@ -106,13 +115,13 @@ class NotificationService {
       this.scheduledNotifications.set(event.id, {
         eventId: event.id,
         timeoutId,
-        scheduledTime: notificationTime
+        scheduledTime: notificationTime,
       });
     }
   }
 
   /**
-   * Cancel a scheduled notification
+   * 예약된 알림 취소
    */
   cancelNotification(eventId: string) {
     const notification = this.scheduledNotifications.get(eventId);
@@ -123,15 +132,15 @@ class NotificationService {
   }
 
   /**
-   * Send a notification using Electron's notification API
+   * Electron의 알림 API를 사용하여 알림 전송
    */
   private async sendNotification(event: Event) {
     try {
       const title = event.title;
-      let body = '';
+      let body = "";
 
       if (event.isAllDay) {
-        body = '오늘 하루 종일 진행되는 이벤트입니다.';
+        body = "오늘 하루 종일 진행되는 이벤트입니다.";
       } else if (event.startTime && event.endTime) {
         body = `${event.startTime} - ${event.endTime}`;
       } else if (event.startTime) {
@@ -148,17 +157,17 @@ class NotificationService {
           title,
           body,
           icon: undefined, // Can add an icon path here if needed
-          silent: false
+          silent: false,
         });
 
         if (!result) {
           console.warn(`Failed to show notification for event: ${event.title}`);
         }
       } else {
-        console.warn('Notification API not available');
+        console.warn("Notification API not available");
       }
     } catch (error) {
-      console.error('Error sending notification:', error);
+      console.error("Error sending notification:", error);
     }
   }
 
@@ -175,13 +184,13 @@ class NotificationService {
    */
   updateNotifications(events: Event[]) {
     // Clear all existing notifications
-    this.scheduledNotifications.forEach(notification => {
+    this.scheduledNotifications.forEach((notification) => {
       clearTimeout(notification.timeoutId);
     });
     this.scheduledNotifications.clear();
 
     // Schedule new notifications
-    events.forEach(event => {
+    events.forEach((event) => {
       if (event.reminder) {
         this.scheduleNotification(event);
       }

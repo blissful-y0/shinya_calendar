@@ -37,6 +37,13 @@
   flex: 1;
   overflow-y: auto;
   position: relative;
+  background: linear-gradient(
+    to bottom,
+    var(--color-border) 1px,
+    transparent 1px
+  );
+  background-size: 100% 60px;
+  background-position: 0 -1px;
 }
 
 .allDaySection {
@@ -45,6 +52,9 @@
   background: var(--color-background);
   border-bottom: 2px solid var(--color-border);
   min-height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .allDayLabel {
@@ -96,6 +106,10 @@
   color: var(--color-text-secondary);
   text-align: right;
   border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
+  position: sticky;
+  left: 0;
+  z-index: 1;
 }
 
 .hourContent {
