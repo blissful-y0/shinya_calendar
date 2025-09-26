@@ -9,9 +9,12 @@ export interface Event {
   description?: string;
   tags?: string[];
   reminder?: boolean;
+  reminderTime?: ReminderTime; // When to send reminder
   isAllDay?: boolean; // All-day event flag
   recurrence?: RecurrenceRule; // Recurring event settings
 }
+
+export type ReminderTime = 'now' | '5min' | '10min' | '30min' | '1hour';
 
 export interface RecurrenceRule {
   frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';

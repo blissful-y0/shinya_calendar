@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { eventsState } from "@store/atoms";
-import { Event, RecurrenceRule } from "@types";
+import { Event, RecurrenceRule, ReminderTime } from "@types";
 import { v4 as uuidv4 } from "uuid";
 import { format, isAfter } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -39,6 +39,10 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       frequency: "daily",
       interval: 1,
     }
+  );
+  const [reminder, setReminder] = useState(event?.reminder || false);
+  const [reminderTime, setReminderTime] = useState<ReminderTime>(
+    event?.reminderTime || "10min"
   );
 
   const colorOptions = [
@@ -96,6 +100,8 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       color,
       isAllDay,
       recurrence: isRecurring ? recurrence : undefined,
+      reminder,
+      reminderTime: reminder ? reminderTime : undefined,
       tags: [],
     };
 
@@ -298,6 +304,52 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
               min={startDate}
             />
           </div>
+        </div>
+      )}
+
+      <div className={styles.formGroup}>
+        <label className={styles.checkboxLabel}>
+          <input
+            type="checkbox"
+            checked={reminder}
+            onChange={(e) => setReminder(e.target.checked)}
+            disabled={!startTime && !isAllDay}
+          />
+          알림 설정
+          {!startTime && !isAllDay && (
+            <span className={styles.disabledNote}>
+              {" "}
+              (시간 설정 필요)
+            </span>
+          )}
+        </label>
+      </div>
+
+      {reminder && (
+        <div className={styles.reminderGroup}>
+          <div className={styles.formGroup}>
+            <label htmlFor="reminderTime">알림 시간</label>
+            <select
+              id="reminderTime"
+              value={reminderTime}
+              onChange={(e) => setReminderTime(e.target.value as ReminderTime)}
+            >
+              <option value="now">{isAllDay ? '자정 (00:00)' : '이벤트 시작 시'}</option>
+              {!isAllDay && (
+                <>
+                  <option value="5min">5분 전</option>
+                  <option value="10min">10분 전</option>
+                  <option value="30min">30분 전</option>
+                  <option value="1hour">1시간 전</option>
+                </>
+              )}
+            </select>
+          </div>
+          {isAllDay && (
+            <p className={styles.reminderNote}>
+              하루 종일 이벤트는 자정에 알림이 울립니다.
+            </p>
+          )}
         </div>
       )}
 

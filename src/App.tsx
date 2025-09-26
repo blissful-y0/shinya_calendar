@@ -1,7 +1,8 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
-import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, currentThemeState, bannerImageState } from "@store/atoms";
+import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, currentThemeState, bannerImageState, eventsState } from "@store/atoms";
 import { Toaster } from 'react-hot-toast';
+import { notificationService } from '@services/notificationService';
 import TitleBar from "@components/Layout/TitleBar";
 import WindowTitleBar from "@components/Common/WindowTitleBar";
 import Header from "@components/Common/Header";
@@ -25,6 +26,7 @@ function App() {
   const [stickers, setStickers] = useRecoilState(stickersState);
   const [currentTheme, setCurrentTheme] = useRecoilState(currentThemeState);
   const [bannerImage, setBannerImage] = useRecoilState(bannerImageState);
+  const events = useRecoilValue(eventsState);
   useTheme(); // Apply theme automatically
   const previousStickersRef = useRef(stickers);
   const isEditModeStartingRef = useRef(false);
@@ -59,6 +61,14 @@ function App() {
     };
 
     restoreAppState();
+
+    // Start notification service
+    notificationService.start();
+
+    // Cleanup on unmount
+    return () => {
+      notificationService.stop();
+    };
   }, []);
 
   // 앱 종료 시 현재 상태 저장
@@ -91,6 +101,11 @@ function App() {
       }
     };
   }, [sidebarOpen, viewMode, currentTheme, bannerImage]);
+
+  // Update notifications when events change
+  useEffect(() => {
+    notificationService.updateNotifications(events);
+  }, [events]);
 
   // 편집 모드 상태 변화 감지
   useEffect(() => {
