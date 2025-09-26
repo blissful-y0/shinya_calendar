@@ -1,4 +1,5 @@
 @import './variables.scss';
+@import './fonts.scss';
 
 * {
   margin: 0;
@@ -6,12 +7,27 @@
   box-sizing: border-box;
 }
 
-html, body {
+html {
+  // 폰트 스무딩 및 렌더링 최적화
+  @include font-smooth;
+
+  // 반응형 폰트 크기 (브라우저 기본값 존중)
+  font-size: 100%;
+}
+
+body {
   height: 100%;
   font-family: $font-primary;
   font-size: $font-size-base;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-weight: $font-weight-regular;
+  line-height: 1.5;
+
+  // 한글 텍스트 최적화
+  @include korean-text-optimize;
+
+  // 폰트 특성 설정
+  font-variant-numeric: tabular-nums; // 숫자 정렬
+  font-feature-settings: 'kern' 1; // 커닝 활성화
 }
 
 #root {

@@ -21,7 +21,7 @@
 .weekDay {
   text-align: center;
   font-size: $font-size-small;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -91,7 +91,7 @@
 
 .dayNumber {
   font-size: $font-size-base;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   color: var(--color-text);
   margin-bottom: $spacing-xs;
 }

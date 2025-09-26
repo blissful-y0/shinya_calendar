@@ -1,9 +1,14 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
+import os from 'os';
 
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {
+  // macOS 특정 설정
+  const isMac = process.platform === 'darwin';
+  const isWindows = process.platform === 'win32';
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -12,9 +17,15 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      // 폰트 렌더링 최적화
+      webgl: true,
+      experimentalFeatures: true
     },
-    titleBarStyle: 'hiddenInset',
+    // OS별 타이틀바 스타일
+    titleBarStyle: isMac ? 'hiddenInset' : 'default',
+    // Windows에서는 frame 옵션 사용
+    frame: !isWindows,
     backgroundColor: '#faf8f5',
     show: false
   });

@@ -6,7 +6,9 @@
       "Bash(yarn install)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(yarn add:*)"
+      "Bash(yarn add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

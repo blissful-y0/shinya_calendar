@@ -1,8 +1,24 @@
-$font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-$font-size-base: 14px;
+@import './fonts.scss';
+
+// 폰트 패밀리 (fonts.scss에서 정의한 스택 사용)
+$font-primary: $font-stack-korean;
+$font-mono: $font-stack-mono;
+
+// 폰트 크기 (더 체계적으로 정리)
+$font-size-xs: 11px;
 $font-size-small: 12px;
-$font-size-large: 16px;
+$font-size-base: 14px;
+$font-size-medium: 16px;
+$font-size-large: 18px;
 $font-size-xlarge: 20px;
+$font-size-xxlarge: 24px;
+
+// 폰트 굵기
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
 
 $border-radius: 12px;
 $border-radius-small: 8px;

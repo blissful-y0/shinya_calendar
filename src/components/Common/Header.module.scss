@@ -48,7 +48,7 @@
 
 .title {
   font-size: $font-size-xlarge;
-  font-weight: 600;
+  font-weight: $font-weight-semibold;
   color: var(--color-text);
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   -webkit-background-clip: text;
@@ -89,7 +89,7 @@
 
   h2 {
     font-size: $font-size-xlarge;
-    font-weight: 500;
+    font-weight: $font-weight-medium;
     color: var(--color-text);
   }
 }
@@ -101,7 +101,7 @@
   border-radius: $border-radius-small;
   cursor: pointer;
   font-size: $font-size-base;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   color: var(--color-primary);
   transition: all $transition-fast;
 
@@ -139,7 +139,7 @@
   border-radius: $border-radius-small - 2px;
   cursor: pointer;
   font-size: $font-size-small;
-  font-weight: 500;
+  font-weight: $font-weight-medium;
   color: var(--color-text-secondary);
   transition: all $transition-fast;
 
