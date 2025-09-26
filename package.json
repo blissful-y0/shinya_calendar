@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "description": "A cute calendar and diary app built with Electron",
   "main": "dist-electron/main.js",
+  "author": {
+    "name": "bliss",
+    "email": "blissful.y0@gmail.com"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "prebuild": "tsc && vite build",
@@ -62,7 +67,6 @@
     ],
     "mac": {
       "category": "public.app-category.productivity",
-      "identity": null,
       "target": [
         {
           "target": "dmg",
