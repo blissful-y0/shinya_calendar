@@ -39,7 +39,7 @@ export interface UploadedStickerTemplate {
 const StickerPanel: React.FC = () => {
   const [stickers, setStickers] = useRecoilState(stickersState);
   const stickerEditMode = useRecoilValue(stickerEditModeState);
-  const [uploadedStickers, setUploadedStickers] = useState<Omit<Sticker, 'x' | 'y' | 'zIndex' | 'rotation'>[]>([]);
+  const [uploadedStickers, setUploadedStickers] = useState<Omit<Sticker, 'x' | 'y' | 'width' | 'height' | 'zIndex' | 'rotation'>[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,8 +51,6 @@ const StickerPanel: React.FC = () => {
         const newSticker = {
           id: uuidv4(),
           image: result,
-          width: 100,
-          height: 100,
           name: file.name
         };
         setUploadedStickers(prev => [...prev, newSticker]);
@@ -61,14 +59,15 @@ const StickerPanel: React.FC = () => {
     }
   };
 
-  const addStickerToCanvas = (uploadedSticker: Omit<Sticker, 'x' | 'y' | 'zIndex' | 'rotation'>) => {
+  const addStickerToCanvas = (uploadedSticker: Omit<Sticker, 'x' | 'y' | 'zIndex' | 'rotation' | 'width' | 'height'>) => {
     const newSticker: Sticker = {
-      ...uploadedSticker,
       id: uuidv4(),
+      image: uploadedSticker.image,
+      name: uploadedSticker.name,
       x: Math.random() * 30 + 10, // 10% ~ 40% 사이의 랜덤 위치
       y: Math.random() * 30 + 10, // 10% ~ 40% 사이의 랜덤 위치
-      width: 10, // 화면 너비의 10%
-      height: 10, // 화면 너비의 10% (비율 유지)
+      width: 15, // 화면 너비의 15%
+      height: 15, // 화면 너비의 15% (비율 유지)
       zIndex: Date.now(),
       rotation: 0
     };

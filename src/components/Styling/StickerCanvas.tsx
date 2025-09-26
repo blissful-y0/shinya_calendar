@@ -51,7 +51,9 @@ const StickerCanvas: React.FC = () => {
   // 스티커의 실제 픽셀 위치 계산
   const getStickerPixelPosition = (sticker: Sticker) => {
     const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return { x: 0, y: 0, width: 100, height: 100 };
+    if (!rect) {
+      return { x: 0, y: 0, width: 100, height: 100 };
+    }
 
     return {
       x: percentToPixel(sticker.x, rect.width),
