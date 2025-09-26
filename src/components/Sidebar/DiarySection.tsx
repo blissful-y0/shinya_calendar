@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useSetRecoilState } from 'recoil';
-import { diaryEntriesState } from '@store/atoms';
-import { DiaryEntry } from '@types/index';
-import { v4 as uuidv4 } from 'uuid';
-import styles from './DiarySection.module.scss';
+import React, { useState, useEffect } from "react";
+import { useSetRecoilState } from "recoil";
+import { diaryEntriesState } from "@store/atoms";
+import { DiaryEntry } from "@types/index";
+import { v4 as uuidv4 } from "uuid";
+import styles from "./DiarySection.module.scss";
 
 interface DiarySectionProps {
   date: Date;
@@ -12,29 +12,37 @@ interface DiarySectionProps {
 
 const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
   const setDiaryEntries = useSetRecoilState(diaryEntriesState);
-  const [content, setContent] = useState(entry?.content || '');
-  const [title, setTitle] = useState(entry?.title || '');
-  const [mood, setMood] = useState<DiaryEntry['mood']>(entry?.mood || 'neutral');
-  const [weather, setWeather] = useState(entry?.weather || '');
+  const [content, setContent] = useState(entry?.content || "");
+  const [title, setTitle] = useState(entry?.title || "");
+  const [mood, setMood] = useState<DiaryEntry["mood"]>(
+    entry?.mood || "neutral"
+  );
+  const [weather, setWeather] = useState(entry?.weather || "");
   const [isEditing, setIsEditing] = useState(!entry);
 
   useEffect(() => {
-    setContent(entry?.content || '');
-    setTitle(entry?.title || '');
-    setMood(entry?.mood || 'neutral');
-    setWeather(entry?.weather || '');
+    setContent(entry?.content || "");
+    setTitle(entry?.title || "");
+    setMood(entry?.mood || "neutral");
+    setWeather(entry?.weather || "");
     setIsEditing(!entry);
   }, [entry, date]);
 
   const moodEmojis = {
-    happy: '😊',
-    sad: '😢',
-    neutral: '😐',
-    excited: '🎉',
-    tired: '😴'
+    happy: "😊",
+    sad: "😢",
+    neutral: "😐",
+    excited: "🎉",
+    tired: "😴",
   };
 
-  const weatherOptions = ['☀️ Sunny', '☁️ Cloudy', '🌧️ Rainy', '❄️ Snowy', '🌈 Rainbow'];
+  const weatherOptions = [
+    "☀️ Sunny",
+    "☁️ Cloudy",
+    "🌧️ Rainy",
+    "❄️ Snowy",
+    "🌈 Rainbow",
+  ];
 
   const handleSave = () => {
     if (!content.trim()) return;
@@ -46,12 +54,12 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
       content,
       mood,
       weather,
-      tags: []
+      tags: [],
     };
 
-    setDiaryEntries(prev => {
+    setDiaryEntries((prev) => {
       if (entry) {
-        return prev.map(e => e.id === entry.id ? newEntry : e);
+        return prev.map((e) => (e.id === entry.id ? newEntry : e));
       }
       return [...prev, newEntry];
     });
@@ -61,11 +69,11 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
 
   const handleDelete = () => {
     if (entry) {
-      setDiaryEntries(prev => prev.filter(e => e.id !== entry.id));
-      setContent('');
-      setTitle('');
-      setMood('neutral');
-      setWeather('');
+      setDiaryEntries((prev) => prev.filter((e) => e.id !== entry.id));
+      setContent("");
+      setTitle("");
+      setMood("neutral");
+      setWeather("");
       setIsEditing(true);
     }
   };
@@ -76,25 +84,24 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
         <div className={styles.diaryHeader}>
           {entry.title && <h3 className={styles.diaryTitle}>{entry.title}</h3>}
           <div className={styles.diaryMeta}>
-            <span className={styles.mood}>{moodEmojis[entry.mood || 'neutral']}</span>
-            {entry.weather && <span className={styles.weather}>{entry.weather}</span>}
+            <span className={styles.mood}>
+              {moodEmojis[entry.mood || "neutral"]}
+            </span>
+            {entry.weather && (
+              <span className={styles.weather}>{entry.weather}</span>
+            )}
           </div>
         </div>
-        <div className={styles.diaryContent}>
-          {entry.content}
-        </div>
+        <div className={styles.diaryContent}>{entry.content}</div>
         <div className={styles.diaryActions}>
           <button
             className={styles.editButton}
             onClick={() => setIsEditing(true)}
           >
-            Edit Entry
+            수정
           </button>
-          <button
-            className={styles.deleteButton}
-            onClick={handleDelete}
-          >
-            Delete
+          <button className={styles.deleteButton} onClick={handleDelete}>
+            삭제
           </button>
         </div>
       </div>
@@ -108,20 +115,22 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Entry title (optional)"
+          placeholder="일기 제목 (선택사항)"
           className={styles.titleInput}
         />
       </div>
 
       <div className={styles.moodSelector}>
-        <label>How are you feeling?</label>
+        <label>기분 기록</label>
         <div className={styles.moodOptions}>
           {Object.entries(moodEmojis).map(([moodKey, emoji]) => (
             <button
               key={moodKey}
               type="button"
-              className={`${styles.moodOption} ${mood === moodKey ? styles.selected : ''}`}
-              onClick={() => setMood(moodKey as DiaryEntry['mood'])}
+              className={`${styles.moodOption} ${
+                mood === moodKey ? styles.selected : ""
+              }`}
+              onClick={() => setMood(moodKey as DiaryEntry["mood"])}
             >
               {emoji}
             </button>
@@ -130,15 +139,17 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
       </div>
 
       <div className={styles.formGroup}>
-        <label>Weather</label>
+        <label>날씨</label>
         <select
           value={weather}
           onChange={(e) => setWeather(e.target.value)}
           className={styles.weatherSelect}
         >
-          <option value="">Select weather</option>
-          {weatherOptions.map(option => (
-            <option key={option} value={option}>{option}</option>
+          <option value="">날씨 선택</option>
+          {weatherOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
           ))}
         </select>
       </div>
@@ -147,7 +158,7 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Write about your day..."
+          placeholder="오늘 하루는 어땠나요?"
           className={styles.contentInput}
           rows={10}
         />
@@ -160,7 +171,7 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
             className={styles.cancelButton}
             onClick={() => setIsEditing(false)}
           >
-            Cancel
+            취소
           </button>
         )}
         <button
@@ -169,7 +180,7 @@ const DiarySection: React.FC<DiarySectionProps> = ({ date, entry }) => {
           onClick={handleSave}
           disabled={!content.trim()}
         >
-          Save Entry
+          저장
         </button>
       </div>
     </div>
