@@ -1,0 +1,212 @@
+@import '@styles/variables.scss';
+
+.diaryView {
+  background: var(--color-background);
+  padding: $spacing-lg;
+  border-radius: $border-radius;
+}
+
+.diaryHeader {
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.diaryTitle {
+  font-size: $font-size-large;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: $spacing-sm;
+}
+
+.diaryMeta {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+}
+
+.mood {
+  font-size: 24px;
+}
+
+.weather {
+  font-size: $font-size-small;
+  color: var(--color-text-secondary);
+}
+
+.diaryContent {
+  font-size: $font-size-base;
+  line-height: 1.6;
+  color: var(--color-text);
+  white-space: pre-wrap;
+  margin-bottom: $spacing-lg;
+}
+
+.diaryActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.diaryForm {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-size-small;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+}
+
+.titleInput {
+  padding: $spacing-sm;
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  font-size: $font-size-base;
+  color: var(--color-text);
+  background: var(--color-surface);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+}
+
+.moodSelector {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  label {
+    font-size: $font-size-small;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+}
+
+.moodOptions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.moodOption {
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all $transition-fast;
+
+  &:hover {
+    transform: scale(1.1);
+    border-color: var(--color-primary);
+  }
+
+  &.selected {
+    border-color: var(--color-primary);
+    background: var(--color-accent);
+  }
+}
+
+.weatherSelect {
+  padding: $spacing-sm;
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  font-size: $font-size-base;
+  color: var(--color-text);
+  background: var(--color-surface);
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+}
+
+.contentInput {
+  padding: $spacing-md;
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  font-size: $font-size-base;
+  font-family: inherit;
+  line-height: 1.6;
+  color: var(--color-text);
+  background: var(--color-surface);
+  resize: vertical;
+  min-height: 200px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+}
+
+.formActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.editButton,
+.deleteButton,
+.cancelButton,
+.saveButton {
+  flex: 1;
+  padding: $spacing-sm $spacing-md;
+  border: none;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-base;
+  font-weight: 500;
+  transition: all $transition-fast;
+}
+
+.editButton {
+  background: var(--color-accent);
+  color: var(--color-text);
+
+  &:hover {
+    background: var(--color-primary);
+    color: white;
+  }
+}
+
+.deleteButton {
+  background: #FFE4E1;
+  color: #FF6B6B;
+
+  &:hover {
+    background: #FFCCCC;
+  }
+}
+
+.cancelButton {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+
+  &:hover {
+    background: var(--color-background);
+  }
+}
+
+.saveButton {
+  background: var(--color-primary);
+  color: white;
+
+  &:hover {
+    background: var(--color-secondary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

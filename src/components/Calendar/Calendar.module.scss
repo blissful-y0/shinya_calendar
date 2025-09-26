@@ -1,0 +1,136 @@
+@import '@styles/variables.scss';
+
+.calendar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: $spacing-md;
+  background: var(--color-surface);
+  border-radius: $border-radius-large;
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  padding-bottom: $spacing-md;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: $spacing-md;
+}
+
+.weekDay {
+  text-align: center;
+  font-size: $font-size-small;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: minmax(100px, 1fr);
+  gap: 1px;
+  background: var(--color-border);
+  border-radius: $border-radius;
+  overflow: hidden;
+  flex: 1;
+}
+
+.calendarDay {
+  background: var(--color-surface);
+  padding: $spacing-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    background: var(--color-accent);
+    transform: scale(1.02);
+    z-index: 1;
+    box-shadow: $shadow-small;
+  }
+
+  &.otherMonth {
+    opacity: 0.4;
+    background: var(--color-background);
+  }
+
+  &.selected {
+    background: var(--color-primary);
+    color: white;
+
+    .dayNumber {
+      color: white;
+    }
+
+    .eventDot {
+      border: 2px solid white;
+    }
+  }
+
+  &.today {
+    background: linear-gradient(135deg, var(--color-accent), var(--color-primary));
+
+    .dayNumber {
+      font-weight: bold;
+      color: white;
+      background: rgba(255, 255, 255, 0.3);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+.dayNumber {
+  font-size: $font-size-base;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: $spacing-xs;
+}
+
+.dayContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.eventIndicators {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.eventDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: transform $transition-fast;
+
+  &:hover {
+    transform: scale(1.3);
+  }
+}
+
+.moreEvents {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  margin-left: 2px;
+}
+
+.diaryIndicator {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-secondary), transparent);
+  border-radius: 2px;
+  margin-top: auto;
+}

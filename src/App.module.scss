@@ -1,0 +1,25 @@
+@import '@styles/variables.scss';
+
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background);
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.calendarContainer {
+  flex: 1;
+  padding: $spacing-lg;
+  overflow: auto;
+  transition: margin-right $transition-normal;
+
+  &.fullWidth {
+    margin-right: 0;
+  }
+}

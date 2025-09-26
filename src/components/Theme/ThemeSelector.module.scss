@@ -1,0 +1,238 @@
+@import '@styles/variables.scss';
+
+.themeSelector {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-base;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+}
+
+.themeCard {
+  position: relative;
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: $border-radius;
+  padding: $spacing-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: $shadow-small;
+  }
+
+  &.selected {
+    border-color: var(--color-primary);
+    background: var(--color-accent);
+  }
+}
+
+.colorPreview {
+  display: flex;
+  gap: 2px;
+  height: 40px;
+  border-radius: $border-radius-small;
+  overflow: hidden;
+  margin-bottom: $spacing-sm;
+}
+
+.colorBar {
+  flex: 1;
+}
+
+.themeName {
+  font-size: $font-size-small;
+  font-weight: 500;
+  color: var(--color-text);
+  text-align: center;
+}
+
+.deleteTheme {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--color-text-secondary);
+  transition: all $transition-fast;
+  opacity: 0;
+
+  .themeCard:hover & {
+    opacity: 1;
+  }
+
+  &:hover {
+    background: #FFE4E1;
+    color: #FF6B6B;
+  }
+}
+
+.createButton {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  border: 2px dashed var(--color-primary);
+  background: transparent;
+  border-radius: $border-radius;
+  cursor: pointer;
+  font-size: $font-size-base;
+  font-weight: 500;
+  color: var(--color-primary);
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-accent);
+    border-style: solid;
+  }
+}
+
+.customForm {
+  background: var(--color-background);
+  padding: $spacing-lg;
+  border-radius: $border-radius;
+}
+
+.formTitle {
+  font-size: $font-size-large;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: $spacing-md;
+}
+
+.formGroup {
+  margin-bottom: $spacing-md;
+
+  label {
+    display: block;
+    font-size: $font-size-small;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: $spacing-xs;
+  }
+
+  input {
+    width: 100%;
+    padding: $spacing-sm;
+    border: 1px solid var(--color-border);
+    border-radius: $border-radius-small;
+    font-size: $font-size-base;
+    color: var(--color-text);
+    background: var(--color-surface);
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+  }
+}
+
+.colorInputs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.colorInput {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-size-small;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+}
+
+.colorControl {
+  display: flex;
+  gap: $spacing-xs;
+
+  input[type="color"] {
+    width: 40px;
+    height: 32px;
+    border: 1px solid var(--color-border);
+    border-radius: $border-radius-small;
+    cursor: pointer;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    padding: $spacing-xs;
+    border: 1px solid var(--color-border);
+    border-radius: $border-radius-small;
+    font-size: $font-size-small;
+    color: var(--color-text);
+    background: var(--color-surface);
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+  }
+}
+
+.formActions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.cancelButton,
+.saveButton {
+  flex: 1;
+  padding: $spacing-sm $spacing-md;
+  border: none;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-base;
+  font-weight: 500;
+  transition: all $transition-fast;
+}
+
+.cancelButton {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+
+  &:hover {
+    background: var(--color-background);
+  }
+}
+
+.saveButton {
+  background: var(--color-primary);
+  color: white;
+
+  &:hover {
+    background: var(--color-secondary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

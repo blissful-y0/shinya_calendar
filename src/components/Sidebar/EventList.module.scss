@@ -1,0 +1,102 @@
+@import '@styles/variables.scss';
+
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-xl $spacing-md;
+
+  p {
+    font-size: $font-size-base;
+    color: var(--color-text);
+    margin-bottom: $spacing-xs;
+  }
+
+  span {
+    font-size: $font-size-small;
+    color: var(--color-text-secondary);
+  }
+}
+
+.eventItem {
+  display: flex;
+  background: var(--color-background);
+  border-radius: $border-radius;
+  overflow: hidden;
+  transition: all $transition-fast;
+
+  &:hover {
+    box-shadow: $shadow-small;
+    transform: translateX(-2px);
+  }
+}
+
+.colorBar {
+  width: 4px;
+  flex-shrink: 0;
+}
+
+.eventContent {
+  flex: 1;
+  padding: $spacing-md;
+}
+
+.eventTitle {
+  font-size: $font-size-base;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: $spacing-xs;
+}
+
+.eventTime {
+  font-size: $font-size-small;
+  color: var(--color-primary);
+  margin-bottom: $spacing-xs;
+}
+
+.eventDescription {
+  font-size: $font-size-small;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.eventActions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  padding: $spacing-sm;
+}
+
+.editButton,
+.deleteButton {
+  padding: $spacing-xs $spacing-sm;
+  border: none;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-small;
+  transition: all $transition-fast;
+}
+
+.editButton {
+  background: var(--color-accent);
+  color: var(--color-text);
+
+  &:hover {
+    background: var(--color-primary);
+    color: white;
+  }
+}
+
+.deleteButton {
+  background: transparent;
+  color: var(--color-text-secondary);
+
+  &:hover {
+    background: #FFE4E1;
+    color: #FF6B6B;
+  }
+}
