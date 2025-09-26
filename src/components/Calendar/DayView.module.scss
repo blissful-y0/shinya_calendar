@@ -1,0 +1,153 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.dayView {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: $border-radius-large;
+  overflow: hidden;
+}
+
+.dayHeader {
+  padding: $spacing-md;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dateTitle {
+  font-size: $font-size-large;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.diaryIndicator {
+  font-size: $font-size-base;
+  color: var(--color-primary);
+  padding: $spacing-xs $spacing-md;
+  background: var(--color-accent);
+  border-radius: $border-radius-small;
+}
+
+.timeGrid {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
+.allDaySection {
+  display: flex;
+  padding: $spacing-md;
+  background: var(--color-background);
+  border-bottom: 2px solid var(--color-border);
+  min-height: 60px;
+}
+
+.allDayLabel {
+  width: 80px;
+  font-size: $font-size-small;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  padding-right: $spacing-md;
+  text-align: right;
+}
+
+.allDayEvents {
+  flex: 1;
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.allDayEvent {
+  padding: $spacing-xs $spacing-md;
+  border-radius: $border-radius-small;
+  font-size: $font-size-small;
+  color: white;
+  font-weight: 500;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hourlyGrid {
+  position: relative;
+}
+
+.hourRow {
+  display: flex;
+  height: 60px;
+  border-bottom: 1px solid var(--color-border);
+
+  &:hover {
+    background: var(--color-background);
+  }
+}
+
+.hourLabel {
+  width: 80px;
+  padding: $spacing-sm;
+  font-size: $font-size-small;
+  color: var(--color-text-secondary);
+  text-align: right;
+  border-right: 1px solid var(--color-border);
+}
+
+.hourContent {
+  flex: 1;
+}
+
+.eventsContainer {
+  position: absolute;
+  top: 0;
+  left: 80px;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.timedEvent {
+  position: absolute;
+  left: $spacing-sm;
+  right: $spacing-sm;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-small;
+  color: white;
+  pointer-events: all;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all $transition-fast;
+  box-shadow: $shadow-small;
+
+  &:hover {
+    transform: scale(1.02);
+    box-shadow: $shadow-medium;
+    z-index: 1;
+  }
+}
+
+.eventTime {
+  font-size: $font-size-small;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.eventTitle {
+  font-size: $font-size-base;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.eventDescription {
+  font-size: $font-size-small;
+  opacity: 0.8;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

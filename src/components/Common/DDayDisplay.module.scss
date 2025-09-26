@@ -1,0 +1,118 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.ddayDisplay {
+  padding: $spacing-md;
+  background: var(--color-background);
+  border-radius: $border-radius;
+  margin-bottom: $spacing-md;
+  position: relative;
+  overflow: hidden;
+  transition: all $transition-normal;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+
+  &.dday {
+    background: linear-gradient(135deg, #FFE4E1 0%, #FFB6C1 100%);
+
+    &::before {
+      background: linear-gradient(90deg, #FF69B4, #FF1493);
+    }
+
+    .ddayBadge {
+      background: #FF1493;
+      color: white;
+      animation: pulse 1.5s infinite;
+    }
+  }
+
+  &.soon {
+    background: linear-gradient(135deg, #FFF4E6 0%, #FFDAB9 100%);
+
+    &::before {
+      background: linear-gradient(90deg, #FFA500, #FF8C00);
+    }
+
+    .ddayBadge {
+      background: #FF8C00;
+      color: white;
+    }
+  }
+
+  &.future {
+    background: linear-gradient(135deg, #E6F3FF 0%, #B6D7FF 100%);
+
+    &::before {
+      background: linear-gradient(90deg, #4A90E2, #5BA0F2);
+    }
+
+    .ddayBadge {
+      background: #4A90E2;
+      color: white;
+    }
+  }
+
+  &.past {
+    background: linear-gradient(135deg, #F5F5F5 0%, #E0E0E0 100%);
+
+    &::before {
+      background: linear-gradient(90deg, #9E9E9E, #757575);
+    }
+
+    .ddayBadge {
+      background: #757575;
+      color: white;
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.ddayHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.ddayBadge {
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-small;
+  font-size: $font-size-small;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.5px;
+  box-shadow: $shadow-small;
+}
+
+.ddayTitle {
+  font-size: $font-size-medium;
+  font-weight: $font-weight-semibold;
+  color: var(--color-text);
+}
+
+.ddayDescription {
+  font-size: $font-size-small;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-bottom: $spacing-xs;
+}
+
+.ddayDate {
+  font-size: $font-size-xs;
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+}

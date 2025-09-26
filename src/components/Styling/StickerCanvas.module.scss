@@ -1,0 +1,163 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.stickerCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 100;
+  user-select: none;
+}
+
+.sticker {
+  position: absolute;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: move;
+  pointer-events: auto;
+  border: 2px solid transparent;
+  border-radius: $border-radius-small;
+  will-change: transform, left, top;
+  user-select: none;
+
+  // 드래그하지 않을 때만 transition 적용
+  &:not(.dragging) {
+    transition: border-color $transition-fast, box-shadow $transition-fast;
+  }
+
+  &:hover:not(.dragging):not(.selected):not(.readOnly) {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  &.selected {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary), 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  &.dragging {
+    border-color: var(--color-secondary);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    z-index: 9999 !important;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  }
+
+  &.readOnly {
+    cursor: default;
+    opacity: 0.9;
+
+    &:hover {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+  }
+}
+
+.handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--color-primary);
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all $transition-fast;
+
+  &:hover {
+    transform: scale(1.2);
+    background: var(--color-secondary);
+  }
+}
+
+.resizeHandle {
+  bottom: -6px;
+  right: -6px;
+  cursor: nw-resize;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-top: 4px solid white;
+  }
+}
+
+.rotateHandle {
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: grab;
+  background: var(--color-secondary);
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 6px;
+    height: 6px;
+    border: 1px solid white;
+    border-radius: 50%;
+    background: white;
+  }
+
+  // 회전 핸들 연결선
+  &::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 8px;
+    background: var(--color-primary);
+  }
+}
+
+.deleteHandle {
+  top: -6px;
+  left: -6px;
+  width: 20px;
+  height: 20px;
+  background: var(--color-danger);
+  border: 2px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: white;
+  transition: all $transition-fast;
+  z-index: 10;
+
+  &:hover {
+    transform: scale(1.2);
+    background: var(--color-danger-dark, #d32f2f);
+    box-shadow: 0 2px 8px rgba(211, 47, 47, 0.4);
+  }
+
+  &:active {
+    transform: scale(1.1);
+  }
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}

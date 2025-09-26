@@ -1,0 +1,122 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.eventForm {
+  background: var(--color-background);
+  padding: $spacing-md;
+  border-radius: $border-radius;
+  margin-bottom: $spacing-md;
+}
+
+.formGroup {
+  margin-bottom: $spacing-md;
+
+  label {
+    display: block;
+    font-size: $font-size-small;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: $spacing-xs;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: $spacing-sm;
+    border: 1px solid var(--color-border);
+    border-radius: $border-radius-small;
+    font-size: $font-size-base;
+    color: var(--color-text);
+    background: var(--color-surface);
+    transition: all $transition-fast;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+    }
+
+    &::placeholder {
+      color: var(--color-text-secondary);
+      opacity: 0.5;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+}
+
+.timeGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-sm;
+}
+
+.colorOptions {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.colorOption {
+  width: 32px;
+  height: 32px;
+  border: 2px solid transparent;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &.selected {
+    border-color: var(--color-text);
+    box-shadow: $shadow-small;
+  }
+}
+
+.formActions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+}
+
+.cancelButton,
+.saveButton {
+  flex: 1;
+  padding: $spacing-sm $spacing-md;
+  border: none;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-base;
+  font-weight: 500;
+  transition: all $transition-fast;
+}
+
+.cancelButton {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+
+  &:hover {
+    background: var(--color-background);
+  }
+}
+
+.saveButton {
+  background: var(--color-primary);
+  color: white;
+
+  &:hover {
+    background: var(--color-secondary);
+    transform: translateY(-2px);
+    box-shadow: $shadow-small;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

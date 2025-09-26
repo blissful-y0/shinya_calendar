@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn create:*)",
+      "Bash(npx create-electron-vite:*)",
+      "Bash(yarn install)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(yarn add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "Bash(for file in /Users/bliss/Documents/shinya_calendar/src/**/*.module.scss)",
+      "Bash(do)",
+      "Bash(done)",
+      "Bash(git branch:*)",
+      "Bash(yarn dev)",
+      "Bash(npm run dev:*)",
+      "Bash(pkill:*)",
+      "Bash(yarn:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

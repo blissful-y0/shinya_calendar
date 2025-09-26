@@ -1,0 +1,59 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.titleBar {
+  height: 40px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $spacing-md;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  user-select: none;
+}
+
+.dragRegion {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  -webkit-app-region: drag; // Electron 드래그 영역
+}
+
+.appTitle {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  -webkit-app-region: no-drag; // 타이틀 텍스트는 드래그 제외
+  pointer-events: none;
+}
+
+.icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  font-size: $font-size-small;
+  font-weight: $font-weight-semibold;
+  color: var(--color-text);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  -webkit-app-region: no-drag; // 컨트롤 영역은 드래그 제외
+}
+
+.currentTime {
+  font-size: $font-size-small;
+  color: var(--color-text-secondary);
+  font-feature-settings: 'tnum';
+}

@@ -1,0 +1,52 @@
+// 폰트 관련 변수를 fonts 모듈에서 가져오기
+@use 'fonts' as *;
+
+// 폰트 패밀리
+$font-primary: $font-stack-korean;
+$font-mono: $font-stack-mono;
+
+// 폰트 크기
+$font-size-xs: 11px;
+$font-size-sm: 12px;
+$font-size-small: 12px;
+$font-size-base: 14px;
+$font-size-md: 16px;
+$font-size-medium: 16px;
+$font-size-large: 18px;
+$font-size-xlarge: 20px;
+$font-size-xxlarge: 24px;
+
+// 폰트 굵기
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// 테두리 반경
+$border-radius: 12px;
+$border-radius-small: 8px;
+$border-radius-medium: 12px;
+$border-radius-large: 16px;
+
+// 그림자
+$shadow-small: 0 2px 8px rgba(0, 0, 0, 0.08);
+$shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.12);
+$shadow-large: 0 8px 32px rgba(0, 0, 0, 0.16);
+
+// 트랜지션
+$transition-fast: 0.2s ease;
+$transition-normal: 0.3s ease;
+$transition-slow: 0.4s ease;
+
+// 간격
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-xxl: 48px;
+
+// 레이아웃
+$sidebar-width: 320px;
+$header-height: 60px;

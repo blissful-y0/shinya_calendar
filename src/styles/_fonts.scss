@@ -1,0 +1,59 @@
+// Pretendard 웹폰트 (한국어 지원, 가독성 우수)
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+// 시스템 폰트 스택 정의 (macOS, Windows 호환)
+$font-stack-korean:
+  'Pretendard',                   // 웹폰트 우선
+  -apple-system,                   // macOS/iOS 시스템 폰트
+  BlinkMacSystemFont,              // macOS Chrome
+  'Apple SD Gothic Neo',           // macOS 한글
+  'Malgun Gothic',                 // Windows 한글
+  '맑은 고딕',                     // Windows 한글 (한글 이름)
+  'Segoe UI',                      // Windows 시스템 폰트
+  'Noto Sans KR',                  // 구글 한글 폰트 (폴백)
+  'Roboto',                        // Android
+  'Helvetica Neue',                // 구형 macOS
+  'Arial',                         // 범용
+  sans-serif;                      // 최종 폴백
+
+// 고정폭 폰트 스택 (코드, 시간 표시용)
+$font-stack-mono:
+  'SF Mono',                       // macOS
+  'Monaco',                        // macOS
+  'Inconsolata',                   // 크로스 플랫폼
+  'Fira Code',                     // 코드용
+  'Consolas',                      // Windows
+  'Courier New',                   // 범용
+  monospace;                       // 최종 폴백
+
+// 폰트 사이즈 맵
+$font-sizes: (
+  'xs': 11px,
+  'sm': 12px,
+  'base': 14px,
+  'md': 16px,
+  'lg': 18px,
+  'xl': 20px,
+  'xxl': 24px,
+  'xxxl': 32px
+);
+
+// 폰트 굵기 맵
+$font-weights: (
+  'thin': 100,
+  'light': 300,
+  'regular': 400,
+  'medium': 500,
+  'semibold': 600,
+  'bold': 700,
+  'extrabold': 800,
+  'black': 900
+);
+
+// 줄 높이 맵
+$line-heights: (
+  'tight': 1.2,
+  'normal': 1.5,
+  'relaxed': 1.75,
+  'loose': 2
+);

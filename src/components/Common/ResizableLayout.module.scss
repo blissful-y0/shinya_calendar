@@ -1,0 +1,109 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.resizableLayout {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+.mainContent {
+  flex: 1;
+  min-width: 0; // flexbox 오버플로 방지
+  transition: margin-right 0.1s ease-out;
+
+  &.resizing {
+    transition: none; // 리사이징 중에는 트랜지션 제거
+  }
+}
+
+.sidebar {
+  position: fixed;
+  right: 0;
+  top: calc(40px + #{$header-height}); // TitleBar(40px) + Header 높이
+  bottom: 0;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  transition: width 0.1s ease-out;
+  z-index: 5;
+}
+
+.resizeHandle {
+  position: absolute;
+  left: -4px;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: col-resize;
+  background: transparent;
+  transition: all $transition-fast;
+  z-index: 10;
+
+  &:hover {
+    .handleBar {
+      background: var(--color-primary);
+      opacity: 0.5;
+      width: 4px;
+    }
+  }
+
+  &.active {
+    .handleBar {
+      background: var(--color-primary);
+      opacity: 1;
+      width: 4px;
+    }
+  }
+}
+
+.handleBar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-border);
+  transition: all $transition-fast;
+  border-radius: 2px;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 4px;
+    background: var(--color-text-secondary);
+    opacity: 0.3;
+    border-radius: 2px;
+  }
+
+  &::before {
+    top: 50%;
+    transform: translate(-50%, -8px);
+  }
+
+  &::after {
+    top: 50%;
+    transform: translate(-50%, 4px);
+  }
+}
+
+// 터치 디바이스용 스타일
+@media (hover: none) and (pointer: coarse) {
+  .resizeHandle {
+    width: 16px;
+    left: -8px;
+
+    .handleBar {
+      width: 4px;
+      background: var(--color-primary);
+      opacity: 0.3;
+    }
+  }
+}
