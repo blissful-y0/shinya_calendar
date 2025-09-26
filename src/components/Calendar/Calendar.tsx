@@ -16,6 +16,7 @@ import {
   weekDays
 } from '@utils/calendar';
 import { Event, DiaryEntry } from '@types/index';
+import { MdCreate } from 'react-icons/md';
 import styles from './Calendar.module.scss';
 
 const Calendar: React.FC = () => {
@@ -87,7 +88,7 @@ const Calendar: React.FC = () => {
             </div>
           )}
           {hasDiary && (
-            <div className={styles.diaryIndicator} title="일기 작성됨">📝</div>
+            <div className={styles.diaryIndicator} title="일기 작성됨"><MdCreate /></div>
           )}
         </div>
       </div>

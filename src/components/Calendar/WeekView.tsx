@@ -2,6 +2,7 @@ import React from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedDateState, eventsState, diaryEntriesState } from '@store/atoms';
 import { getDaysInWeek, formatDate, isSameDayAs, isCurrentDay } from '@utils/calendar';
+import { MdCreate } from 'react-icons/md';
 import styles from './WeekView.module.scss';
 
 const WeekView: React.FC = () => {
@@ -77,7 +78,7 @@ const WeekView: React.FC = () => {
               <div className={styles.dayNumber}>
                 {date.getDate()}
               </div>
-              {hasDiary && <span className={styles.diaryDot}>📝</span>}
+              {hasDiary && <span className={styles.diaryDot}><MdCreate /></span>}
             </div>
           );
         })}

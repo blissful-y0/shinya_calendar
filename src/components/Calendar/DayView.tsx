@@ -3,6 +3,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { selectedDateState, eventsState, diaryEntriesState } from '@store/atoms';
 import { formatDate, isSameDayAs } from '@utils/calendar';
 import { Event } from '@types/index';
+import { MdCreate } from 'react-icons/md';
 import styles from './DayView.module.scss';
 
 const DayView: React.FC = () => {
@@ -54,7 +55,7 @@ const DayView: React.FC = () => {
           {formatDate(selectedDate, 'yyyy년 M월 d일 EEEE')}
         </h2>
         {hasDiary && (
-          <span className={styles.diaryIndicator}>📝 일기 작성됨</span>
+          <span className={styles.diaryIndicator}><MdCreate /> 일기 작성됨</span>
         )}
       </div>
 

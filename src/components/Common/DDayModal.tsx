@@ -4,6 +4,7 @@ import { dDaysState, activeDDayState } from '@store/atoms';
 import { DDay } from '@types/index';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
+import { MdClose, MdEdit, MdDelete, MdCheck, MdCalendarToday } from 'react-icons/md';
 import styles from './DDayModal.module.scss';
 
 interface DDayModalProps {
@@ -92,7 +93,7 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>D-Day 관리</h2>
           <button className={styles.closeButton} onClick={onClose}>
-            ✕
+            <MdClose />
           </button>
         </div>
 
@@ -155,7 +156,7 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
           <div className={styles.ddayList}>
             {ddays.length === 0 ? (
               <div className={styles.emptyState}>
-                <span className={styles.emptyIcon}>📅</span>
+                <span className={styles.emptyIcon}><MdCalendarToday /></span>
                 <p>등록된 D-Day가 없습니다</p>
                 <span>중요한 날을 추가해보세요</span>
               </div>
@@ -188,7 +189,7 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
                           onClick={() => handleSetActive(dday)}
                           title="활성화"
                         >
-                          ✓
+                          <MdCheck />
                         </button>
                       )}
                       <button
@@ -196,14 +197,14 @@ const DDayModal: React.FC<DDayModalProps> = ({ onClose }) => {
                         onClick={() => handleEdit(dday)}
                         title="수정"
                       >
-                        ✏️
+                        <MdEdit />
                       </button>
                       <button
                         className={styles.deleteButton}
                         onClick={() => handleDelete(dday.id)}
                         title="삭제"
                       >
-                        🗑️
+                        <MdDelete />
                       </button>
                     </div>
                   </div>

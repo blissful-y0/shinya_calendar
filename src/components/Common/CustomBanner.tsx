@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useRecoilState } from "recoil";
 import { bannerImageState } from "@store/atoms";
+import { MdPhoto, MdClose } from 'react-icons/md';
 import styles from "./CustomBanner.module.scss";
 
 const CustomBanner: React.FC = () => {
@@ -51,14 +52,14 @@ const CustomBanner: React.FC = () => {
                 onClick={handleClick}
                 title="이미지 변경"
               >
-                <span>🖼️</span>
+                <MdPhoto />
               </button>
               <button
                 className={styles.removeButton}
                 onClick={handleRemoveImage}
                 title="이미지 제거"
               >
-                <span>✕</span>
+                <MdClose />
               </button>
             </div>
           )}

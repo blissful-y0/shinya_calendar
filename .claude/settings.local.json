@@ -11,7 +11,8 @@
       "Bash(git push:*)",
       "Bash(for file in /Users/bliss/Documents/shinya_calendar/src/**/*.module.scss)",
       "Bash(do)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(git branch:*)"
     ],
     "deny": [],
     "ask": []
