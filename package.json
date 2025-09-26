@@ -28,10 +28,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@types/react-datepicker": "^7.0.0",
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.2.0",
     "electron-store": "^10.1.0",
     "react": "^18.2.0",
+    "react-colorful": "^5.6.1",
+    "react-datepicker": "^8.7.0",
     "react-dom": "^18.2.0",
     "react-easy-crop": "^5.5.2",
     "react-hot-toast": "^2.6.0",
