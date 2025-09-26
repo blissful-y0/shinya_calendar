@@ -79,6 +79,7 @@
       "!**/*.{ts,map,spec.js,test.js}"
     ],
     "mac": {
+      "icon": "public/icon.icns",
       "category": "public.app-category.productivity",
       "identity": null,
       "hardenedRuntime": true,
@@ -94,6 +95,7 @@
       ]
     },
     "win": {
+      "icon": "public/icon.ico",
       "target": [
         {
           "target": "nsis",
@@ -115,6 +117,7 @@
       "runAfterFinish": true
     },
     "linux": {
+      "icon": "public/icon.png",
       "target": [
         {
           "target": "AppImage",
