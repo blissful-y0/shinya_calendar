@@ -232,3 +232,25 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.multiDay {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.5), transparent);
+  }
+}
+
+.continueIndicator {
+  font-size: 10px;
+  opacity: 0.8;
+  font-style: italic;
+  white-space: nowrap;
+}
