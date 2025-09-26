@@ -253,21 +253,21 @@ const ThemeSelector: React.FC = () => {
                     }
                     className={styles.colorText}
                   />
+                  {activeColorPicker === key && (
+                    <div className={styles.colorPickerPopover}>
+                      <div className={styles.colorPickerCover} onClick={() => setActiveColorPicker(null)} />
+                      <HexColorPicker
+                        color={value}
+                        onChange={(color) =>
+                          setCustomColors((prev) => ({
+                            ...prev,
+                            [key]: color,
+                          }))
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
-                {activeColorPicker === key && (
-                  <div className={styles.colorPickerPopover}>
-                    <div className={styles.colorPickerCover} onClick={() => setActiveColorPicker(null)} />
-                    <HexColorPicker
-                      color={value}
-                      onChange={(color) =>
-                        setCustomColors((prev) => ({
-                          ...prev,
-                          [key]: color,
-                        }))
-                      }
-                    />
-                  </div>
-                )}
               </div>
             ))}
           </div>

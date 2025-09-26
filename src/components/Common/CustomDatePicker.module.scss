@@ -166,12 +166,12 @@
       background: var(--color-accent) !important;
       color: var(--color-primary) !important;
     }
+  }
 
-    &--selected {
-      background: var(--color-primary) !important;
-      color: white !important;
-      font-weight: $font-weight-medium;
-    }
+  :global(.react-datepicker__time-list-item--selected) {
+    background: var(--color-primary) !important;
+    color: white !important;
+    font-weight: $font-weight-medium;
   }
 }
 

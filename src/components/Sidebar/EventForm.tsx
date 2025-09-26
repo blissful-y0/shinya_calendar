@@ -7,6 +7,7 @@ import { format, isAfter, parse } from "date-fns";
 import { ko } from "date-fns/locale";
 import toast from "react-hot-toast";
 import CustomDatePicker from "@components/Common/CustomDatePicker";
+import CustomTimePicker from "@components/Common/CustomTimePicker";
 import { HexColorPicker } from "react-colorful";
 import styles from "./EventForm.module.scss";
 
@@ -193,21 +194,19 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       {!isAllDay && (
         <div className={styles.timeGroup}>
           <div className={styles.formGroup}>
-            <label htmlFor="startTime">시작 시간</label>
-            <input
-              id="startTime"
-              type="time"
+            <label>시작 시간</label>
+            <CustomTimePicker
               value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              onChange={setStartTime}
+              placeholderText="시작 시간 선택"
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="endTime">종료 시간</label>
-            <input
-              id="endTime"
-              type="time"
+            <label>종료 시간</label>
+            <CustomTimePicker
               value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
+              onChange={setEndTime}
+              placeholderText="종료 시간 선택"
             />
           </div>
         </div>
