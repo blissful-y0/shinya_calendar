@@ -99,7 +99,13 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
           <input
             type="checkbox"
             checked={isMultiDay}
-            onChange={(e) => setIsMultiDay(e.target.checked)}
+            onChange={(e) => {
+              setIsMultiDay(e.target.checked);
+              // 다중 날짜 선택 시 반복 이벤트 해제
+              if (e.target.checked) {
+                setIsRecurring(false);
+              }
+            }}
           />
           종료 날짜 설정
         </label>
@@ -166,13 +172,18 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       )}
 
       <div className={styles.formGroup}>
-        <label className={styles.checkboxLabel}>
+        <label
+          className={`${styles.checkboxLabel} ${isMultiDay ? styles.disabled : ''}`}
+          title={isMultiDay ? "종료 날짜가 설정된 경우 반복 이벤트를 사용할 수 없습니다" : ""}
+        >
           <input
             type="checkbox"
             checked={isRecurring}
             onChange={(e) => setIsRecurring(e.target.checked)}
+            disabled={isMultiDay}
           />
           반복 이벤트
+          {isMultiDay && <span className={styles.disabledNote}> (종료 날짜 설정 시 사용 불가)</span>}
         </label>
       </div>
 

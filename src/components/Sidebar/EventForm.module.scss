@@ -66,6 +66,21 @@
     width: auto !important;
     margin: 0;
   }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    input[type="checkbox"] {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.disabledNote {
+  color: var(--color-text-secondary);
+  font-size: $font-size-small;
+  font-style: italic;
 }
 
 .recurrenceGroup {
