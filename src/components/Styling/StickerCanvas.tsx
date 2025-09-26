@@ -8,6 +8,12 @@ import {
 } from "@store/atoms";
 import { MdDelete } from "react-icons/md";
 import { Sticker } from "./StickerPanel";
+import {
+  updateStickerPercentages,
+  calculatePixelPositions,
+  migrateStickerToResponsive,
+  clampStickerPosition,
+} from "@utils/stickerUtils";
 import styles from "./StickerCanvas.module.scss";
 
 interface DraggingState {
@@ -40,6 +46,7 @@ const StickerCanvas: React.FC = () => {
   const [resizing, setResizing] = useState<ResizingState | null>(null);
   const [rotating, setRotating] = useState<RotatingState | null>(null);
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const handleMouseDown = (e: React.MouseEvent, sticker: Sticker) => {
@@ -119,7 +126,13 @@ const StickerCanvas: React.FC = () => {
 
         setStickers((prev) =>
           prev.map((s) =>
-            s.id === dragging.id ? { ...s, x: boundedX, y: boundedY } : s
+            s.id === dragging.id
+              ? updateStickerPercentages(
+                  { ...s, x: boundedX, y: boundedY },
+                  rect.width,
+                  rect.height
+                )
+              : s
           )
         );
       }
@@ -140,7 +153,11 @@ const StickerCanvas: React.FC = () => {
         setStickers((prev) =>
           prev.map((s) =>
             s.id === resizing.id
-              ? { ...s, width: newWidth, height: newHeight }
+              ? updateStickerPercentages(
+                  { ...s, width: newWidth, height: newHeight },
+                  rect.width,
+                  rect.height
+                )
               : s
           )
         );
@@ -207,6 +224,39 @@ const StickerCanvas: React.FC = () => {
     }
   }, [stickerEditMode]);
 
+  // Initialize and handle container size updates
+  useEffect(() => {
+    const updateContainerSize = () => {
+      if (canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        setContainerSize({ width: rect.width, height: rect.height });
+
+        // Migrate existing stickers to responsive positioning if needed
+        setStickers((prev) => migrateStickerToResponsive(prev, rect.width, rect.height));
+      }
+    };
+
+    // Initial size
+    updateContainerSize();
+
+    // Create ResizeObserver for responsive updates
+    const resizeObserver = new ResizeObserver(() => {
+      updateContainerSize();
+    });
+
+    if (canvasRef.current) {
+      resizeObserver.observe(canvasRef.current);
+    }
+
+    // Also listen to window resize as fallback
+    window.addEventListener('resize', updateContainerSize);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateContainerSize);
+    };
+  }, []);
+
   const handleStickerRightClick = (e: React.MouseEvent, stickerId: string) => {
     if (!stickerEditMode) return;
 
@@ -238,7 +288,13 @@ const StickerCanvas: React.FC = () => {
       className={styles.stickerCanvas}
       onClick={handleCanvasClick}
     >
-      {stickers.map((sticker) => {
+      {stickers.map((originalSticker) => {
+        // Calculate pixel positions from percentages for responsive behavior
+        const sticker = calculatePixelPositions(
+          originalSticker,
+          containerSize.width || 800,
+          containerSize.height || 600
+        );
         const isSelected = selectedSticker === sticker.id;
         const isDragging = dragging?.id === sticker.id;
 
