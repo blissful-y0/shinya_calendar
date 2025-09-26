@@ -15,7 +15,7 @@
     "build:win": "yarn prebuild && electron-builder --win",
     "build:mac": "yarn prebuild && electron-builder --mac",
     "build:linux": "yarn prebuild && electron-builder --linux",
-    "build:all": "concurrently \"yarn build:win\" \"yarn build:mac\" \"yarn build:linux\"",
+    "build:all": "concurrently \"yarn build:win\" \"yarn build:mac\"",
     "preview": "vite preview",
     "electron": "electron .",
     "electron:dev": "concurrently \"yarn dev\" \"wait-on http://localhost:5173 && electron .\"",
