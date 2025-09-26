@@ -1,6 +1,6 @@
 import React from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { selectedDateState, eventsState, diaryEntriesState } from '@store/atoms';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { selectedDateState, selectedEventState, eventsState, diaryEntriesState } from '@store/atoms';
 import { formatDate, isSameDayAs } from '@utils/calendar';
 import { getEventsForDate } from '@utils/eventUtils';
 import { Event } from '@types';
@@ -10,6 +10,7 @@ import styles from './DayView.module.scss';
 
 const DayView: React.FC = () => {
   const [selectedDate] = useRecoilState(selectedDateState);
+  const setSelectedEvent = useSetRecoilState(selectedEventState);
   const events = useRecoilValue(eventsState);
   const diaryEntries = useRecoilValue(diaryEntriesState);
 
@@ -71,7 +72,8 @@ const DayView: React.FC = () => {
               <div
                 key={event.id}
                 className={styles.allDayEvent}
-                style={{ backgroundColor: event.color }}
+                style={{ backgroundColor: event.color, cursor: 'pointer' }}
+                onClick={() => setSelectedEvent(event)}
               >
                 {event.title}
               </div>
@@ -101,8 +103,10 @@ const DayView: React.FC = () => {
                   style={{
                     top: `${position.top}px`,
                     height: `${position.height}px`,
-                    backgroundColor: event.color
+                    backgroundColor: event.color,
+                    cursor: 'pointer'
                   }}
+                  onClick={() => setSelectedEvent(event)}
                 >
                   <div className={styles.eventTime}>
                     {event.startTime}

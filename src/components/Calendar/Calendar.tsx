@@ -1,8 +1,9 @@
 import React from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   currentMonthState,
   selectedDateState,
+  selectedEventState,
   eventsState,
   diaryEntriesState,
   viewModeState
@@ -24,6 +25,7 @@ import styles from './Calendar.module.scss';
 const Calendar: React.FC = () => {
   const [currentMonth, setCurrentMonth] = useRecoilState(currentMonthState);
   const [selectedDate, setSelectedDate] = useRecoilState(selectedDateState);
+  const setSelectedEvent = useSetRecoilState(selectedEventState);
   const events = useRecoilValue(eventsState);
   const diaryEntries = useRecoilValue(diaryEntriesState);
   const viewMode = useRecoilValue(viewModeState);
@@ -74,7 +76,12 @@ const Calendar: React.FC = () => {
                 <div
                   key={event.id}
                   className={styles.eventItem}
-                  style={{ borderLeftColor: event.color }}
+                  style={{ borderLeftColor: event.color, cursor: 'pointer' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedEvent(event);
+                    setSelectedDate(date);
+                  }}
                 >
                   <span className={styles.eventTime}>
                     {event.startTime}
