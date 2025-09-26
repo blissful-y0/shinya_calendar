@@ -1,6 +1,6 @@
 import React from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { selectedDateState, eventsState, diaryEntriesState } from '@store/atoms';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { selectedDateState, selectedEventState, eventsState, diaryEntriesState } from '@store/atoms';
 import { getDaysInWeek, formatDate, isSameDayAs, isCurrentDay } from '@utils/calendar';
 import { getEventsForDate } from '@utils/eventUtils';
 import { startOfMonth, endOfMonth, addMonths } from 'date-fns';
@@ -9,6 +9,7 @@ import styles from './WeekView.module.scss';
 
 const WeekView: React.FC = () => {
   const [selectedDate, setSelectedDate] = useRecoilState(selectedDateState);
+  const setSelectedEvent = useSetRecoilState(selectedEventState);
   const events = useRecoilValue(eventsState);
   const diaryEntries = useRecoilValue(diaryEntriesState);
 
@@ -99,7 +100,11 @@ const WeekView: React.FC = () => {
                   <div
                     key={event.id}
                     className={styles.allDayEvent}
-                    style={{ backgroundColor: event.color }}
+                    style={{ backgroundColor: event.color, cursor: 'pointer' }}
+                    onClick={() => {
+                      setSelectedEvent(event);
+                      setSelectedDate(date);
+                    }}
                   >
                     {event.title}
                   </div>
@@ -145,7 +150,12 @@ const WeekView: React.FC = () => {
                         height: `${position.height}px`,
                         left: `${position.left}%`,
                         width: `calc(${position.width}% - 4px)`,
-                        backgroundColor: event.color
+                        backgroundColor: event.color,
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => {
+                        setSelectedEvent(event);
+                        setSelectedDate(date);
                       }}
                     >
                       <div className={styles.eventTime}>

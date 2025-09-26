@@ -174,6 +174,11 @@ export const selectedDateState = atom<Date>({
   default: new Date()
 });
 
+export const selectedEventState = atom<Event | null>({
+  key: 'selectedEvent',
+  default: null
+});
+
 export const currentMonthState = atom<Date>({
   key: 'currentMonth',
   default: startOfMonth(new Date())

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { useSetRecoilState } from "recoil";
-import { eventsState } from "@store/atoms";
+import { useSetRecoilState, useRecoilState } from "recoil";
+import { eventsState, selectedEventState } from "@store/atoms";
 import { Event } from "@types";
 import { formatEventTime } from "@utils/eventUtils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import toast from "react-hot-toast";
 import EventForm from "./EventForm";
+import EventDetail from "./EventDetail";
 import styles from "./EventList.module.scss";
 
 interface EventListProps {
@@ -15,7 +16,17 @@ interface EventListProps {
 
 const EventList: React.FC<EventListProps> = ({ events }) => {
   const setEvents = useSetRecoilState(eventsState);
+  const [selectedEvent, setSelectedEvent] = useRecoilState(selectedEventState);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+
+  const handleEventClick = (event: Event) => {
+    setSelectedEvent(event);
+  };
+
+  const handleEdit = (event: Event) => {
+    setEditingEvent(event);
+    setSelectedEvent(null);
+  };
 
   const handleDelete = (eventId: string) => {
     if (confirm('이 이벤트를 삭제하시겠습니까?')) {
@@ -32,6 +43,16 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     const displayHour = hour % 12 || 12;
     return `${ampm} ${displayHour}:${minutes}`;
   };
+
+  if (selectedEvent && events.some(e => e.id === selectedEvent.id)) {
+    const event = events.find(e => e.id === selectedEvent.id)!;
+    return (
+      <EventDetail
+        event={event}
+        onEdit={() => handleEdit(event)}
+      />
+    );
+  }
 
   if (editingEvent) {
     return (
@@ -55,7 +76,12 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
   return (
     <div className={styles.eventList}>
       {events.map((event) => (
-        <div key={event.id} className={styles.eventItem}>
+        <div
+          key={event.id}
+          className={styles.eventItem}
+          onClick={() => handleEventClick(event)}
+          style={{ cursor: 'pointer' }}
+        >
           <div
             className={styles.colorBar}
             style={{ backgroundColor: event.color }}
@@ -103,13 +129,19 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
           <div className={styles.eventActions}>
             <button
               className={styles.editButton}
-              onClick={() => setEditingEvent(event)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditingEvent(event);
+              }}
             >
               수정
             </button>
             <button
               className={styles.deleteButton}
-              onClick={() => handleDelete(event.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(event.id);
+              }}
             >
               삭제
             </button>
