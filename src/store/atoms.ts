@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { Event, DiaryEntry, Theme, DDay } from '@types/index';
+import { Event, DiaryEntry, Theme, DDay } from '@types';
 import { Sticker, StickerLayout, UploadedStickerTemplate } from '@components/Styling/StickerPanel';
 import { startOfMonth } from 'date-fns';
 import { electronStore } from '@utils/electronStore';

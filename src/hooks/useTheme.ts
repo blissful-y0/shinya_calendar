@@ -1,6 +1,6 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentThemeState, customThemesState, predefinedThemes } from '@store/atoms';
-import { Theme } from '@types/index';
+import { Theme } from '@types';
 import { useEffect } from 'react';
 
 export const useTheme = () => {

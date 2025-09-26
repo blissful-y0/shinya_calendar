@@ -16,7 +16,11 @@
       "Bash(yarn dev)",
       "Bash(npm run dev:*)",
       "Bash(pkill:*)",
-      "Bash(yarn:*)"
+      "Bash(yarn:*)",
+      "Bash(gh pr create:*)",
+      "Bash(open https://github.com/blissful-y0/shinya_calendar/pull/new/feature/build-configuration)",
+      "Bash(find:*)",
+      "Bash(for:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { dDaysState, activeDDayState } from '@store/atoms';
-import { DDay } from '@types/index';
+import { DDay } from '@types';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import styles from './DDayManager.module.scss';
