@@ -39,6 +39,9 @@ const DayView: React.FC = () => {
   };
 
   const getEventPosition = (event: Event) => {
+    const PIXELS_PER_HOUR = 80;
+    const PIXELS_PER_MINUTE = PIXELS_PER_HOUR / 60;
+
     // Multi-day 이벤트 처리
     if (event.endDate && event.date !== event.endDate) {
       const currentDayStart = startOfDay(selectedDate);
@@ -65,25 +68,27 @@ const DayView: React.FC = () => {
       let top = 0;
       if (!startsBeforeToday && event.startTime) {
         const [hours, minutes] = event.startTime.split(':').map(Number);
-        top = (hours * 60 + minutes) * (80 / 60); // 80px per hour
+        top = (hours * 60 + minutes) * PIXELS_PER_MINUTE;
       }
 
       // 높이 계산
-      let height = 1920; // 전체 24시간 (24 * 80px)
+      let height = 1440 * PIXELS_PER_MINUTE; // 전체 24시간
       if (!startsBeforeToday && !endsAfterToday && event.startTime && event.endTime) {
         // 오늘 시작하고 오늘 끝나는 경우
         const [startHours, startMinutes] = event.startTime.split(':').map(Number);
         const [endHours, endMinutes] = event.endTime.split(':').map(Number);
-        const duration = (endHours * 60 + endMinutes) - (startHours * 60 + startMinutes);
-        height = duration * (80 / 60);
+        const durationMinutes = (endHours * 60 + endMinutes) - (startHours * 60 + startMinutes);
+        height = Math.max(durationMinutes * PIXELS_PER_MINUTE, 25);
       } else if (!startsBeforeToday && event.startTime) {
         // 오늘 시작하지만 다른 날에 끝나는 경우
         const [startHours, startMinutes] = event.startTime.split(':').map(Number);
-        height = (1440 - (startHours * 60 + startMinutes)) * (80 / 60);
+        const remainingMinutes = 1440 - (startHours * 60 + startMinutes);
+        height = remainingMinutes * PIXELS_PER_MINUTE;
       } else if (!endsAfterToday && event.endTime) {
         // 이전에 시작했지만 오늘 끝나는 경우
         const [endHours, endMinutes] = event.endTime.split(':').map(Number);
-        height = (endHours * 60 + endMinutes) * (80 / 60);
+        const elapsedMinutes = endHours * 60 + endMinutes;
+        height = elapsedMinutes * PIXELS_PER_MINUTE;
       }
 
       return {
@@ -99,13 +104,16 @@ const DayView: React.FC = () => {
     if (!event.startTime) return null;
 
     const [hours, minutes] = event.startTime.split(':').map(Number);
-    const top = (hours * 60 + minutes) * (80 / 60); // 80px per hour
+    const startMinutes = hours * 60 + minutes;
+    const top = startMinutes * PIXELS_PER_MINUTE;
 
-    let height = 80; // 기본 높이
+    let height = PIXELS_PER_HOUR; // 기본 높이 (1시간)
     if (event.endTime) {
       const [endHours, endMinutes] = event.endTime.split(':').map(Number);
-      const duration = (endHours * 60 + endMinutes) - (hours * 60 + minutes);
-      height = duration * (80 / 60);
+      const endTotalMinutes = endHours * 60 + endMinutes;
+      const durationMinutes = endTotalMinutes - startMinutes;
+      // 짧은 이벤트도 가독성을 위해 최소 25px 보장
+      height = Math.max(durationMinutes * PIXELS_PER_MINUTE, 25);
     }
 
     return { top, height, isMultiDay: false };

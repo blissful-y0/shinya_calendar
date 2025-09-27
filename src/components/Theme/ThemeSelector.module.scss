@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+  position: relative;
 }
 
 .section {
@@ -132,6 +133,8 @@
   background: var(--color-background);
   padding: $spacing-lg;
   border-radius: $border-radius;
+  position: relative;
+  overflow: visible;
 }
 
 .formTitle {
@@ -205,6 +208,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: $spacing-sm;
   margin-bottom: $spacing-lg;
+  overflow: visible;
 }
 
 .colorInput {
@@ -261,10 +265,8 @@
 }
 
 .colorPickerPopover {
-  position: absolute;
+  position: fixed;
   z-index: 2000;
-  top: 40px;
-  left: 0;
 }
 
 .colorPickerCover {
