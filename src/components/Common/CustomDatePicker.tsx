@@ -1,8 +1,8 @@
-import React from 'react';
-import DatePicker from 'react-datepicker';
-import { ko } from 'date-fns/locale';
-import 'react-datepicker/dist/react-datepicker.css';
-import styles from './CustomDatePicker.module.scss';
+import React from "react";
+import DatePicker from "react-datepicker";
+import { ko } from "date-fns/locale";
+import "react-datepicker/dist/react-datepicker.css";
+import styles from "./CustomDatePicker.module.scss";
 
 interface CustomDatePickerProps {
   selected: Date | null;
@@ -20,13 +20,13 @@ interface CustomDatePickerProps {
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   selected,
   onChange,
-  placeholderText = '날짜를 선택하세요',
+  placeholderText = "날짜를 선택하세요",
   minDate,
   maxDate,
   showTimeSelect = false,
   timeIntervals = 30,
-  dateFormat = showTimeSelect ? 'yyyy년 MM월 dd일 aa h:mm' : 'yyyy년 MM월 dd일',
-  className = '',
+  dateFormat = showTimeSelect ? "yyyy/MM/dd h:mmaa" : "yyyy/MM/dd",
+  className = "",
   disabled = false,
 }) => {
   return (
@@ -45,8 +45,11 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         className={styles.datePickerInput}
         calendarClassName={styles.datePickerCalendar}
         dayClassName={(date) =>
-          date.getDay() === 0 ? styles.sunday :
-          date.getDay() === 6 ? styles.saturday : ''
+          date.getDay() === 0
+            ? styles.sunday
+            : date.getDay() === 6
+            ? styles.saturday
+            : ""
         }
         showPopperArrow={false}
         popperClassName={styles.datePickerPopper}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTheme } from "@hooks/useTheme";
 import { Theme } from "@types";
 import { v4 as uuidv4 } from "uuid";
@@ -21,6 +21,9 @@ const ThemeSelector: React.FC = () => {
   const [editingTheme, setEditingTheme] = useState<Theme | null>(null);
   const [customThemeName, setCustomThemeName] = useState("");
   const [activeColorPicker, setActiveColorPicker] = useState<string | null>(null);
+  const [colorPickerPosition, setColorPickerPosition] = useState({ top: 0, left: 0 });
+  const colorPickerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const [customColors, setCustomColors] = useState({
     primary: "#FFB6C1",
     secondary: "#FFC0CB",
@@ -190,7 +193,7 @@ const ThemeSelector: React.FC = () => {
           + 커스텀 테마 만들기
         </button>
       ) : (
-        <div className={styles.customForm}>
+        <div className={styles.customForm} ref={formRef}>
           <h4 className={styles.formTitle}>
             {editingTheme ? "테마 수정" : "커스텀 테마 만들기"}
           </h4>
@@ -240,7 +243,40 @@ const ThemeSelector: React.FC = () => {
                   <button
                     className={styles.colorButton}
                     style={{ backgroundColor: value }}
-                    onClick={() => setActiveColorPicker(activeColorPicker === key ? null : key)}
+                    onClick={(e) => {
+                      if (activeColorPicker === key) {
+                        setActiveColorPicker(null);
+                      } else {
+                        const button = e.currentTarget;
+                        const rect = button.getBoundingClientRect();
+                        const viewportHeight = window.innerHeight;
+                        const viewportWidth = window.innerWidth;
+                        const pickerHeight = 220;
+                        const pickerWidth = 200;
+
+                        let top = rect.bottom + 10;
+                        let left = rect.left;
+
+                        // 화면 아래쪽 공간 체크
+                        if (top + pickerHeight > viewportHeight - 20) {
+                          // 위쪽으로 표시
+                          top = rect.top - pickerHeight - 10;
+                        }
+
+                        // 화면 오른쪽 공간 체크
+                        if (left + pickerWidth > viewportWidth - 20) {
+                          left = viewportWidth - pickerWidth - 20;
+                        }
+
+                        // 화면 왼쪽 공간 체크
+                        if (left < 20) {
+                          left = 20;
+                        }
+
+                        setColorPickerPosition({ top, left });
+                        setActiveColorPicker(key);
+                      }
+                    }}
                   />
                   <input
                     type="text"
@@ -254,7 +290,13 @@ const ThemeSelector: React.FC = () => {
                     className={styles.colorText}
                   />
                   {activeColorPicker === key && (
-                    <div className={styles.colorPickerPopover}>
+                    <div
+                      className={styles.colorPickerPopover}
+                      style={{
+                        top: `${colorPickerPosition.top}px`,
+                        left: `${colorPickerPosition.left}px`,
+                      }}
+                    >
                       <div className={styles.colorPickerCover} onClick={() => setActiveColorPicker(null)} />
                       <HexColorPicker
                         color={value}
