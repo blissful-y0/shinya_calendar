@@ -209,140 +209,138 @@
   gap: $spacing-sm;
   margin-bottom: $spacing-lg;
   overflow: visible;
-}
 
-.colorInput {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-xs;
+  .colorInput {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
 
-  label {
-    font-size: $font-size-small;
-    font-weight: 500;
-    color: var(--color-text-secondary);
+    label {
+      font-size: $font-size-small;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+    }
+
+    .colorControl {
+      display: flex;
+      gap: $spacing-xs;
+      position: relative;
+
+      .colorButton {
+        width: 40px;
+        height: 32px;
+        border: 2px solid var(--color-border);
+        border-radius: $border-radius-small;
+        cursor: pointer;
+        transition: all $transition-fast;
+        position: relative;
+
+        &:hover {
+          border-color: var(--color-primary);
+          transform: scale(1.05);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+
+      .colorText {
+        flex: 1;
+        padding: $spacing-xs;
+        border: 1px solid var(--color-border);
+        border-radius: $border-radius-small;
+        font-size: $font-size-small;
+        color: var(--color-text);
+        background: var(--color-surface);
+        font-family: 'Monaco', 'Menlo', monospace;
+
+        &:focus {
+          outline: none;
+          border-color: var(--color-primary);
+        }
+      }
+    }
+
+    :global(.react-colorful) {
+      width: 200px;
+      height: 200px;
+      border-radius: $border-radius;
+      box-shadow: $shadow-large;
+      border: 2px solid var(--color-border);
+      background: var(--color-surface);
+    }
+
+    :global(.react-colorful__saturation) {
+      border-radius: $border-radius-small;
+    }
+
+    :global(.react-colorful__hue) {
+      margin-top: 12px;
+      height: 12px;
+      border-radius: 6px;
+    }
+
+    :global(.react-colorful__pointer) {
+      width: 20px;
+      height: 20px;
+      border: 3px solid white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .colorPickerPopover {
+    position: fixed;
+    z-index: 2000;
+  }
+
+  .colorPickerCover {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 }
 
-.colorControl {
-  display: flex;
-  gap: $spacing-xs;
-  position: relative;
-}
-
-.colorButton {
-  width: 40px;
-  height: 32px;
-  border: 2px solid var(--color-border);
-  border-radius: $border-radius-small;
-  cursor: pointer;
-  transition: all $transition-fast;
-  position: relative;
-
-  &:hover {
-    border-color: var(--color-primary);
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
-}
-
-.colorText {
-  flex: 1;
-  padding: $spacing-xs;
-  border: 1px solid var(--color-border);
-  border-radius: $border-radius-small;
-  font-size: $font-size-small;
-  color: var(--color-text);
-  background: var(--color-surface);
-  font-family: 'Monaco', 'Menlo', monospace;
-
-  &:focus {
-    outline: none;
-    border-color: var(--color-primary);
-  }
-}
-
-.colorPickerPopover {
-  position: fixed;
-  z-index: 2000;
-}
-
-.colorPickerCover {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-// React Colorful 커스텀 스타일
-.colorInput {
-  :global(.react-colorful) {
-    width: 200px;
-    height: 200px;
-    border-radius: $border-radius;
-    box-shadow: $shadow-large;
-    border: 2px solid var(--color-border);
-    background: var(--color-surface);
-  }
-
-  :global(.react-colorful__saturation) {
-    border-radius: $border-radius-small;
-  }
-
-  :global(.react-colorful__hue) {
-    margin-top: 12px;
-    height: 12px;
-    border-radius: 6px;
-  }
-
-  :global(.react-colorful__pointer) {
-    width: 20px;
-    height: 20px;
-    border: 3px solid white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-}
 
 .formActions {
   display: flex;
   gap: $spacing-sm;
-}
 
-.cancelButton,
-.saveButton {
-  flex: 1;
-  padding: $spacing-sm $spacing-md;
-  border: none;
-  border-radius: $border-radius-small;
-  cursor: pointer;
-  font-size: $font-size-base;
-  font-weight: 500;
-  transition: all $transition-fast;
-}
-
-.cancelButton {
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-
-  &:hover {
-    background: var(--color-background);
-  }
-}
-
-.saveButton {
-  background: var(--color-primary);
-  color: white;
-
-  &:hover {
-    background: var(--color-secondary);
+  .cancelButton,
+  .saveButton {
+    flex: 1;
+    padding: $spacing-sm $spacing-md;
+    border: none;
+    border-radius: $border-radius-small;
+    cursor: pointer;
+    font-size: $font-size-base;
+    font-weight: 500;
+    transition: all $transition-fast;
   }
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .cancelButton {
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+
+    &:hover {
+      background: var(--color-background);
+    }
+  }
+
+  .saveButton {
+    background: var(--color-primary);
+    color: white;
+
+    &:hover {
+      background: var(--color-secondary);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 }

@@ -5,21 +5,21 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-sm;
-}
 
-.emptyState {
-  text-align: center;
-  padding: $spacing-xl $spacing-md;
+  .emptyState {
+    text-align: center;
+    padding: $spacing-xl $spacing-md;
 
-  p {
-    font-size: $font-size-base;
-    color: var(--color-text);
-    margin-bottom: $spacing-xs;
-  }
+    p {
+      font-size: $font-size-base;
+      color: var(--color-text);
+      margin-bottom: $spacing-xs;
+    }
 
-  span {
-    font-size: $font-size-small;
-    color: var(--color-text-secondary);
+    span {
+      font-size: $font-size-small;
+      color: var(--color-text-secondary);
+    }
   }
 }
 
@@ -34,96 +34,96 @@
     box-shadow: $shadow-small;
     transform: translateX(-2px);
   }
-}
 
-.colorBar {
-  width: 4px;
-  flex-shrink: 0;
-}
-
-.eventContent {
-  flex: 1;
-  padding: $spacing-md;
-}
-
-.eventTitle {
-  font-size: $font-size-base;
-  font-weight: 600;
-  color: var(--color-text);
-  margin-bottom: $spacing-xs;
-  display: flex;
-  align-items: center;
-  gap: $spacing-xs;
-}
-
-.recurringBadge {
-  display: inline-block;
-  padding: 2px 6px;
-  background: var(--color-primary);
-  color: white;
-  border-radius: $border-radius-small;
-  font-size: $font-size-xs;
-  font-weight: normal;
-}
-
-.eventDateRange {
-  font-size: $font-size-small;
-  color: var(--color-primary);
-  margin-bottom: $spacing-xs;
-}
-
-.recurrenceInfo {
-  font-size: $font-size-small;
-  color: var(--color-text-secondary);
-  margin-bottom: $spacing-xs;
-  font-style: italic;
-}
-
-.eventTime {
-  font-size: $font-size-small;
-  color: var(--color-primary);
-  margin-bottom: $spacing-xs;
-}
-
-.eventDescription {
-  font-size: $font-size-small;
-  color: var(--color-text-secondary);
-  line-height: 1.4;
-}
-
-.eventActions {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-xs;
-  padding: $spacing-sm;
-}
-
-.editButton,
-.deleteButton {
-  padding: $spacing-xs $spacing-sm;
-  border: none;
-  border-radius: $border-radius-small;
-  cursor: pointer;
-  font-size: $font-size-small;
-  transition: all $transition-fast;
-}
-
-.editButton {
-  background: var(--color-accent);
-  color: var(--color-text);
-
-  &:hover {
-    background: var(--color-primary);
-    color: white;
+  .colorBar {
+    width: 4px;
+    flex-shrink: 0;
   }
-}
 
-.deleteButton {
-  background: transparent;
-  color: var(--color-text-secondary);
+  .eventContent {
+    flex: 1;
+    padding: $spacing-md;
 
-  &:hover {
-    background: #ffe4e1;
-    color: #ff6b6b;
+    .eventTitle {
+      font-size: $font-size-base;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: $spacing-xs;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+
+      .recurringBadge {
+        display: inline-block;
+        padding: 2px 6px;
+        background: var(--color-primary);
+        color: white;
+        border-radius: $border-radius-small;
+        font-size: $font-size-xs;
+        font-weight: normal;
+      }
+    }
+
+    .eventDateRange {
+      font-size: $font-size-small;
+      color: var(--color-primary);
+      margin-bottom: $spacing-xs;
+    }
+
+    .recurrenceInfo {
+      font-size: $font-size-small;
+      color: var(--color-text-secondary);
+      margin-bottom: $spacing-xs;
+      font-style: italic;
+    }
+
+    .eventTime {
+      font-size: $font-size-small;
+      color: var(--color-primary);
+      margin-bottom: $spacing-xs;
+    }
+
+    .eventDescription {
+      font-size: $font-size-small;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
+    }
+  }
+
+  .eventActions {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    padding: $spacing-sm;
+
+    .editButton,
+    .deleteButton {
+      padding: $spacing-xs $spacing-sm;
+      border: none;
+      border-radius: $border-radius-small;
+      cursor: pointer;
+      font-size: $font-size-small;
+      transition: all $transition-fast;
+    }
+
+    .editButton {
+      background: var(--color-accent);
+      color: var(--color-text);
+
+      &:hover {
+        background: var(--color-primary);
+        color: white;
+      }
+    }
+
+    .deleteButton {
+      background: transparent;
+      color: var(--color-text-secondary);
+
+      &:hover {
+        background: #ffe4e1;
+        color: #ff6b6b;
+      }
+    }
   }
 }

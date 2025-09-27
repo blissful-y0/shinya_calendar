@@ -6,148 +6,149 @@
   padding: $spacing-md;
   border-radius: $border-radius;
   margin-bottom: $spacing-md;
-}
 
-.detailHeader {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  margin-bottom: $spacing-lg;
-  padding-bottom: $spacing-sm;
-  border-bottom: 1px solid var(--color-border);
+  .detailHeader {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid var(--color-border);
 
-  h3 {
-    flex: 1;
-    font-size: $font-size-large;
-    font-weight: 600;
-    color: var(--color-text);
-    margin: 0;
-  }
-}
+    h3 {
+      flex: 1;
+      font-size: $font-size-large;
+      font-weight: 600;
+      color: var(--color-text);
+      margin: 0;
+    }
 
-.closeButton {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  font-size: $font-size-large;
-  cursor: pointer;
-  border-radius: $border-radius-small;
-  transition: all $transition-fast;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    .closeButton {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: var(--color-surface);
+      color: var(--color-text-secondary);
+      font-size: $font-size-large;
+      cursor: pointer;
+      border-radius: $border-radius-small;
+      transition: all $transition-fast;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-  &:hover {
-    background: var(--color-accent);
-    color: var(--color-text);
+      &:hover {
+        background: var(--color-accent);
+        color: var(--color-text);
+      }
+    }
   }
 }
 
 .detailBody {
   position: relative;
-}
 
-.colorBar {
-  width: 100%;
-  height: 4px;
-  border-radius: $border-radius-small;
-  margin-bottom: $spacing-md;
-}
-
-.detailContent {
-  // No margin needed
-}
-
-.detailGroup {
-  margin-bottom: $spacing-md;
-
-  &:last-child {
-    margin-bottom: 0;
+  .colorBar {
+    width: 100%;
+    height: 4px;
+    border-radius: $border-radius-small;
+    margin-bottom: $spacing-md;
   }
 
-  label {
-    display: block;
-    font-size: $font-size-small;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    margin-bottom: $spacing-xs;
+  .detailContent {
+    // No margin needed
+
+    .detailGroup {
+      margin-bottom: $spacing-md;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      label {
+        display: block;
+        font-size: $font-size-small;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        margin-bottom: $spacing-xs;
+      }
+
+      .detailValue {
+        padding: $spacing-sm;
+        border: 1px solid var(--color-border);
+        border-radius: $border-radius-small;
+        background: var(--color-surface);
+        font-size: $font-size-base;
+        color: var(--color-text);
+        line-height: 1.5;
+        min-height: 38px;
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+
+        .recurringBadge {
+          display: inline-block;
+          margin-left: $spacing-sm;
+          padding: 2px $spacing-sm;
+          background: var(--color-primary);
+          color: white;
+          font-size: $font-size-small;
+          font-weight: 500;
+          border-radius: $border-radius-small;
+        }
+      }
+
+      .recurrenceEnd {
+        margin-top: $spacing-xs;
+        font-size: $font-size-small;
+        color: var(--color-text-secondary);
+      }
+    }
   }
-}
-
-.detailValue {
-  padding: $spacing-sm;
-  border: 1px solid var(--color-border);
-  border-radius: $border-radius-small;
-  background: var(--color-surface);
-  font-size: $font-size-base;
-  color: var(--color-text);
-  line-height: 1.5;
-  min-height: 38px;
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-}
-
-.recurringBadge {
-  display: inline-block;
-  margin-left: $spacing-sm;
-  padding: 2px $spacing-sm;
-  background: var(--color-primary);
-  color: white;
-  font-size: $font-size-small;
-  font-weight: 500;
-  border-radius: $border-radius-small;
-}
-
-.recurrenceEnd {
-  margin-top: $spacing-xs;
-  font-size: $font-size-small;
-  color: var(--color-text-secondary);
 }
 
 .detailActions {
   display: flex;
   gap: $spacing-sm;
   margin-top: $spacing-lg;
-}
 
-.editButton,
-.deleteButton {
-  flex: 1;
-  padding: $spacing-sm $spacing-md;
-  border: none;
-  border-radius: $border-radius-small;
-  cursor: pointer;
-  font-size: $font-size-base;
-  font-weight: 500;
-  transition: all $transition-fast;
-}
-
-.editButton {
-  background: var(--color-primary);
-  color: white;
-
-  &:hover {
-    background: var(--color-secondary);
-    transform: translateY(-2px);
-    box-shadow: $shadow-small;
+  .editButton,
+  .deleteButton {
+    flex: 1;
+    padding: $spacing-sm $spacing-md;
+    border: none;
+    border-radius: $border-radius-small;
+    cursor: pointer;
+    font-size: $font-size-base;
+    font-weight: 500;
+    transition: all $transition-fast;
   }
 
-  &:active {
-    transform: translateY(0);
+  .editButton {
+    background: var(--color-primary);
+    color: white;
+
+    &:hover {
+      background: var(--color-secondary);
+      transform: translateY(-2px);
+      box-shadow: $shadow-small;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .deleteButton {
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+
+    &:hover {
+      background: var(--color-danger-light);
+      color: var(--color-danger);
+      border-color: var(--color-danger);
+    }
   }
 }
-
-.deleteButton {
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-
-  &:hover {
-    background: var(--color-danger-light);
-    color: var(--color-danger);
-    border-color: var(--color-danger);
-  }
 }

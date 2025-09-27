@@ -9,6 +9,107 @@
   flex-direction: column;
   animation: slideIn $transition-normal;
   overflow: hidden; // 내부 스크롤 관리를 위해 추가
+
+  .divider {
+    height: 1px;
+    background: var(--color-surface);
+    position: relative;
+    margin: $spacing-sm $spacing-lg;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--color-border) 20%,
+        var(--color-primary) 50%,
+        var(--color-border) 80%,
+        transparent 100%
+      );
+      opacity: 0.6;
+    }
+  }
+
+  .sidebarHeader {
+    padding: $spacing-lg;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-background);
+
+    .dateTitle {
+      font-size: $font-size-large;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: $spacing-md;
+    }
+
+    .tabs {
+      display: flex;
+      gap: $spacing-xs;
+      background: var(--color-surface);
+      padding: 2px;
+      border-radius: $border-radius-small;
+
+      .tab {
+        flex: 1;
+        padding: $spacing-xs;
+        border: none;
+        background: transparent;
+        border-radius: $border-radius-small - 2px;
+        cursor: pointer;
+        font-size: $font-size-xs;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        transition: all $transition-fast;
+
+        &:hover {
+          color: var(--color-text);
+        }
+
+        &.active {
+          background: var(--color-primary);
+          color: white;
+        }
+      }
+    }
+  }
+
+  .sidebarContent {
+    flex: 1;
+    padding: $spacing-lg;
+    overflow-y: auto;
+
+    .actionBar {
+      margin-bottom: $spacing-md;
+
+      .addButton {
+        width: 100%;
+        padding: $spacing-sm $spacing-md;
+        border: 2px dashed var(--color-primary);
+        background: transparent;
+        border-radius: $border-radius-small;
+        cursor: pointer;
+        font-size: $font-size-base;
+        font-weight: 500;
+        color: var(--color-primary);
+        transition: all $transition-fast;
+
+        &:hover {
+          background: var(--color-accent);
+          border-style: solid;
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+    }
+  }
 }
 
 @keyframes slideIn {
@@ -17,106 +118,5 @@
   }
   to {
     transform: translateX(0);
-  }
-}
-
-.divider {
-  height: 1px;
-  background: var(--color-surface);
-  position: relative;
-  margin: $spacing-sm $spacing-lg;
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      var(--color-border) 20%,
-      var(--color-primary) 50%,
-      var(--color-border) 80%,
-      transparent 100%
-    );
-    opacity: 0.6;
-  }
-}
-
-.sidebarHeader {
-  padding: $spacing-lg;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-background);
-}
-
-.dateTitle {
-  font-size: $font-size-large;
-  font-weight: 600;
-  color: var(--color-text);
-  margin-bottom: $spacing-md;
-}
-
-.tabs {
-  display: flex;
-  gap: $spacing-xs;
-  background: var(--color-surface);
-  padding: 2px;
-  border-radius: $border-radius-small;
-}
-
-.tab {
-  flex: 1;
-  padding: $spacing-xs;
-  border: none;
-  background: transparent;
-  border-radius: $border-radius-small - 2px;
-  cursor: pointer;
-  font-size: $font-size-xs;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  transition: all $transition-fast;
-
-  &:hover {
-    color: var(--color-text);
-  }
-
-  &.active {
-    background: var(--color-primary);
-    color: white;
-  }
-}
-
-.sidebarContent {
-  flex: 1;
-  padding: $spacing-lg;
-  overflow-y: auto;
-}
-
-.actionBar {
-  margin-bottom: $spacing-md;
-}
-
-.addButton {
-  width: 100%;
-  padding: $spacing-sm $spacing-md;
-  border: 2px dashed var(--color-primary);
-  background: transparent;
-  border-radius: $border-radius-small;
-  cursor: pointer;
-  font-size: $font-size-base;
-  font-weight: 500;
-  color: var(--color-primary);
-  transition: all $transition-fast;
-
-  &:hover {
-    background: var(--color-accent);
-    border-style: solid;
-  }
-
-  &:active {
-    transform: scale(0.98);
   }
 }
