@@ -1,7 +1,12 @@
-import { app, BrowserWindow, ipcMain, Notification } from "electron";
+import { app, BrowserWindow, ipcMain, Notification, shell } from "electron";
 import path from "path";
 import os from "os";
 import Store from "electron-store";
+import {
+  startOAuthServer,
+  stopOAuthServer,
+  openAuthWindow,
+} from "./googleOAuthHandler";
 
 // Electron Store 초기화
 const store = new Store();
@@ -276,4 +281,31 @@ ipcMain.handle("resize-window", (_, width: number, height: number) => {
   }
 
   throw new Error("Main window is not available");
+});
+
+// Google OAuth 핸들러
+ipcMain.handle("google-oauth-start", async (_) => {
+  if (!mainWindow) {
+    throw new Error("Main window is not available");
+  }
+
+  try {
+    const code = await startOAuthServer(mainWindow);
+    return { success: true, code };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle("google-oauth-stop", () => {
+  stopOAuthServer();
+});
+
+ipcMain.handle("open-external", (_, url: string) => {
+  // OAuth URL인 경우 Electron 창으로 열기
+  if (url.includes("accounts.google.com/o/oauth2")) {
+    openAuthWindow(url);
+  } else {
+    shell.openExternal(url);
+  }
 });

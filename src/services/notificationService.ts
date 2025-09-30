@@ -1,6 +1,16 @@
-import { Event, ReminderTime } from '@types';
-import { isBefore, isAfter, addMinutes, subMinutes, subHours, startOfDay, parseISO, addDays, endOfDay } from 'date-fns';
-import { generateRecurringEvents } from '@utils/eventUtils';
+import { Event, ReminderTime } from "@types";
+import {
+  isBefore,
+  isAfter,
+  addMinutes,
+  subMinutes,
+  subHours,
+  startOfDay,
+  parseISO,
+  addDays,
+  endOfDay,
+} from "date-fns";
+import { generateRecurringEvents } from "@utils/eventUtils";
 
 interface ScheduledNotification {
   eventId: string;
@@ -10,7 +20,8 @@ interface ScheduledNotification {
 }
 
 class NotificationService {
-  private scheduledNotifications: Map<string, ScheduledNotification> = new Map();
+  private scheduledNotifications: Map<string, ScheduledNotification> =
+    new Map();
   private checkInterval: NodeJS.Timeout | null = null;
 
   /**
@@ -36,7 +47,7 @@ class NotificationService {
     }
 
     // Clear all scheduled notifications
-    this.scheduledNotifications.forEach(notification => {
+    this.scheduledNotifications.forEach((notification) => {
       clearTimeout(notification.timeoutId);
     });
     this.scheduledNotifications.clear();
@@ -45,11 +56,16 @@ class NotificationService {
   /**
    * Calculate notification time based on event and reminder settings
    */
-  private calculateNotificationTime(event: Event, instanceDate?: Date): Date | null {
+  private calculateNotificationTime(
+    event: Event,
+    instanceDate?: Date
+  ): Date | null {
     if (!event.reminder || !event.reminderTime) return null;
 
     // Use instance date for recurring events, otherwise use event date
-    const eventDate = instanceDate ? new Date(instanceDate) : new Date(event.date);
+    const eventDate = instanceDate
+      ? new Date(instanceDate)
+      : new Date(event.date);
 
     // For all-day events, set time to midnight (00:00)
     let eventTime: Date;
@@ -57,7 +73,7 @@ class NotificationService {
       eventTime = startOfDay(eventDate);
       eventTime.setHours(0, 0, 0, 0);
     } else if (event.startTime) {
-      const [hours, minutes] = event.startTime.split(':').map(Number);
+      const [hours, minutes] = event.startTime.split(":").map(Number);
       eventTime = new Date(eventDate);
       eventTime.setHours(hours, minutes, 0, 0);
     } else {
@@ -66,15 +82,15 @@ class NotificationService {
 
     // Calculate notification time based on reminder setting
     switch (event.reminderTime) {
-      case 'now':
+      case "now":
         return eventTime;
-      case '5min':
+      case "5min":
         return subMinutes(eventTime, 5);
-      case '10min':
+      case "10min":
         return subMinutes(eventTime, 10);
-      case '30min':
+      case "30min":
         return subMinutes(eventTime, 30);
-      case '1hour':
+      case "1hour":
         return subHours(eventTime, 1);
       default:
         return eventTime;
@@ -100,13 +116,20 @@ class NotificationService {
   /**
    * Schedule notification for a single event instance
    */
-  private scheduleSingleNotification(event: Event, instanceDate?: Date, notificationKey?: string) {
+  private scheduleSingleNotification(
+    event: Event,
+    instanceDate?: Date,
+    notificationKey?: string
+  ) {
     const key = notificationKey || event.id;
 
     // Cancel existing notification for this key
     this.cancelNotification(key);
 
-    const notificationTime = this.calculateNotificationTime(event, instanceDate);
+    const notificationTime = this.calculateNotificationTime(
+      event,
+      instanceDate
+    );
     if (!notificationTime) return;
 
     const now = new Date();
@@ -126,7 +149,7 @@ class NotificationService {
         eventId: event.id,
         timeoutId,
         scheduledTime: notificationTime,
-        instanceDate
+        instanceDate,
       });
     }
   }
@@ -139,7 +162,7 @@ class NotificationService {
 
     // Clear any existing notifications for this event
     // Remove all notifications that start with this event ID
-    Array.from(this.scheduledNotifications.keys()).forEach(key => {
+    Array.from(this.scheduledNotifications.keys()).forEach((key) => {
       if (key.startsWith(event.id)) {
         this.cancelNotification(key);
       }
@@ -174,20 +197,20 @@ class NotificationService {
   private async sendNotification(event: Event, instanceDate?: Date) {
     try {
       const title = event.title;
-      let body = '';
+      let body = "";
 
       // Add date info for recurring events
       if (event.recurrence && instanceDate) {
-        const dateStr = instanceDate.toLocaleDateString('ko-KR', {
-          month: 'long',
-          day: 'numeric',
-          weekday: 'short'
+        const dateStr = instanceDate.toLocaleDateString("ko-KR", {
+          month: "long",
+          day: "numeric",
+          weekday: "short",
         });
         body = `${dateStr} - `;
       }
 
       if (event.isAllDay) {
-        body += '하루 종일 진행되는 이벤트입니다.';
+        body += "하루 종일 진행되는 이벤트입니다.";
       } else if (event.startTime && event.endTime) {
         body += `${event.startTime} - ${event.endTime}`;
       } else if (event.startTime) {
@@ -204,17 +227,17 @@ class NotificationService {
           title,
           body,
           icon: undefined, // Can add an icon path here if needed
-          silent: false
+          silent: false,
         });
 
         if (!result) {
           console.warn(`Failed to show notification for event: ${event.title}`);
         }
       } else {
-        console.warn('Notification API not available');
+        console.warn("Notification API not available");
       }
     } catch (error) {
-      console.error('Error sending notification:', error);
+      console.error("Error sending notification:", error);
     }
   }
 
@@ -231,13 +254,13 @@ class NotificationService {
    */
   updateNotifications(events: Event[]) {
     // Clear all existing notifications
-    this.scheduledNotifications.forEach(notification => {
+    this.scheduledNotifications.forEach((notification) => {
       clearTimeout(notification.timeoutId);
     });
     this.scheduledNotifications.clear();
 
     // Schedule new notifications
-    events.forEach(event => {
+    events.forEach((event) => {
       if (event.reminder) {
         this.scheduleNotification(event);
       }
@@ -248,5 +271,5 @@ class NotificationService {
   }
 }
 
-// Export singleton instance
+// 싱글톤 유지
 export const notificationService = new NotificationService();

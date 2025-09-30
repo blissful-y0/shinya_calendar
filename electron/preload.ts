@@ -34,4 +34,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
     icon?: string;
     silent?: boolean;
   }) => ipcRenderer.invoke("show-notification", options),
+
+  // Google OAuth API
+  googleOAuth: {
+    start: () => ipcRenderer.invoke("google-oauth-start"),
+    stop: () => ipcRenderer.invoke("google-oauth-stop"),
+  },
+  openExternal: (url: string) => ipcRenderer.invoke("open-external", url),
 });

@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { Event, DiaryEntry, Theme, DDay } from '@types';
+import { Event, DiaryEntry, Theme, DDay, GoogleCalendarSyncState } from '@types';
 import { Sticker, StickerLayout, UploadedStickerTemplate } from '@components/Styling/StickerPanel';
 import { startOfMonth } from 'date-fns';
 import { electronStore } from '@utils/electronStore';
@@ -143,8 +143,18 @@ export const eventsState = atom<Event[]>({
     ({ setSelf, onSet }) => {
       // Electron Store에서 저장된 이벤트 목록 불러오기
       electronStore.get('events').then(savedEvents => {
-        if (savedEvents) {
-          setSelf(savedEvents);
+        if (savedEvents && Array.isArray(savedEvents)) {
+          // Date 문자열을 Date 객체로 변환
+          const eventsWithDates = (savedEvents as any[]).map(event => ({
+            ...event,
+            date: new Date(event.date),
+            endDate: event.endDate ? new Date(event.endDate) : undefined,
+            recurrence: event.recurrence ? {
+              ...event.recurrence,
+              endDate: event.recurrence.endDate ? new Date(event.recurrence.endDate) : undefined
+            } : undefined
+          }));
+          setSelf(eventsWithDates);
         }
       }).catch(error => {
         console.error('Failed to load events:', error);
@@ -430,6 +440,36 @@ export const stickerLayoutsState = atom<StickerLayout[]>({
       onSet((newLayouts, _, isReset) => {
         if (!isReset) {
           electronStore.set('stickerLayouts', newLayouts);
+        }
+      });
+    }
+  ]
+});
+
+// Google Calendar 동기화 상태
+export const googleCalendarSyncState = atom<GoogleCalendarSyncState>({
+  key: 'googleCalendarSync',
+  default: {
+    isConnected: false,
+    autoSync: false,
+  },
+  effects: [
+    ({ setSelf, onSet }) => {
+      electronStore.get('googleCalendarSyncState').then(savedState => {
+        if (savedState) {
+          const restored = {
+            ...savedState,
+            lastSyncTime: savedState.lastSyncTime ? new Date(savedState.lastSyncTime) : undefined
+          };
+          setSelf(restored);
+        }
+      }).catch(error => {
+        console.error('Failed to load Google Calendar sync state:', error);
+      });
+
+      onSet((newState, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('googleCalendarSyncState', newState);
         }
       });
     }

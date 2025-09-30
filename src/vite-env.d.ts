@@ -23,6 +23,11 @@ interface ElectronAPI {
     icon?: string;
     silent?: boolean;
   }) => Promise<boolean>;
+  googleOAuth: {
+    start: () => Promise<{ success: boolean; code?: string; error?: string }>;
+    stop: () => Promise<void>;
+  };
+  openExternal: (url: string) => Promise<void>;
 }
 
 interface Window {

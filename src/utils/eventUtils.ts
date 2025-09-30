@@ -70,25 +70,29 @@ export function generateRecurringEvents(baseEvent: Event, startRange: Date, endR
  * Check if an event occurs on a specific date
  */
 export function isEventOnDate(event: Event, date: Date): boolean {
-  const targetStart = startOfDay(date);
-  const targetEnd = endOfDay(date);
-
-  // Check if it's a multi-day event
-  if (event.endDate) {
-    const eventStart = startOfDay(event.date);
-    const eventEnd = endOfDay(event.endDate);
-
-    return (
-      (isAfter(targetStart, eventStart) || isSameDay(targetStart, eventStart)) &&
-      (isBefore(targetEnd, eventEnd) || isSameDay(targetEnd, eventEnd))
-    ) || (
-      (isAfter(eventStart, targetStart) || isSameDay(eventStart, targetStart)) &&
-      (isBefore(eventStart, targetEnd) || isSameDay(eventStart, targetEnd))
-    );
-  }
+  const targetDate = startOfDay(date);
+  const eventDate = startOfDay(event.date);
 
   // Single day event
-  return isSameDay(event.date, date);
+  if (!event.endDate) {
+    const matches = isSameDay(eventDate, targetDate);
+    if (matches) {
+      console.log(`Event "${event.title}" matches date ${date.toDateString()}`);
+    }
+    return matches;
+  }
+
+  // Multi-day event: check if target date falls between start and end
+  const eventEndDate = startOfDay(event.endDate);
+  const isInRange =
+    (isSameDay(targetDate, eventDate) || isAfter(targetDate, eventDate)) &&
+    (isSameDay(targetDate, eventEndDate) || isBefore(targetDate, eventEndDate));
+
+  if (isInRange) {
+    console.log(`Multi-day event "${event.title}" matches date ${date.toDateString()}`);
+  }
+
+  return isInRange;
 }
 
 /**
