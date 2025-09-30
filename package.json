@@ -54,7 +54,7 @@
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",
     "concurrently": "^8.2.2",
-    "electron": "^28.2.0",
+    "electron": "^38.2.0",
     "electron-builder": "^24.13.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
@@ -87,6 +87,8 @@
       "identity": null,
       "hardenedRuntime": true,
       "gatekeeperAssess": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
       "target": [
         {
           "target": "dmg",
@@ -97,6 +99,7 @@
         }
       ]
     },
+    "afterPack": "scripts/verify-bundle.js",
     "win": {
       "icon": "public/icon.ico",
       "target": [

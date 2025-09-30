@@ -8,6 +8,17 @@ const store = new Store();
 
 let mainWindow: BrowserWindow | null = null;
 
+// 런타임 에러 디버깅을 위한 핸들러 추가
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+  console.error("Stack:", error.stack);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise);
+  console.error("Reason:", reason);
+});
+
 function createWindow() {
   // macOS 특정 설정
   const isMac = process.platform === "darwin";
