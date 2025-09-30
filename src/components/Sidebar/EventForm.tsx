@@ -25,7 +25,11 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     event?.date ? new Date(event.date) : date
   );
   const [endDate, setEndDate] = useState<Date>(
-    event?.endDate ? new Date(event.endDate) : event?.date ? new Date(event.date) : date
+    event?.endDate
+      ? new Date(event.endDate)
+      : event?.date
+      ? new Date(event.date)
+      : date
   );
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [startTime, setStartTime] = useState(event?.startTime || "");
@@ -34,14 +38,26 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const [color, setColor] = useState(event?.color || "#FFB6C1");
   const [isAllDay, setIsAllDay] = useState(event?.isAllDay || false);
   const [isMultiDay, setIsMultiDay] = useState(
-    !!event?.endDate && new Date(event.date).getTime() !== new Date(event.endDate).getTime()
+    !!event?.endDate &&
+      new Date(event.date).getTime() !== new Date(event.endDate).getTime()
   );
   const [isRecurring, setIsRecurring] = useState(!!event?.recurrence);
-  const [recurrence, setRecurrence] = useState<RecurrenceRule>(
-    event?.recurrence || {
+  const [recurrence, setRecurrence] = useState<RecurrenceRule>(() => {
+    const baseRecurrence = event?.recurrence || {
       frequency: "daily",
       interval: 1,
+    };
+    // byweekday가 있으면 정렬
+    if (baseRecurrence.byweekday && baseRecurrence.byweekday.length > 0) {
+      return {
+        ...baseRecurrence,
+        byweekday: [...baseRecurrence.byweekday].sort((a, b) => a - b),
+      };
     }
+    return baseRecurrence;
+  });
+  const [monthlyType, setMonthlyType] = useState<"dayofmonth" | "dayofweek">(
+    event?.recurrence?.bymonthday ? "dayofmonth" : "dayofweek"
   );
   const [reminder, setReminder] = useState(event?.reminder || false);
   const [reminderTime, setReminderTime] = useState<ReminderTime>(
@@ -92,6 +108,39 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       }
     }
 
+    // 반복 이벤트 설정 처리
+    let finalRecurrence = isRecurring ? { ...recurrence } : undefined;
+
+    if (isRecurring && finalRecurrence) {
+      // 월별 반복 설정
+      if (recurrence.frequency === "monthly") {
+        if (monthlyType === "dayofmonth") {
+          finalRecurrence.bymonthday = startDate.getDate();
+          delete finalRecurrence.byweekday;
+          delete finalRecurrence.bysetpos;
+        } else {
+          // dayofweek: 몇 번째 무슨 요일
+          const dayOfWeek = startDate.getDay(); // 0=일요일, 1=월요일...
+          const rruleDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // RRule: 0=월요일
+          const weekOfMonth = Math.ceil(startDate.getDate() / 7);
+
+          finalRecurrence.byweekday = [rruleDayOfWeek];
+          finalRecurrence.bysetpos = weekOfMonth;
+          delete finalRecurrence.bymonthday;
+        }
+      }
+
+      // 주별 반복 시 요일이 선택되지 않았으면 시작일의 요일 사용
+      if (
+        recurrence.frequency === "weekly" &&
+        (!finalRecurrence.byweekday || finalRecurrence.byweekday.length === 0)
+      ) {
+        const dayOfWeek = startDate.getDay();
+        const rruleDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        finalRecurrence.byweekday = [rruleDayOfWeek];
+      }
+    }
+
     const newEvent: Event = {
       id: event?.id || uuidv4(),
       title: title.trim(),
@@ -102,7 +151,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       description,
       color,
       isAllDay,
-      recurrence: isRecurring ? recurrence : undefined,
+      recurrence: finalRecurrence,
       reminder,
       reminderTime: reminder ? reminderTime : undefined,
       reminderForAllOccurrences:
@@ -288,6 +337,77 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
               </span>
             </div>
           </div>
+
+          {/* 주별 반복 시 요일 선택 */}
+          {recurrence.frequency === "weekly" && (
+            <div className={styles.formGroup}>
+              <label>반복 요일</label>
+              <div className={styles.weekdaySelector}>
+                {["월", "화", "수", "목", "금", "토", "일"].map(
+                  (day, index) => {
+                    const rruleIndex = index; // RRule: 0=월요일
+                    const isSelected =
+                      recurrence.byweekday?.includes(rruleIndex) || false;
+                    return (
+                      <button
+                        key={day}
+                        type="button"
+                        className={`${styles.weekdayButton} ${
+                          isSelected ? styles.selected : ""
+                        }`}
+                        onClick={() => {
+                          const currentDays = recurrence.byweekday || [];
+                          const newDays = isSelected
+                            ? currentDays.filter((d) => d !== rruleIndex)
+                            : [...currentDays, rruleIndex].sort();
+                          setRecurrence({
+                            ...recurrence,
+                            byweekday: newDays.length > 0 ? newDays : undefined,
+                          });
+                        }}
+                      >
+                        {day}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 월별 반복 시 옵션 선택 */}
+          {recurrence.frequency === "monthly" && (
+            <div className={styles.formGroup}>
+              <label>반복 방식</label>
+              <div className={styles.monthlyOptions}>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name="monthlyType"
+                    checked={monthlyType === "dayofmonth"}
+                    onChange={() => setMonthlyType("dayofmonth")}
+                  />
+                  매월 {startDate.getDate()}일
+                </label>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name="monthlyType"
+                    checked={monthlyType === "dayofweek"}
+                    onChange={() => setMonthlyType("dayofweek")}
+                  />
+                  매월 {Math.ceil(startDate.getDate() / 7)}번째{" "}
+                  {
+                    ["일", "월", "화", "수", "목", "금", "토"][
+                      startDate.getDay()
+                    ]
+                  }
+                  요일
+                </label>
+              </div>
+            </div>
+          )}
+
           <div className={styles.formGroup}>
             <label>반복 종료</label>
             <CustomDatePicker

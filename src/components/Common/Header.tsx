@@ -9,9 +9,12 @@ import {
   stickerVisibilityState,
 } from "@store/atoms";
 import { getNextMonth, getPreviousMonth, monthNames } from "@utils/calendar";
-import { addDays, addWeeks, subDays, subWeeks, format } from "date-fns";
-import { ko } from "date-fns/locale";
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
 import { FcGoogle } from "react-icons/fc";
+import { MdDeleteForever } from "react-icons/md";
+import toast from "react-hot-toast";
+import { electronStore } from "@utils/electronStore";
 import styles from "./Header.module.scss";
 
 // Lazy load Google Calendar components
@@ -35,7 +38,8 @@ const Header: React.FC = () => {
   const [stickerVisibility, setStickerVisibility] = useRecoilState(
     stickerVisibilityState
   );
-  const [showGoogleCalendarSettings, setShowGoogleCalendarSettings] = useState(false);
+  const [showGoogleCalendarSettings, setShowGoogleCalendarSettings] =
+    useState(false);
   const [showGoogleCalendarSync, setShowGoogleCalendarSync] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -49,21 +53,21 @@ const Header: React.FC = () => {
     };
 
     if (showMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showMenu]);
 
   const handlePrevious = () => {
     if (viewMode === "day") {
-      const newDate = subDays(selectedDate, 1);
+      const newDate = dayjs(selectedDate).subtract(1, 'day').toDate();
       setSelectedDate(newDate);
       setCurrentMonth(newDate);
     } else if (viewMode === "week") {
-      const newDate = subWeeks(selectedDate, 1);
+      const newDate = dayjs(selectedDate).subtract(1, 'week').toDate();
       setSelectedDate(newDate);
       setCurrentMonth(newDate);
     } else {
@@ -73,11 +77,11 @@ const Header: React.FC = () => {
 
   const handleNext = () => {
     if (viewMode === "day") {
-      const newDate = addDays(selectedDate, 1);
+      const newDate = dayjs(selectedDate).add(1, 'day').toDate();
       setSelectedDate(newDate);
       setCurrentMonth(newDate);
     } else if (viewMode === "week") {
-      const newDate = addWeeks(selectedDate, 1);
+      const newDate = dayjs(selectedDate).add(1, 'week').toDate();
       setSelectedDate(newDate);
       setCurrentMonth(newDate);
     } else {
@@ -93,13 +97,36 @@ const Header: React.FC = () => {
 
   const getDateDisplay = () => {
     if (viewMode === "day") {
-      return format(selectedDate, "yyyy년 M월 d일 EEEE", { locale: ko });
+      return dayjs(selectedDate).locale('ko').format("YYYY년 M월 D일 dddd");
     } else if (viewMode === "week") {
-      return format(selectedDate, "yyyy년 M월", { locale: ko });
+      return dayjs(selectedDate).format("YYYY년 M월");
     } else {
       return `${currentMonth.getFullYear()}년 ${
         monthNames[currentMonth.getMonth()]
       }`;
+    }
+  };
+
+  const handleResetStore = async () => {
+    const confirmed = window.confirm(
+      "모든 데이터를 초기화하시겠습니까?\n이벤트, 일기, 구글 캘린더 연동 정보 등 모든 데이터가 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다."
+    );
+
+    if (!confirmed) return;
+
+    try {
+      // 모든 store 데이터 삭제
+      await electronStore.set("events", []);
+
+      toast.success("모든 데이터가 초기화되었습니다. 페이지를 새로고침합니다.");
+
+      // 페이지 새로고침
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error("Failed to reset store:", error);
+      toast.error("데이터 초기화 실패");
     }
   };
 
@@ -201,18 +228,55 @@ const Header: React.FC = () => {
               >
                 이벤트 동기화
               </button>
+              <button
+                onClick={async () => {
+                  setShowMenu(false);
+                  // byweekday 정렬 수정
+                  const events = await electronStore.get('events') || [];
+                  const fixedEvents = events.map((event: any) => {
+                    if (event.recurrence?.byweekday && Array.isArray(event.recurrence.byweekday)) {
+                      return {
+                        ...event,
+                        recurrence: {
+                          ...event.recurrence,
+                          byweekday: [...event.recurrence.byweekday].sort((a: number, b: number) => a - b)
+                        }
+                      };
+                    }
+                    return event;
+                  });
+                  await electronStore.set('events', fixedEvents);
+                  toast.success('요일 데이터를 수정했습니다. 새로고침합니다.');
+                  setTimeout(() => window.location.reload(), 1000);
+                }}
+              >
+                🔧 요일 데이터 수정
+              </button>
+              <button
+                onClick={() => {
+                  setShowMenu(false);
+                  handleResetStore();
+                }}
+                className={styles.dangerButton}
+              >
+                <MdDeleteForever size={16} /> 데이터 초기화
+              </button>
             </div>
           )}
         </div>
       </div>
       {showGoogleCalendarSettings && (
         <React.Suspense fallback={<div>로딩 중...</div>}>
-          <GoogleCalendarSync onClose={() => setShowGoogleCalendarSettings(false)} />
+          <GoogleCalendarSync
+            onClose={() => setShowGoogleCalendarSettings(false)}
+          />
         </React.Suspense>
       )}
       {showGoogleCalendarSync && (
         <React.Suspense fallback={<div>로딩 중...</div>}>
-          <GoogleCalendarSyncPanel onClose={() => setShowGoogleCalendarSync(false)} />
+          <GoogleCalendarSyncPanel
+            onClose={() => setShowGoogleCalendarSync(false)}
+          />
         </React.Suspense>
       )}
     </header>

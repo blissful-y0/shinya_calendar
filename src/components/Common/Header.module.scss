@@ -249,6 +249,9 @@
     color: var(--color-text);
     cursor: pointer;
     transition: background $transition-fast;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
 
     &:hover {
       background: var(--color-accent);
@@ -256,6 +259,14 @@
 
     &:not(:last-child) {
       border-bottom: 1px solid var(--color-border);
+    }
+  }
+
+  .dangerButton {
+    color: var(--color-danger);
+
+    &:hover {
+      background: var(--color-danger-light);
     }
   }
 }

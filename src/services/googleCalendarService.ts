@@ -202,7 +202,6 @@ export class GoogleCalendarService {
 
     const calendarsData = await calendarsResponse.json();
     const calendars = calendarsData.items || [];
-    console.log(`Found ${calendars.length} calendars:`, calendars.map((c: any) => c.summary));
 
     // 2. 각 캘린더에서 이벤트 가져오기
     const allEvents: GoogleCalendarEvent[] = [];
@@ -213,6 +212,14 @@ export class GoogleCalendarService {
           maxResults: "2500",
           singleEvents: "false", // 반복 이벤트를 개별 인스턴스로 펼치지 않음
         });
+
+        // 날짜 범위 필터 추가
+        if (timeMin) {
+          params.append("timeMin", timeMin.toISOString());
+        }
+        if (timeMax) {
+          params.append("timeMax", timeMax.toISOString());
+        }
 
         const calendarId = encodeURIComponent(calendar.id);
         const response = await fetch(
@@ -249,13 +256,11 @@ export class GoogleCalendarService {
         }));
 
         allEvents.push(...events);
-        console.log(`Fetched ${events.length} events from calendar: ${calendar.summary}`);
       } catch (error) {
         console.error(`Error fetching events from calendar ${calendar.summary}:`, error);
       }
     }
 
-    console.log(`Total events from all calendars: ${allEvents.length}`);
     return allEvents;
   }
 

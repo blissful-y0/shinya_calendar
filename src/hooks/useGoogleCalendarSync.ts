@@ -33,20 +33,11 @@ export const useGoogleCalendarSync = () => {
           convertGoogleEventToAppEvent(gEvent)
         );
 
-        console.log('Imported events from Google:', importedEvents);
-        console.log('Sample event date:', importedEvents[0]?.date, 'Type:', typeof importedEvents[0]?.date);
-
         // 기존 이벤트와 병합 (중복 제거)
         const existingIds = new Set(events.map((e) => e.id));
-        console.log('Existing event IDs sample (first 10):', Array.from(existingIds).slice(0, 10));
-        console.log('Google event IDs sample (first 5):', importedEvents.slice(0, 5).map(e => e.id));
 
         // 중복 제거: 이미 존재하는 ID는 제외
         const newEvents = importedEvents.filter((e) => !existingIds.has(e.id));
-
-        console.log('New events to add:', newEvents);
-        console.log('Duplicate events filtered out:', importedEvents.length - newEvents.length);
-        console.log('Total events after merge:', [...events, ...newEvents].length);
 
         setEvents([...events, ...newEvents]);
 
@@ -173,7 +164,7 @@ export const useGoogleCalendarSync = () => {
 };
 
 /**
- * 구글 캘린더 이벤트를 앱 이벤트로 변환
+ * 구글 캘린더 이벤트를 앱 이벤트 형식으로 변환
  */
 function convertGoogleEventToAppEvent(gEvent: GoogleCalendarEvent): Event {
   const isAllDay = !!gEvent.start.date;
@@ -184,57 +175,71 @@ function convertGoogleEventToAppEvent(gEvent: GoogleCalendarEvent): Event {
   let endTime: string | undefined;
 
   if (isAllDay) {
-    // 종일 이벤트: YYYY-MM-DD 형식을 로컬 타임존으로 파싱
+    // 종일 이벤트: YYYY-MM-DD 형식을 UTC로 저장 (타임존 문제 방지)
     const [year, month, day] = gEvent.start.date!.split('-').map(Number);
-    date = new Date(year, month - 1, day);
+    date = new Date(Date.UTC(year, month - 1, day));
 
     if (gEvent.end.date) {
       const [eYear, eMonth, eDay] = gEvent.end.date.split('-').map(Number);
-      endDate = new Date(eYear, eMonth - 1, eDay);
+      endDate = new Date(Date.UTC(eYear, eMonth - 1, eDay));
       // 구글 캘린더의 종일 이벤트는 종료일이 다음날로 설정되므로 하루 빼기
-      endDate.setDate(endDate.getDate() - 1);
+      endDate.setUTCDate(endDate.getUTCDate() - 1);
     }
   } else {
+    // 시간 지정 이벤트: 로컬 타임존 기준으로 날짜 추출
     const startDateTime = new Date(gEvent.start.dateTime!);
     const endDateTime = new Date(gEvent.end.dateTime!);
 
-    date = new Date(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
+    // 날짜는 UTC로 저장 (로컬 날짜 기준)
+    date = new Date(Date.UTC(
+      startDateTime.getFullYear(),
+      startDateTime.getMonth(),
+      startDateTime.getDate()
+    ));
     startTime = formatTime(startDateTime);
     endTime = formatTime(endDateTime);
 
-    // 다른 날짜면 endDate 설정
-    if (startDateTime.toDateString() !== endDateTime.toDateString()) {
-      endDate = new Date(endDateTime.getFullYear(), endDateTime.getMonth(), endDateTime.getDate());
+    // 종료일이 시작일과 다른 경우 endDate 설정 (로컬 타임존 기준으로 비교)
+    if (startDateTime.getDate() !== endDateTime.getDate() ||
+        startDateTime.getMonth() !== endDateTime.getMonth() ||
+        startDateTime.getFullYear() !== endDateTime.getFullYear()) {
+      endDate = new Date(Date.UTC(
+        endDateTime.getFullYear(),
+        endDateTime.getMonth(),
+        endDateTime.getDate()
+      ));
     }
   }
 
-  // 색상 매핑 (구글 캘린더 색상 ID -> 앱 색상)
+  // 색상 매핑: 구글 캘린더 색상 -> 앱 색상 팔레트
+  // 앱 색상: #FFB6C1(핑크), #FFC0CB(연핑크), #FFE4B5(베이지), #E6E6FA(라벤더),
+  //         #B0E0E6(하늘), #98FB98(민트), #F0E68C(노랑), #DDA0DD(자주)
   const colorMap: Record<string, string> = {
-    "1": "#a4bdfc", // 연한 파란색
-    "2": "#7ae7bf", // 민트색
-    "3": "#dbadff", // 연한 보라색
-    "4": "#ff887c", // 연한 빨간색
-    "5": "#fbd75b", // 노란색
-    "6": "#ffb878", // 오렌지색
-    "7": "#46d6db", // 청록색
-    "8": "#e1e1e1", // 회색
-    "9": "#5484ed", // 파란색
-    "10": "#51b749", // 초록색
-    "11": "#dc2127", // 빨간색
+    "1": "#B0E0E6",  // 구글 연한 파란색 → 하늘색
+    "2": "#98FB98",  // 구글 민트색 → 민트
+    "3": "#DDA0DD",  // 구글 연한 보라색 → 자주
+    "4": "#FFB6C1",  // 구글 연한 빨간색 → 핑크
+    "5": "#F0E68C",  // 구글 노란색 → 노랑
+    "6": "#FFE4B5",  // 구글 오렌지색 → 베이지
+    "7": "#B0E0E6",  // 구글 청록색 → 하늘색
+    "8": "#E6E6FA",  // 구글 회색 → 라벤더
+    "9": "#B0E0E6",  // 구글 파란색 → 하늘색
+    "10": "#98FB98", // 구글 초록색 → 민트
+    "11": "#FFB6C1", // 구글 빨간색 → 핑크
   };
 
   const color = gEvent.colorId
-    ? colorMap[gEvent.colorId] || "#a4bdfc"
-    : "#a4bdfc";
+    ? colorMap[gEvent.colorId] || "#FFC0CB"
+    : "#FFC0CB"; // 기본값: 연핑크
 
-  // 반복 이벤트 처리
+  // 반복 이벤트 규칙 처리
   let recurrence;
   if (gEvent.recurrence && gEvent.recurrence.length > 0) {
-    recurrence = parseGoogleRecurrence(gEvent.recurrence[0]);
+    recurrence = parseGoogleRecurrence(gEvent.recurrence[0], gEvent.summary);
   }
 
   return {
-    id: `google_${gEvent.id || uuidv4()}`, // 구글 이벤트임을 표시
+    id: `google_${gEvent.id || uuidv4()}`, // 구글 캘린더 이벤트 ID
     title: gEvent.summary,
     date,
     endDate,
@@ -257,12 +262,12 @@ function formatTime(date: Date): string {
 }
 
 /**
- * 구글 RRULE을 앱 반복 규칙으로 변환 (rrule 라이브러리 사용)
+ * 구글 RRULE 문자열을 앱 반복 규칙 형식으로 변환
  */
-function parseGoogleRecurrence(rruleString: string): any {
+function parseGoogleRecurrence(rruleString: string, eventTitle?: string): any {
   try {
     if (!rruleString || !rruleString.startsWith('RRULE:')) {
-      console.warn('Invalid recurrence rule:', rruleString);
+      console.warn('잘못된 반복 규칙 형식:', rruleString);
       return undefined;
     }
 
@@ -270,7 +275,7 @@ function parseGoogleRecurrence(rruleString: string): any {
     const rule = rrulestr(rruleString);
     const options = rule.options;
 
-    // frequency 매핑
+    // 빈도(frequency) 매핑
     const freqMap: Record<number, "daily" | "weekly" | "monthly" | "yearly"> = {
       [RRule.DAILY]: 'daily',
       [RRule.WEEKLY]: 'weekly',
@@ -280,35 +285,64 @@ function parseGoogleRecurrence(rruleString: string): any {
 
     const frequency = freqMap[options.freq];
     if (!frequency) {
-      console.warn('Unknown frequency:', options.freq);
+      console.warn('알 수 없는 반복 빈도:', options.freq);
       return undefined;
     }
 
-    // 기본 필드들
+    // 기본 반복 규칙 필드
     const recurrence: any = {
       frequency,
       interval: options.interval || 1,
     };
 
-    // COUNT (occurrences)
+    // COUNT: 반복 횟수 제한
     if (options.count) {
       recurrence.occurrences = options.count;
     }
 
-    // UNTIL (endDate)
+    // UNTIL: 반복 종료 날짜
     if (options.until) {
       recurrence.endDate = options.until;
     }
 
-    // 추가 옵션들 (BYDAY, BYMONTHDAY 등)을 원본 RRULE 문자열로 저장
-    // 나중에 다시 생성할 때 사용
-    recurrence._rrule = rruleString;
+    // BYDAY: 요일 지정
+    // RRule 형식: 0=월요일, 1=화요일, ..., 6=일요일
+    // RRule 형식 그대로 저장 (표시 시 변환)
+    if (options.byweekday && options.byweekday.length > 0) {
+      // RRule Weekday 객체를 숫자로 변환
+      const weekdayArray = Array.isArray(options.byweekday)
+        ? options.byweekday
+        : [options.byweekday];
 
-    console.log('Parsed recurrence rule:', recurrence);
+      recurrence.byweekday = weekdayArray.map(day => {
+        // Weekday 객체인 경우 weekday 속성 추출
+        if (typeof day === 'object' && day !== null && 'weekday' in day) {
+          return (day as any).weekday;
+        }
+        return day;
+      }).sort((a, b) => a - b);
+    }
+
+    // BYMONTHDAY: 월의 특정 일 지정 (예: 매월 15일)
+    if (options.bymonthday) {
+      recurrence.bymonthday = Array.isArray(options.bymonthday)
+        ? options.bymonthday[0]
+        : options.bymonthday;
+    }
+
+    // BYSETPOS: n번째 발생 지정 (예: 매월 세 번째 월요일)
+    if (options.bysetpos) {
+      recurrence.bysetpos = Array.isArray(options.bysetpos)
+        ? options.bysetpos[0]
+        : options.bysetpos;
+    }
+
+    // 원본 RRULE 문자열 저장 (정확한 재생성을 위해)
+    recurrence._rrule = rruleString;
 
     return recurrence;
   } catch (error) {
-    console.error('Failed to parse recurrence rule:', rruleString, error);
+    console.error('반복 규칙 파싱 실패:', rruleString, error);
     return undefined;
   }
 }

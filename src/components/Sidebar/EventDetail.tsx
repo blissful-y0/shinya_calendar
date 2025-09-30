@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { selectedEventState, eventsState } from "@store/atoms";
 import { Event } from "@types";
-import { format } from "date-fns";
-import { ko } from "date-fns/locale";
+import dayjs from "dayjs";
+import "dayjs/locale/ko";
 import toast from "react-hot-toast";
 import RecurringEventDeleteModal from "@components/Common/RecurringEventDeleteModal";
 import styles from "./EventDetail.module.scss";
@@ -41,18 +41,25 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
     const targetId = event.baseEventId || event.id;
     const dateToExclude = event.date.toISOString();
 
-    setEvents((prev) => prev.map((e) => {
-      if (e.id === targetId) {
-        return {
-          ...e,
-          recurrence: e.recurrence ? {
-            ...e.recurrence,
-            excludeDates: [...(e.recurrence.excludeDates || []), dateToExclude]
-          } : undefined
-        };
-      }
-      return e;
-    }));
+    setEvents((prev) =>
+      prev.map((e) => {
+        if (e.id === targetId) {
+          return {
+            ...e,
+            recurrence: e.recurrence
+              ? {
+                  ...e.recurrence,
+                  excludeDates: [
+                    ...(e.recurrence.excludeDates || []),
+                    dateToExclude,
+                  ],
+                }
+              : undefined,
+          };
+        }
+        return e;
+      })
+    );
 
     setShowDeleteModal(false);
     setSelectedEvent(null);
@@ -98,11 +105,24 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
             <div className={styles.detailValue}>
               {event.endDate && event.date !== event.endDate ? (
                 <>
-                  {format(new Date(event.date), "yyyy년 MM월 dd일", { locale: ko })} ~{" "}
-                  {format(new Date(event.endDate), "yyyy년 MM월 dd일", { locale: ko })}
+                  {dayjs
+                    .utc(event.date)
+                    .local()
+                    .locale("ko")
+                    .format("YYYY년 MM월 DD일")}{" "}
+                  ~{" "}
+                  {dayjs
+                    .utc(event.endDate)
+                    .local()
+                    .locale("ko")
+                    .format("YYYY년 MM월 DD일")}
                 </>
               ) : (
-                format(new Date(event.date), "yyyy년 MM월 dd일 EEEE", { locale: ko })
+                dayjs
+                  .utc(event.date)
+                  .local()
+                  .locale("ko")
+                  .format("YYYY년 MM월 DD일 dddd")
               )}
             </div>
           </div>
@@ -132,8 +152,51 @@ const EventDetail: React.FC<EventDetailProps> = ({ event, onEdit }) => {
                 {event.recurrence.frequency === "monthly" && "매월"}
                 {event.recurrence.frequency === "yearly" && "매년"}
                 {event.recurrence.interval && event.recurrence.interval > 1 && (
-                  <> {event.recurrence.interval}번마다</>
+                  <> {event.recurrence.interval}번</>
                 )}
+                {event.recurrence.frequency === "weekly" &&
+                  event.recurrence.byweekday &&
+                  event.recurrence.byweekday.length > 0 && (
+                    <>
+                      {" - "}
+                      {(() => {
+                        // RRule format: 0=Monday, 1=Tuesday, ..., 6=Sunday
+                        const dayNames = [
+                          "월",
+                          "화",
+                          "수",
+                          "목",
+                          "금",
+                          "토",
+                          "일",
+                        ];
+                        // 요일 인덱스를 정렬해서 표시
+                        return [...event.recurrence.byweekday]
+                          .sort((a, b) => a - b)
+                          .map((dayIndex) => dayNames[dayIndex])
+                          .join(", ");
+                      })()}
+                      요일
+                    </>
+                  )}
+                {event.recurrence.frequency === "monthly" &&
+                  event.recurrence.bymonthday && (
+                    <> - 매월 {event.recurrence.bymonthday}일</>
+                  )}
+                {event.recurrence.frequency === "monthly" &&
+                  event.recurrence.byweekday &&
+                  event.recurrence.bysetpos && (
+                    <>
+                      {" - 매월 "}
+                      {event.recurrence.bysetpos}번째{" "}
+                      {
+                        ["월", "화", "수", "목", "금", "토", "일"][
+                          event.recurrence.byweekday[0]
+                        ]
+                      }
+                      요일
+                    </>
+                  )}
               </div>
             </div>
           )}

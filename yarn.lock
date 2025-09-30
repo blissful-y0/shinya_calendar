@@ -1833,6 +1833,11 @@ date-fns@^4.1.0:
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-4.1.0.tgz#64b3d83fff5aa80438f5b1a633c2e83b8a1c2d14"
   integrity sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==
 
+dayjs@^1.11.18:
+  version "1.11.18"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.18.tgz#835fa712aac52ab9dec8b1494098774ed7070a11"
+  integrity sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA==
+
 debounce-fn@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/debounce-fn/-/debounce-fn-6.0.0.tgz#558169aed853eb3cf3a17c0a2438e1a91a7ba44f"

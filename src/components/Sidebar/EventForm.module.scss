@@ -130,6 +130,64 @@
   }
 }
 
+.weekdaySelector {
+  display: flex;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+}
+
+.weekdayButton {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: $font-size-small;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+  }
+
+  &.selected {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+  }
+}
+
+.monthlyOptions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.radioLabel {
+  display: flex !important;
+  align-items: center;
+  gap: $spacing-xs;
+  cursor: pointer;
+  font-weight: normal !important;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-small;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: var(--color-background);
+  }
+
+  input[type="radio"] {
+    width: auto !important;
+    margin: 0;
+    cursor: pointer;
+  }
+}
+
 .colorSection {
   position: relative;
 }

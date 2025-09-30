@@ -24,6 +24,9 @@ export interface RecurrenceRule {
   endDate?: Date; // When recurrence ends
   occurrences?: number; // Number of occurrences
   excludeDates?: string[]; // ISO date strings to exclude from recurrence
+  byweekday?: number[]; // BYDAY: 0=Monday, 1=Tuesday, ..., 6=Sunday (RRule format)
+  bymonthday?: number; // BYMONTHDAY: day of month (1-31)
+  bysetpos?: number; // BYSETPOS: nth occurrence (-1 for last)
   _rrule?: string; // 원본 RRULE 문자열 (구글 캘린더 호환용)
 }
 
