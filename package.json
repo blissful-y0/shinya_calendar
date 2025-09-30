@@ -87,6 +87,8 @@
       "identity": null,
       "hardenedRuntime": true,
       "gatekeeperAssess": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
       "target": [
         {
           "target": "dmg",
@@ -97,6 +99,7 @@
         }
       ]
     },
+    "afterPack": "scripts/verify-bundle.js",
     "win": {
       "icon": "public/icon.ico",
       "target": [
