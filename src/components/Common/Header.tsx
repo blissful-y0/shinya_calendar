@@ -307,9 +307,7 @@ const Header: React.FC = () => {
               >
                 이벤트 동기화
               </button>
-              <button onClick={handleCheckVersion}>
-                <FiInfo size={16} /> 버전 확인
-              </button>
+
               <button
                 onClick={async () => {
                   setShowMenu(false);

@@ -75,7 +75,7 @@
   },
   "build": {
     "appId": "com.simya.calendar",
-    "productName": "심야 캘린더",
+    "productName": "Shinya Calendar",
     "directories": {
       "output": "release"
     },
@@ -122,7 +122,7 @@
       "deleteAppDataOnUninstall": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "심야 캘린더",
+      "shortcutName": "Shinya Calendar",
       "runAfterFinish": true
     },
     "linux": {
