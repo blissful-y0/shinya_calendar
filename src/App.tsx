@@ -28,7 +28,7 @@ function App() {
   useTheme(); // Apply theme automatically
   const previousStickersRef = useRef(stickers);
   const isEditModeStartingRef = useRef(false);
-
+  const isWindows = useRef(false);
   // 앱 시작 시 이전 상태 복원
   useEffect(() => {
     document.title = "";
@@ -54,6 +54,11 @@ function App() {
 
     restoreAppState();
 
+    if (window.electronAPI?.getPlatform) {
+      window.electronAPI.getPlatform()
+        .then(platform => { isWindows.current = platform === 'win32';})
+        .catch(() => {isWindows.current = false});
+    }
     // Start notification service
     notificationService.start();
 
@@ -132,7 +137,7 @@ function App() {
   };
 
   return (
-    <div className={styles.app}>
+    <div className={`${styles.app} ${isWindows.current ?  styles.winSystemTitleBar : '' }`}>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -153,7 +158,7 @@ function App() {
           },
         }}
       />
-      <WindowTitleBar />
+
       <TitleBar />
       <Header />
       <div className={styles.mainContent}>

@@ -54,8 +54,8 @@ function createWindow() {
       webgl: true,
       experimentalFeatures: true,
     },
-    // Windows에서는 frameless, macOS에서는 hidden 사용
-    ...(isWindows ? { frame: false } : { titleBarStyle: "hidden" }),
+    // Windows에서는 menu hide, macOS에서는 hidden 사용
+    ...(isWindows ? { frame:true, autoHideMenuBar: true  } : { titleBarStyle: "hidden" }),
     // macOS에서 트래픽 라이트 버튼 위치 조정
     ...(isMac ? { trafficLightPosition: { x: 15, y: 13 } } : {}),
     backgroundColor: "#faf8f5",

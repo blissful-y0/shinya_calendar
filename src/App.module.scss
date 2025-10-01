@@ -10,6 +10,11 @@
   box-sizing: border-box;
 }
 
+.winSystemTitleBar {
+  padding-top: 0px;
+  border-top: 1px solid var(--color-border);
+}
+
 .mainContent {
   flex: 1;
   display: flex;
