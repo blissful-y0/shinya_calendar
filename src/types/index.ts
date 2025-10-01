@@ -16,14 +16,18 @@ export interface Event {
   recurrence?: RecurrenceRule; // Recurring event settings
 }
 
-export type ReminderTime = 'now' | '5min' | '10min' | '30min' | '1hour';
+export type ReminderTime = "now" | "5min" | "10min" | "30min" | "1hour";
 
 export interface RecurrenceRule {
-  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  frequency: "daily" | "weekly" | "monthly" | "yearly";
   interval?: number; // Every N days/weeks/months
   endDate?: Date; // When recurrence ends
   occurrences?: number; // Number of occurrences
   excludeDates?: string[]; // ISO date strings to exclude from recurrence
+  byweekday?: number[]; // BYDAY: 0=Monday, 1=Tuesday, ..., 6=Sunday (RRule format)
+  bymonthday?: number; // BYMONTHDAY: day of month (1-31)
+  bysetpos?: number; // BYSETPOS: nth occurrence (-1 for last)
+  _rrule?: string; // 원본 RRULE 문자열 (구글 캘린더 호환용)
 }
 
 export interface DiaryEntry {
@@ -31,7 +35,7 @@ export interface DiaryEntry {
   date: Date;
   title?: string;
   content: string;
-  mood?: 'happy' | 'sad' | 'neutral' | 'excited' | 'tired';
+  mood?: "happy" | "sad" | "neutral" | "excited" | "tired";
   tags?: string[];
   attachments?: string[];
   weather?: string;
@@ -68,3 +72,37 @@ export interface DDay {
   isActive: boolean;
   createdAt: Date;
 }
+
+// 구글 캘린더 연동
+export type GoogleCalendarAuth = {
+  access_token: string;
+  refresh_token: string;
+  scope: string;
+  token_type: string;
+  expiry_date: number;
+};
+
+export type GoogleCalendarSyncState = {
+  isConnected: boolean;
+  userEmail?: string;
+  lastSyncTime?: Date;
+  autoSync: boolean;
+};
+
+export type GoogleCalendarEvent = {
+  id: string;
+  summary: string;
+  description?: string;
+  start: {
+    dateTime?: string;
+    date?: string;
+    timeZone?: string;
+  };
+  end: {
+    dateTime?: string;
+    date?: string;
+    timeZone?: string;
+  };
+  colorId?: string;
+  recurrence?: string[];
+};

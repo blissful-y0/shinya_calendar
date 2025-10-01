@@ -1,0 +1,270 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.content {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px;
+  border-bottom: 1px solid #f0f0f0;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #333;
+  }
+}
+
+.body {
+  padding: 28px;
+}
+
+.notConnected {
+  text-align: center;
+  color: #666;
+  padding: 40px 20px;
+  line-height: 1.6;
+}
+
+.connectionStatus {
+  padding: 20px;
+  background: #f0f7ff;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  text-align: center;
+
+  p {
+    margin: 8px 0 0 0;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .statusBadge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: #4285f4;
+    color: white;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .lastSync {
+    font-size: 13px;
+    color: #999;
+    margin-top: 4px;
+  }
+}
+
+.section {
+  margin-bottom: 32px;
+
+  h3 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.rangeSelector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+
+  button {
+    padding: 12px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    &.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: white;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+
+  svg {
+    flex-shrink: 0;
+    color: var(--color-primary);
+  }
+
+  div {
+    flex: 1;
+
+    strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      color: #666;
+    }
+  }
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.15);
+    transform: translateY(-1px);
+  }
+
+  &.primary {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+
+    svg {
+      color: white;
+    }
+
+    div {
+      strong {
+        color: white;
+      }
+
+      p {
+        color: rgba(255, 255, 255, 0.9);
+      }
+    }
+
+    &:hover:not(:disabled) {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.autoSyncNotice {
+  padding: 16px;
+  background: var(--color-accent);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  margin-top: 20px;
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-text);
+    line-height: 1.5;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

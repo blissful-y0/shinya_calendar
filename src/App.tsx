@@ -1,8 +1,14 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
-import { sidebarOpenState, viewModeState, stickerEditModeState, stickersState, eventsState } from "@store/atoms";
-import { Toaster } from 'react-hot-toast';
-import { notificationService } from '@services/notificationService';
+import {
+  sidebarOpenState,
+  viewModeState,
+  stickerEditModeState,
+  stickersState,
+  eventsState,
+} from "@store/atoms";
+import { Toaster } from "react-hot-toast";
+import { notificationService } from "@/services/notificationService";
 import TitleBar from "@components/Layout/TitleBar";
 import WindowTitleBar from "@components/Common/WindowTitleBar";
 import Header from "@components/Common/Header";
@@ -29,6 +35,19 @@ function App() {
   const previousStickersRef = useRef(stickers);
   const isEditModeStartingRef = useRef(false);
   const isWindows = useRef(false);
+
+  // 플랫폼 확인 함수
+  const checkPlatform = async () => {
+    try {
+      if (window.electronAPI?.getPlatform) {
+        const platform = await window.electronAPI.getPlatform();
+        isWindows.current = platform === "win32";
+      }
+    } catch (error) {
+      console.error("Failed to get platform:", error);
+      isWindows.current = false;
+    }
+  };
   // 앱 시작 시 이전 상태 복원
   useEffect(() => {
     document.title = "";
@@ -37,28 +56,24 @@ function App() {
       try {
         if (window.electronAPI?.store) {
           // UI 상태 복원 (테마 제외 - atoms.ts의 effect에서 처리)
-          const savedUIState = await window.electronAPI.store.get('appUIState');
+          const savedUIState = await window.electronAPI.store.get("appUIState");
           if (savedUIState) {
-            if (typeof savedUIState.sidebarOpen === 'boolean') {
+            if (typeof savedUIState.sidebarOpen === "boolean") {
               setSidebarOpen(savedUIState.sidebarOpen);
             }
-            if (['month', 'week', 'day'].includes(savedUIState.viewMode)) {
+            if (["month", "week", "day"].includes(savedUIState.viewMode)) {
               setViewMode(savedUIState.viewMode);
             }
           }
         }
       } catch (error) {
-        console.error('Failed to restore app state:', error);
+        console.error("Failed to restore app state:", error);
       }
     };
 
     restoreAppState();
+    checkPlatform();
 
-    if (window.electronAPI?.getPlatform) {
-      window.electronAPI.getPlatform()
-        .then(platform => { isWindows.current = platform === 'win32';})
-        .catch(() => {isWindows.current = false});
-    }
     // Start notification service
     notificationService.start();
 
@@ -74,13 +89,13 @@ function App() {
       try {
         if (window.electronAPI?.store) {
           // UI 상태 저장 (테마 제외 - atoms.ts의 effect에서 처리)
-          await window.electronAPI.store.set('appUIState', {
+          await window.electronAPI.store.set("appUIState", {
             sidebarOpen,
-            viewMode
+            viewMode,
           });
         }
       } catch (error) {
-        console.error('Failed to save app state:', error);
+        console.error("Failed to save app state:", error);
       }
     };
 
@@ -137,23 +152,27 @@ function App() {
   };
 
   return (
-    <div className={`${styles.app} ${isWindows.current ?  styles.winSystemTitleBar : '' }`}>
+    <div
+      className={`${styles.app} ${
+        isWindows.current ? styles.winSystemTitleBar : ""
+      }`}
+    >
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 3000,
           style: {
-            background: 'var(--color-surface)',
-            color: 'var(--color-text)',
-            border: '1px solid var(--color-border)',
-            borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            background: "var(--color-surface)",
+            color: "var(--color-text)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "8px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
           },
           error: {
             style: {
-              background: 'var(--color-danger-light)',
-              color: 'var(--color-danger)',
-              border: '1px solid var(--color-danger)',
+              background: "var(--color-danger-light)",
+              color: "var(--color-danger)",
+              border: "1px solid var(--color-danger)",
             },
           },
         }}

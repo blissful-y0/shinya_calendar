@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useSetRecoilState } from "recoil";
-import { eventsState, selectedEventState } from "@store/atoms";
+import { useSetRecoilState, useRecoilValue } from "recoil";
+import { eventsState, selectedEventState, googleCalendarSyncState } from "@store/atoms";
 import { Event, RecurrenceRule, ReminderTime } from "@types";
 import { v4 as uuidv4 } from "uuid";
 import { format, isAfter, parse } from "date-fns";
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import CustomDatePicker from "@components/Common/CustomDatePicker";
 import CustomTimePicker from "@components/Common/CustomTimePicker";
 import { HexColorPicker } from "react-colorful";
+import { useGoogleCalendarSync } from "@/hooks/useGoogleCalendarSync";
 import styles from "./EventForm.module.scss";
 
 interface EventFormProps {
@@ -20,12 +21,20 @@ interface EventFormProps {
 const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const setEvents = useSetRecoilState(eventsState);
   const setSelectedEvent = useSetRecoilState(selectedEventState);
+  // 구글 캘린더 동기화 상태 가져오기
+  const syncState = useRecoilValue(googleCalendarSyncState);
+  // 구글 캘린더 동기화 훅
+  const { exportToGoogle } = useGoogleCalendarSync();
   const [title, setTitle] = useState(event?.title || "");
   const [startDate, setStartDate] = useState<Date>(
     event?.date ? new Date(event.date) : date
   );
   const [endDate, setEndDate] = useState<Date>(
-    event?.endDate ? new Date(event.endDate) : event?.date ? new Date(event.date) : date
+    event?.endDate
+      ? new Date(event.endDate)
+      : event?.date
+      ? new Date(event.date)
+      : date
   );
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [startTime, setStartTime] = useState(event?.startTime || "");
@@ -34,14 +43,26 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const [color, setColor] = useState(event?.color || "#FFB6C1");
   const [isAllDay, setIsAllDay] = useState(event?.isAllDay || false);
   const [isMultiDay, setIsMultiDay] = useState(
-    !!event?.endDate && new Date(event.date).getTime() !== new Date(event.endDate).getTime()
+    !!event?.endDate &&
+      new Date(event.date).getTime() !== new Date(event.endDate).getTime()
   );
   const [isRecurring, setIsRecurring] = useState(!!event?.recurrence);
-  const [recurrence, setRecurrence] = useState<RecurrenceRule>(
-    event?.recurrence || {
+  const [recurrence, setRecurrence] = useState<RecurrenceRule>(() => {
+    const baseRecurrence = event?.recurrence || {
       frequency: "daily",
       interval: 1,
+    };
+    // byweekday가 있으면 정렬
+    if (baseRecurrence.byweekday && baseRecurrence.byweekday.length > 0) {
+      return {
+        ...baseRecurrence,
+        byweekday: [...baseRecurrence.byweekday].sort((a, b) => a - b),
+      };
     }
+    return baseRecurrence;
+  });
+  const [monthlyType, setMonthlyType] = useState<"dayofmonth" | "dayofweek">(
+    event?.recurrence?.bymonthday ? "dayofmonth" : "dayofweek"
   );
   const [reminder, setReminder] = useState(event?.reminder || false);
   const [reminderTime, setReminderTime] = useState<ReminderTime>(
@@ -62,7 +83,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     "#DDA0DD",
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title.trim()) {
@@ -92,6 +113,39 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       }
     }
 
+    // 반복 이벤트 설정 처리
+    let finalRecurrence = isRecurring ? { ...recurrence } : undefined;
+
+    if (isRecurring && finalRecurrence) {
+      // 월별 반복 설정
+      if (recurrence.frequency === "monthly") {
+        if (monthlyType === "dayofmonth") {
+          finalRecurrence.bymonthday = startDate.getDate();
+          delete finalRecurrence.byweekday;
+          delete finalRecurrence.bysetpos;
+        } else {
+          // dayofweek: 몇 번째 무슨 요일
+          const dayOfWeek = startDate.getDay(); // 0=일요일, 1=월요일...
+          const rruleDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // RRule: 0=월요일
+          const weekOfMonth = Math.ceil(startDate.getDate() / 7);
+
+          finalRecurrence.byweekday = [rruleDayOfWeek];
+          finalRecurrence.bysetpos = weekOfMonth;
+          delete finalRecurrence.bymonthday;
+        }
+      }
+
+      // 주별 반복 시 요일이 선택되지 않았으면 시작일의 요일 사용
+      if (
+        recurrence.frequency === "weekly" &&
+        (!finalRecurrence.byweekday || finalRecurrence.byweekday.length === 0)
+      ) {
+        const dayOfWeek = startDate.getDay();
+        const rruleDayOfWeek = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        finalRecurrence.byweekday = [rruleDayOfWeek];
+      }
+    }
+
     const newEvent: Event = {
       id: event?.id || uuidv4(),
       title: title.trim(),
@@ -102,7 +156,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       description,
       color,
       isAllDay,
-      recurrence: isRecurring ? recurrence : undefined,
+      recurrence: finalRecurrence,
       reminder,
       reminderTime: reminder ? reminderTime : undefined,
       reminderForAllOccurrences:
@@ -110,6 +164,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       tags: [],
     };
 
+    // 로컬 상태에 이벤트 저장
     setEvents((prev) => {
       if (event) {
         // 반복 이벤트의 경우 baseEventId 사용, 없으면 원본 ID 추출
@@ -123,6 +178,25 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     toast.success(
       event ? "이벤트가 수정되었습니다" : "이벤트가 추가되었습니다"
     );
+
+    // 구글 캘린더 자동 동기화 (연동된 경우에만)
+    if (syncState.isConnected) {
+      // 구글 캘린더에서 가져온 이벤트인지 확인 (ID가 'google_'로 시작)
+      const isGoogleEvent = newEvent.id.startsWith('google_');
+
+      // 구글 캘린더에서 가져온 이벤트가 아닌 경우에만 동기화
+      if (!isGoogleEvent) {
+        try {
+          await exportToGoogle(newEvent);
+          console.log("구글 캘린더에 이벤트가 동기화되었습니다:", newEvent.title);
+        } catch (error) {
+          console.error("구글 캘린더 동기화 실패:", error);
+          // 에러가 발생해도 로컬 저장은 완료되었으므로 사용자에게 별도 에러 표시 안 함
+        }
+      } else {
+        console.log("구글 캘린더 이벤트는 자동 동기화하지 않습니다:", newEvent.title);
+      }
+    }
 
     // 선택된 이벤트 초기화
     setSelectedEvent(null);
@@ -288,6 +362,77 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
               </span>
             </div>
           </div>
+
+          {/* 주별 반복 시 요일 선택 */}
+          {recurrence.frequency === "weekly" && (
+            <div className={styles.formGroup}>
+              <label>반복 요일</label>
+              <div className={styles.weekdaySelector}>
+                {["월", "화", "수", "목", "금", "토", "일"].map(
+                  (day, index) => {
+                    const rruleIndex = index; // RRule: 0=월요일
+                    const isSelected =
+                      recurrence.byweekday?.includes(rruleIndex) || false;
+                    return (
+                      <button
+                        key={day}
+                        type="button"
+                        className={`${styles.weekdayButton} ${
+                          isSelected ? styles.selected : ""
+                        }`}
+                        onClick={() => {
+                          const currentDays = recurrence.byweekday || [];
+                          const newDays = isSelected
+                            ? currentDays.filter((d) => d !== rruleIndex)
+                            : [...currentDays, rruleIndex].sort();
+                          setRecurrence({
+                            ...recurrence,
+                            byweekday: newDays.length > 0 ? newDays : undefined,
+                          });
+                        }}
+                      >
+                        {day}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 월별 반복 시 옵션 선택 */}
+          {recurrence.frequency === "monthly" && (
+            <div className={styles.formGroup}>
+              <label>반복 방식</label>
+              <div className={styles.monthlyOptions}>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name="monthlyType"
+                    checked={monthlyType === "dayofmonth"}
+                    onChange={() => setMonthlyType("dayofmonth")}
+                  />
+                  매월 {startDate.getDate()}일
+                </label>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name="monthlyType"
+                    checked={monthlyType === "dayofweek"}
+                    onChange={() => setMonthlyType("dayofweek")}
+                  />
+                  매월 {Math.ceil(startDate.getDate() / 7)}번째{" "}
+                  {
+                    ["일", "월", "화", "수", "목", "금", "토"][
+                      startDate.getDay()
+                    ]
+                  }
+                  요일
+                </label>
+              </div>
+            </div>
+          )}
+
           <div className={styles.formGroup}>
             <label>반복 종료</label>
             <CustomDatePicker

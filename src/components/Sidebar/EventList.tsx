@@ -38,9 +38,9 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
       setShowDeleteModal(true);
     } else {
       // 일반 이벤트는 바로 삭제 확인
-      if (confirm('이 이벤트를 삭제하시겠습니까?')) {
+      if (confirm("이 이벤트를 삭제하시겠습니까?")) {
         setEvents((prev) => prev.filter((e) => e.id !== event.id));
-        toast.success('이벤트가 삭제되었습니다');
+        toast.success("이벤트가 삭제되었습니다");
       }
     }
   };
@@ -52,22 +52,29 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     const targetId = deletingEvent.baseEventId || deletingEvent.id;
     const dateToExclude = deletingEvent.date.toISOString();
 
-    setEvents((prev) => prev.map((e) => {
-      if (e.id === targetId) {
-        return {
-          ...e,
-          recurrence: e.recurrence ? {
-            ...e.recurrence,
-            excludeDates: [...(e.recurrence.excludeDates || []), dateToExclude]
-          } : undefined
-        };
-      }
-      return e;
-    }));
+    setEvents((prev) =>
+      prev.map((e) => {
+        if (e.id === targetId) {
+          return {
+            ...e,
+            recurrence: e.recurrence
+              ? {
+                  ...e.recurrence,
+                  excludeDates: [
+                    ...(e.recurrence.excludeDates || []),
+                    dateToExclude,
+                  ],
+                }
+              : undefined,
+          };
+        }
+        return e;
+      })
+    );
 
     setShowDeleteModal(false);
     setDeletingEvent(null);
-    toast.success('선택한 이벤트가 삭제되었습니다');
+    toast.success("선택한 이벤트가 삭제되었습니다");
   };
 
   const handleDeleteAll = () => {
@@ -78,7 +85,7 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     setEvents((prev) => prev.filter((e) => e.id !== targetId));
     setShowDeleteModal(false);
     setDeletingEvent(null);
-    toast.success('모든 반복 이벤트가 삭제되었습니다');
+    toast.success("모든 반복 이벤트가 삭제되었습니다");
   };
 
   const formatTime = (time?: string) => {
@@ -93,14 +100,9 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
   if (selectedEvent) {
     // 선택된 이벤트를 events 배열에서 찾기
     // 반복 이벤트의 경우 전달된 events prop에 인스턴스가 포함되어 있음
-    const event = events.find(e => e.id === selectedEvent.id);
+    const event = events.find((e) => e.id === selectedEvent.id);
     if (event) {
-      return (
-        <EventDetail
-          event={event}
-          onEdit={() => handleEdit(event)}
-        />
-      );
+      return <EventDetail event={event} onEdit={() => handleEdit(event)} />;
     }
   }
 
@@ -123,14 +125,33 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     );
   }
 
+  // 시간순으로 정렬: 종일 이벤트 → 시간 이벤트 (시간순)
+  const sortedEvents = [...events].sort((a, b) => {
+    // 종일 이벤트는 맨 앞으로
+    if (a.isAllDay && !b.isAllDay) return -1;
+    if (!a.isAllDay && b.isAllDay) return 1;
+    if (a.isAllDay && b.isAllDay) return 0;
+
+    // 시간이 있는 이벤트는 시간순으로 정렬
+    if (a.startTime && b.startTime) {
+      return a.startTime.localeCompare(b.startTime);
+    }
+
+    // 시작 시간이 없는 이벤트는 뒤로
+    if (!a.startTime) return 1;
+    if (!b.startTime) return -1;
+
+    return 0;
+  });
+
   return (
     <div className={styles.eventList}>
-      {events.map((event) => (
+      {sortedEvents.map((event) => (
         <div
           key={event.id}
           className={styles.eventItem}
           onClick={() => handleEventClick(event)}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: "pointer" }}
         >
           <div
             className={styles.colorBar}
@@ -169,7 +190,7 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
                 {event.recurrence.frequency === "yearly" && `매년`}
                 {event.recurrence.interval &&
                   event.recurrence.interval > 1 &&
-                  ` ${event.recurrence.interval}번마다`}
+                  ` ${event.recurrence.interval}번`}
               </p>
             )}
             {event.description && (

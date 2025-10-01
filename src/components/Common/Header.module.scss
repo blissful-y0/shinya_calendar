@@ -197,3 +197,87 @@
     box-shadow: $shadow-small;
   }
 }
+
+.googleMenu {
+  position: relative;
+}
+
+.googleButton {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-accent);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: $shadow-small;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-medium;
+  box-shadow: $shadow-medium;
+  min-width: 200px;
+  overflow: hidden;
+  z-index: 100;
+  animation: dropdownFadeIn 0.2s ease-out;
+
+  button {
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    border: none;
+    background: transparent;
+    text-align: left;
+    font-size: $font-size-small;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background $transition-fast;
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    &:hover {
+      background: var(--color-accent);
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--color-border);
+    }
+  }
+
+  .dangerButton {
+    color: var(--color-danger);
+
+    &:hover {
+      background: var(--color-danger-light);
+    }
+  }
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
