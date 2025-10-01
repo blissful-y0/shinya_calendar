@@ -13,8 +13,10 @@ import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import { FcGoogle } from "react-icons/fc";
 import { MdDeleteForever } from "react-icons/md";
+import { FiInfo } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { electronStore } from "@utils/electronStore";
+import { getCurrentVersion, checkForUpdates } from "@utils/version";
 import styles from "./Header.module.scss";
 
 // Lazy load Google Calendar components
@@ -43,6 +45,31 @@ const Header: React.FC = () => {
   const [showGoogleCalendarSync, setShowGoogleCalendarSync] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [appVersion, setAppVersion] = useState<string>("");
+  const [hasUpdate, setHasUpdate] = useState<boolean>(false);
+
+  // 앱 버전 로드 및 업데이트 확인
+  useEffect(() => {
+    const loadVersion = async () => {
+      try {
+        const version = await getCurrentVersion();
+        setAppVersion(version);
+
+        // 업데이트 확인 (백그라운드에서)
+        checkForUpdates()
+          .then((updateInfo) => {
+            setHasUpdate(updateInfo.hasUpdate);
+          })
+          .catch((error) => {
+            console.error("Update check failed:", error);
+          });
+      } catch (error) {
+        console.error("Failed to load version:", error);
+      }
+    };
+
+    loadVersion();
+  }, []);
 
   // 메뉴 외부 클릭 시 닫기
   useEffect(() => {
@@ -130,6 +157,44 @@ const Header: React.FC = () => {
     }
   };
 
+  // 버전 확인
+  const handleCheckVersion = async () => {
+    setShowMenu(false);
+
+    toast.loading("버전 확인 중...");
+
+    try {
+      const updateInfo = await checkForUpdates();
+
+      toast.dismiss();
+
+      if (updateInfo.hasUpdate) {
+        const confirmed = window.confirm(
+          `새로운 버전이 있습니다!\n\n` +
+            `현재 버전: ${updateInfo.currentVersion}\n` +
+            `최신 버전: ${updateInfo.latestVersion}\n\n` +
+            `다운로드 페이지로 이동하시겠습니까?`
+        );
+
+        if (confirmed && updateInfo.url) {
+          window.open(
+            "https://www.postype.com/@sungbaeking/post/20527213",
+            "_blank"
+          );
+        }
+      } else {
+        toast.success(
+          `최신 버전을 사용 중입니다.\n현재 버전: ${updateInfo.currentVersion}`,
+          { duration: 3000 }
+        );
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error("버전 확인 중 오류가 발생했습니다.");
+      console.error("Version check failed:", error);
+    }
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
@@ -202,6 +267,20 @@ const Header: React.FC = () => {
             월
           </button>
         </div>
+        {appVersion && (
+          <div
+            className={styles.versionBadge}
+            onClick={handleCheckVersion}
+            title={
+              hasUpdate
+                ? "새로운 버전이 있습니다! 클릭하여 확인하세요."
+                : "버전 정보"
+            }
+          >
+            <span className={styles.versionText}>v{appVersion}</span>
+            {hasUpdate && <span className={styles.updateDot}>●</span>}
+          </div>
+        )}
         <div className={styles.googleMenu} ref={menuRef}>
           <button
             className={styles.googleButton}
@@ -227,6 +306,9 @@ const Header: React.FC = () => {
                 }}
               >
                 이벤트 동기화
+              </button>
+              <button onClick={handleCheckVersion}>
+                <FiInfo size={16} /> 버전 확인
               </button>
               <button
                 onClick={async () => {
