@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Shinya Calendar - 아름답고 직관적인 데스크톱 캘린더 애플리케이션. Google Calendar와의 완벽한 양방향 동기화를 제공합니다."
+    />
+    <meta
+      name="keywords"
+      content="calendar, desktop app, Google Calendar, sync, scheduler, 캘린더, 일정 관리"
+    />
+    <meta name="author" content="Shinya" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Shinya Calendar - 데스크톱 캘린더 앱" />
+    <meta
+      property="og:description"
+      content="Google Calendar와 완벽하게 동기화되는 아름다운 데스크톱 캘린더"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://blissful-y0.github.io/shinya_calendar"
+    />
+
+    <title>Shinya Calendar - 데스크톱 캘린더 애플리케이션</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --accent-color: #f093fb;
+        --text-dark: #2d3748;
+        --text-light: #718096;
+        --bg-light: #f7fafc;
+        --success-color: #48bb78;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+          "Helvetica Neue", sans-serif;
+        line-height: 1.6;
+        color: var(--text-dark);
+        overflow-x: hidden;
+      }
+
+      /* Navigation */
+      nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        z-index: 1000;
+        padding: 1rem 0;
+      }
+
+      nav .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      nav .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      nav .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+
+      nav .nav-links a {
+        text-decoration: none;
+        color: var(--text-dark);
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+
+      nav .nav-links a:hover {
+        color: var(--primary-color);
+      }
+
+      /* Hero Section */
+      .hero {
+        margin-top: 80px;
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          var(--secondary-color) 100%
+        );
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+        animation: float 20s linear infinite;
+      }
+
+      @keyframes float {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(-100px);
+        }
+      }
+
+      .hero .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      .hero .subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.95;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+      }
+
+      .hero .description {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 3rem;
+        opacity: 0.9;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.8s ease-out 0.6s both;
+      }
+
+      .btn {
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        display: inline-block;
+      }
+
+      .btn-primary {
+        background: white;
+        color: var(--primary-color);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+      }
+
+      .btn-secondary:hover {
+        background: white;
+        color: var(--primary-color);
+      }
+
+      /* Section Styles */
+      section {
+        padding: 5rem 2rem;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+      }
+
+      .section-subtitle {
+        text-align: center;
+        font-size: 1.2rem;
+        color: var(--text-light);
+        margin-bottom: 4rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Features Section */
+      .features {
+        background: var(--bg-light);
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+
+      .feature-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .feature-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+      }
+
+      .feature-card p {
+        color: var(--text-light);
+        line-height: 1.8;
+      }
+
+      /* Google Calendar Section */
+      .google-calendar {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+      }
+
+      .google-calendar .section-title,
+      .google-calendar .section-subtitle {
+        color: white;
+      }
+
+      .data-usage {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .data-usage h3 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .data-usage-list {
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      .data-usage-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .data-usage-item .icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+
+      .privacy-badges {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+
+      .privacy-badge {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 1.5rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .privacy-badge .icon {
+        font-size: 2rem;
+      }
+
+      /* Download Section */
+      .download {
+        background: var(--bg-light);
+      }
+
+      .download-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+      }
+
+      .download-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
+      }
+
+      .download-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      .download-card .icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+
+      .download-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .download-card .btn {
+        margin-top: 1rem;
+        width: 100%;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        border: none;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--text-dark);
+        color: white;
+        padding: 3rem 2rem 1.5rem;
+      }
+
+      .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 3rem;
+        margin-bottom: 2rem;
+      }
+
+      .footer-section h4 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+      }
+
+      .footer-section ul {
+        list-style: none;
+      }
+
+      .footer-section ul li {
+        margin-bottom: 0.8rem;
+      }
+
+      .footer-section a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .footer-section a:hover {
+        color: white;
+      }
+
+      .footer-bottom {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .hero .subtitle {
+          font-size: 1.2rem;
+        }
+
+        .hero .description {
+          font-size: 1rem;
+        }
+
+        nav .nav-links {
+          display: none;
+        }
+
+        .features-grid,
+        .download-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Smooth scroll */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Highlight */
+      .highlight {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav>
+      <div class="container">
+        <div class="logo">📅 Shinya Calendar</div>
+        <ul class="nav-links">
+          <li><a href="#features">기능</a></li>
+          <li><a href="#privacy">프라이버시</a></li>
+          <li><a href="#download">다운로드</a></li>
+          <li>
+            <a
+              href="https://github.com/blissful-y0/shinya_calendar"
+              target="_blank"
+              >GitHub</a
+            >
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <h1>📅 Shinya Calendar</h1>
+        <p class="subtitle">아름답고 직관적인 데스크톱 캘린더</p>
+        <p class="description">
+          Windows, macOS, Linux에서 사용 가능한 무료 오픈소스 캘린더
+          애플리케이션입니다.<br />
+          Google Calendar와의 완벽한 양방향 동기화를 제공합니다.
+        </p>
+        <div class="cta-buttons">
+          <a href="#download" class="btn btn-primary">무료 다운로드</a>
+          <a
+            href="https://github.com/blissful-y0/shinya_calendar"
+            class="btn btn-secondary"
+            target="_blank"
+            >GitHub 보기</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+      <div class="container">
+        <h2 class="section-title">주요 기능</h2>
+        <p class="section-subtitle">강력하면서도 사용하기 쉬운 기능들</p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📆</div>
+            <h3>다양한 캘린더 보기</h3>
+            <p>
+              월간, 주간, 일간 보기로 일정을 한눈에 확인하세요. 직관적인 UI로
+              쉽게 일정을 추가하고 관리할 수 있습니다.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <h3>Google Calendar 동기화</h3>
+            <p>
+              Google Calendar와 실시간 양방향 동기화. 여러 개의 캘린더를 한
+              곳에서 관리하고, 오프라인에서도 접근 가능합니다.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3>아름다운 디자인</h3>
+            <p>
+              현대적이고 깔끔한 UI/UX. 8가지 색상 팔레트로 일정을 구분하고, 다크
+              모드로 눈의 피로를 줄일 수 있습니다.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🔁</div>
+            <h3>반복 일정</h3>
+            <p>
+              매일, 매주, 매월, 매년 반복되는 일정을 쉽게 생성하고 관리하세요.
+              복잡한 반복 패턴도 지원합니다.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>빠른 성능</h3>
+            <p>
+              Electron 기반으로 빠르고 반응성 높은 사용 경험. 대용량 일정
+              데이터도 부드럽게 처리합니다.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🌍</div>
+            <h3>크로스 플랫폼</h3>
+            <p>
+              Windows, macOS, Linux 모두 지원. 어떤 운영체제에서도 동일한 경험을
+              제공합니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Google Calendar Privacy Section -->
+    <section id="privacy" class="google-calendar">
+      <div class="container">
+        <h2 class="section-title">🔐 Google Calendar 데이터 사용 정책</h2>
+        <p class="section-subtitle">투명하고 안전한 데이터 처리</p>
+
+        <div class="data-usage">
+          <h3>왜 Google Calendar 접근 권한이 필요한가요?</h3>
+          <div class="data-usage-list">
+            <div class="data-usage-item">
+              <span class="icon">📥</span>
+              <div>
+                <strong>일정 가져오기 (읽기)</strong>
+                <p>
+                  사용자의 Google Calendar에 저장된 모든 캘린더와 이벤트를
+                  읽어와 앱에서 통합하여 볼 수 있습니다. 반복 이벤트, 종일
+                  이벤트 등 모든 유형의 일정을 지원합니다.
+                </p>
+              </div>
+            </div>
+
+            <div class="data-usage-item">
+              <span class="icon">🔄</span>
+              <div>
+                <strong>일정 동기화 (쓰기)</strong>
+                <p>
+                  앱에서 생성, 수정, 삭제한 일정을 Google Calendar에 반영하여
+                  모든 기기에서 일정을 최신 상태로 유지합니다.
+                </p>
+              </div>
+            </div>
+
+            <div class="data-usage-item">
+              <span class="icon">📴</span>
+              <div>
+                <strong>오프라인 사용</strong>
+                <p>
+                  동기화된 일정을 로컬 기기에 저장하여 인터넷 연결 없이도 일정을
+                  확인하고 관리할 수 있습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3
+          style="text-align: center; margin-bottom: 1.5rem; font-size: 1.8rem"
+        >
+          데이터 보안 약속
+        </h3>
+        <div class="privacy-badges">
+          <div class="privacy-badge">
+            <span class="icon">💾</span>
+            <div>
+              <strong>로컬 저장</strong>
+              <p>모든 데이터는 사용자 기기에만 저장</p>
+            </div>
+          </div>
+
+          <div class="privacy-badge">
+            <span class="icon">🚫</span>
+            <div>
+              <strong>외부 전송 없음</strong>
+              <p>사용자 데이터를 외부 서버로 전송하지 않음</p>
+            </div>
+          </div>
+
+          <div class="privacy-badge">
+            <span class="icon">🔒</span>
+            <div>
+              <strong>직접 통신</strong>
+              <p>Google API와 직접 통신하며 중간 서버 없음</p>
+            </div>
+          </div>
+
+          <div class="privacy-badge">
+            <span class="icon">🔓</span>
+            <div>
+              <strong>언제든 해제</strong>
+              <p>설정에서 언제든지 계정 연결 해제 가능</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem">
+          <a href="PRIVACY_POLICY.md" class="btn btn-primary"
+            >개인정보 처리방침 전문 보기</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="download">
+      <div class="container">
+        <h2 class="section-title">무료 다운로드</h2>
+        <p class="section-subtitle">운영체제에 맞는 버전을 선택하세요</p>
+
+        <div class="download-grid">
+          <div class="download-card">
+            <div class="icon">🪟</div>
+            <h3>Windows</h3>
+            <p>Windows 10 이상</p>
+            <a
+              href="https://github.com/blissful-y0/shinya_calendar/releases/latest/download/Shinya%20Calendar%20Setup%201.1.0.exe"
+              class="btn"
+              >다운로드</a
+            >
+          </div>
+
+          <div class="download-card">
+            <div class="icon">🍎</div>
+            <h3>macOS (Intel)</h3>
+            <p>macOS 10.13 이상</p>
+            <a
+              href="https://github.com/blissful-y0/shinya_calendar/releases/latest/download/Shinya%20Calendar-1.1.0.dmg"
+              class="btn"
+              >다운로드</a
+            >
+          </div>
+
+          <div class="download-card">
+            <div class="icon">🍏</div>
+            <h3>macOS (Apple Silicon)</h3>
+            <p>M1/M2/M3 Mac</p>
+            <a
+              href="https://github.com/blissful-y0/shinya_calendar/releases/latest/download/Shinya%20Calendar-1.1.0-arm64.dmg"
+              class="btn"
+              >다운로드</a
+            >
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem">
+          <p style="color: var(--text-light); margin-bottom: 1rem">
+            오픈소스 프로젝트입니다. 소스 코드를 직접 빌드할 수도 있습니다.
+          </p>
+          <a
+            href="https://github.com/blissful-y0/shinya_calendar"
+            class="btn btn-secondary"
+            target="_blank"
+            style="
+              color: var(--primary-color);
+              border-color: var(--primary-color);
+            "
+            >GitHub에서 소스 보기</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>Shinya Calendar</h4>
+          <p>아름답고 직관적인 데스크톱 캘린더 애플리케이션</p>
+          <p style="margin-top: 1rem; opacity: 0.7">Made with ❤️ by Shinya</p>
+        </div>
+
+        <div class="footer-section">
+          <h4>제품</h4>
+          <ul>
+            <li><a href="#features">기능</a></li>
+            <li><a href="#download">다운로드</a></li>
+            <li>
+              <a
+                href="https://github.com/blissful-y0/shinya_calendar/releases"
+                target="_blank"
+                >릴리스 노트</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/blissful-y0/shinya_calendar"
+                target="_blank"
+                >GitHub</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>법적 문서</h4>
+          <ul>
+            <li>
+              <a href="privacy-policy.html">개인정보처리방침</a>
+            </li>
+            <li>
+              <a href="terms-of-service.html">서비스 이용약관</a>
+            </li>
+            <li>
+              <a
+                href="https://github.com/blissful-y0/shinya_calendar/blob/master/LICENSE"
+                target="_blank"
+                >라이선스 (MIT)</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>지원</h4>
+          <ul>
+            <li>
+              <a
+                href="https://github.com/blissful-y0/shinya_calendar/issues"
+                target="_blank"
+                >이슈 신고</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://github.com/blissful-y0/shinya_calendar#%EC%97%B0%EB%9D%BD%EC%B2%98"
+                target="_blank"
+                >연락처</a
+              >
+            </li>
+            <li>Discord: @ambiguousmorality</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>
+          &copy; 2025 Shinya Calendar. All rights reserved. Licensed under MIT
+          License.
+        </p>
+        <p style="margin-top: 0.5rem">
+          This app uses Google Calendar API to provide calendar synchronization
+          features.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

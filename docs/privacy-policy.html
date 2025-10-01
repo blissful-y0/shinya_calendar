@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Shinya Calendar 개인정보 처리방침 - 사용자 데이터 수집, 사용, 저장 방식에 대한 상세 설명"
+    />
+    <title>개인정보 처리방침 - Shinya Calendar</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --text-dark: #2d3748;
+        --text-light: #718096;
+        --bg-light: #f7fafc;
+        --border-color: #e2e8f0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+          "Helvetica Neue", sans-serif;
+        line-height: 1.6;
+        color: var(--text-dark);
+        background-color: #ffffff;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: white;
+        padding: 60px 20px;
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+
+      header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        background: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        color: var(--primary-color);
+        margin-top: 40px;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--border-color);
+      }
+
+      h3 {
+        color: var(--text-dark);
+        margin-top: 30px;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+      }
+
+      p {
+        margin-bottom: 15px;
+        color: var(--text-light);
+      }
+
+      ul,
+      ol {
+        margin-left: 30px;
+        margin-bottom: 15px;
+        color: var(--text-light);
+      }
+
+      li {
+        margin-bottom: 8px;
+      }
+
+      strong {
+        color: var(--text-dark);
+        font-weight: 600;
+      }
+
+      .highlight {
+        background-color: #fef3c7;
+        padding: 20px;
+        border-left: 4px solid #f59e0b;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+
+      .section {
+        margin-bottom: 30px;
+      }
+
+      a {
+        color: var(--primary-color);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      footer {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-light);
+        border-top: 1px solid var(--border-color);
+        margin-top: 60px;
+      }
+
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 2rem;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>📋 개인정보 처리방침</h1>
+      <p>Shinya Calendar</p>
+    </header>
+
+    <div class="container">
+      <a href="index.html" class="back-link">← 홈으로 돌아가기</a>
+
+      <div class="content">
+        <p><strong>최종 수정일: 2025년 10월 1일</strong></p>
+
+        <section class="section">
+          <h2>1. 개요</h2>
+          <p>
+            Shinya Calendar(이하 "본 서비스")는 사용자의 개인정보 보호를 매우
+            중요하게 생각합니다. 본 개인정보 처리방침은 본 서비스가 수집, 사용,
+            저장하는 정보에 대해 설명합니다.
+          </p>
+
+          <div class="highlight">
+            <p>
+              <strong>중요:</strong> Shinya Calendar는
+              <strong>로컬 우선(Local-First)</strong>
+              애플리케이션으로, 대부분의 데이터가 사용자의 기기에만 저장되며
+              외부 서버로 전송되지 않습니다.
+            </p>
+            <p>
+              <strong>개인 개발자 운영:</strong> 본 서비스는 개인 개발자에 의해
+              운영되며, 별도의 법인이나 사업자가 아닙니다.
+            </p>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>2. 수집하는 정보</h2>
+
+          <h3>2.1 로컬에만 저장되는 정보 (외부 전송 없음)</h3>
+          <p>
+            다음 정보는 사용자의 컴퓨터에만 저장되며, 개발자나 제3자에게
+            전송되지 않습니다:
+          </p>
+          <ul>
+            <li>
+              <strong>캘린더 이벤트 데이터:</strong> 사용자가 생성한 일정, 제목,
+              설명, 날짜, 시간, 반복 설정 등
+            </li>
+            <li><strong>다이어리 항목:</strong> 사용자가 작성한 일기 내용</li>
+            <li>
+              <strong>테마 및 커스터마이징 설정:</strong> 선택한 테마, 사용자
+              지정 색상, 배너 이미지, 스티커 등
+            </li>
+            <li>
+              <strong>UI 설정:</strong> 사이드바 너비, 보기 모드(월/주/일),
+              스티커 표시 여부 등
+            </li>
+            <li><strong>D-Day 정보:</strong> 사용자가 설정한 D-Day 항목들</li>
+          </ul>
+
+          <h3>2.2 Google Calendar 연동 시 처리되는 정보</h3>
+          <p>Google Calendar와 연동하는 경우 다음 정보가 처리됩니다:</p>
+          <ul>
+            <li>
+              <strong>Google 계정 이메일 주소:</strong> 연동된 계정 식별 목적
+            </li>
+            <li>
+              <strong>Google OAuth 토큰:</strong> Google Calendar API 접근을
+              위한 액세스 토큰 및 리프레시 토큰
+            </li>
+            <li>
+              <strong>Google Calendar 이벤트 데이터:</strong> 동기화를 위한
+              캘린더 이벤트 정보
+            </li>
+          </ul>
+          <p>
+            <strong>Google 토큰 저장 위치:</strong> OAuth 토큰은 사용자 기기의
+            로컬 저장소(electron-store)에만 암호화되어 저장되며, 개발자 서버로
+            전송되지 않습니다.
+          </p>
+        </section>
+
+        <section class="section">
+          <h2>3. 정보의 사용 목적</h2>
+          <p>수집된 정보는 다음 목적으로만 사용됩니다:</p>
+          <ul>
+            <li><strong>캘린더 기능 제공:</strong> 일정 관리 및 표시</li>
+            <li><strong>다이어리 기능 제공:</strong> 일기 작성 및 저장</li>
+            <li>
+              <strong>Google Calendar 동기화:</strong> 사용자가 선택한 경우에만
+              Google Calendar와 양방향 동기화
+            </li>
+            <li>
+              <strong>사용자 경험 개선:</strong> 테마, 레이아웃 등 사용자 설정
+              유지
+            </li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>4. 정보의 저장 및 보관</h2>
+
+          <h3>4.1 로컬 저장</h3>
+          <p>모든 데이터는 다음 위치에 저장됩니다:</p>
+          <ul>
+            <li>
+              <strong>Windows:</strong> <code>%APPDATA%/simya-calendar/</code>
+            </li>
+            <li>
+              <strong>macOS:</strong>
+              <code>~/Library/Application Support/simya-calendar/</code>
+            </li>
+            <li>
+              <strong>Linux:</strong> <code>~/.config/simya-calendar/</code>
+            </li>
+          </ul>
+
+          <h3>4.2 보관 기간</h3>
+          <ul>
+            <li>
+              로컬 데이터는 사용자가 애플리케이션을 삭제하거나 수동으로 데이터를
+              삭제할 때까지 보관됩니다.
+            </li>
+            <li>
+              Google OAuth 토큰은 사용자가 연동을 해제할 때까지 보관됩니다.
+            </li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>5. 분석 및 추적 도구</h2>
+          <div class="highlight">
+            <p>
+              <strong
+                >본 서비스는 어떠한 분석 도구, 추적 도구, 광고 도구도 사용하지
+                않습니다.</strong
+              >
+            </p>
+          </div>
+          <ul>
+            <li>Google Analytics, Mixpanel 등의 분석 도구 미사용</li>
+            <li>Sentry 등의 오류 추적 도구 미사용</li>
+            <li>광고 네트워크 미사용</li>
+            <li>사용 통계 수집 미사용</li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>6. 제3자 서비스</h2>
+
+          <h3>6.1 Google Calendar API</h3>
+          <p>
+            본 서비스는 Google Calendar와의 동기화를 위해 Google Calendar API를
+            사용합니다:
+          </p>
+          <ul>
+            <li>
+              <strong>사용 목적:</strong> 사용자가 선택적으로 활성화한 경우에만
+              Google Calendar와 이벤트 동기화
+            </li>
+            <li>
+              <strong>접근 범위:</strong>
+              <ul>
+                <li>
+                  <code>https://www.googleapis.com/auth/calendar</code> - 캘린더
+                  이벤트 읽기/쓰기
+                </li>
+                <li>
+                  <code>https://www.googleapis.com/auth/userinfo.email</code> -
+                  사용자 이메일 주소 확인
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>데이터 전송:</strong> Google 서버와 직접 통신하며, 개발자
+              서버를 거치지 않습니다
+            </li>
+            <li>
+              <strong>연동 해제:</strong> 사용자는 언제든지 앱 내에서 Google
+              Calendar 연동을 해제할 수 있습니다
+            </li>
+          </ul>
+          <p>
+            Google의 개인정보 처리방침:
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              >https://policies.google.com/privacy</a
+            >
+          </p>
+        </section>
+
+        <section class="section">
+          <h2>7. 정보의 제3자 제공</h2>
+          <p>
+            본 서비스는 사용자의 개인정보를 제3자에게 제공하지 않습니다. 단,
+            다음의 경우는 예외로 합니다:
+          </p>
+          <ul>
+            <li>사용자가 명시적으로 동의한 경우 (예: Google Calendar 연동)</li>
+            <li>법률에 의해 요구되는 경우</li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>8. 사용자의 권리</h2>
+
+          <h3>8.1 데이터 접근 및 확인</h3>
+          <p>
+            모든 데이터는 사용자의 로컬 저장소에 있으며, 언제든지 앱 내에서
+            확인할 수 있습니다.
+          </p>
+
+          <h3>8.2 데이터 수정 및 삭제</h3>
+          <ul>
+            <li>
+              사용자는 언제든지 앱 내에서 자신의 데이터를 수정하거나 삭제할 수
+              있습니다.
+            </li>
+            <li>애플리케이션 삭제 시 모든 로컬 데이터가 함께 삭제됩니다.</li>
+          </ul>
+
+          <h3>8.3 Google Calendar 연동 해제</h3>
+          <ul>
+            <li>
+              사용자는 언제든지 설정에서 Google Calendar 연동을 해제할 수
+              있습니다.
+            </li>
+            <li>
+              연동 해제 시 저장된 OAuth 토큰이 즉시 삭제되고 Google에 토큰 폐기
+              요청이 전송됩니다.
+            </li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>9. 데이터 보안</h2>
+          <p>본 서비스는 사용자 데이터 보호를 위해 다음 조치를 취합니다:</p>
+          <ul>
+            <li>
+              <strong>로컬 저장:</strong> 대부분의 데이터를 사용자 기기에만 저장
+            </li>
+            <li>
+              <strong>암호화된 저장소:</strong> electron-store를 통한 안전한
+              로컬 저장
+            </li>
+            <li>
+              <strong>직접 API 통신:</strong> Google과의 통신 시 개발자 서버를
+              거치지 않음
+            </li>
+            <li>
+              <strong>토큰 보안:</strong> OAuth 토큰은 로컬에만 저장되며 외부로
+              전송되지 않음
+            </li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>10. 아동의 개인정보 보호</h2>
+          <p>
+            본 서비스는 만 14세 미만 아동을 대상으로 하지 않으며, 의도적으로
+            아동의 개인정보를 수집하지 않습니다.
+          </p>
+        </section>
+
+        <section class="section">
+          <h2>11. 개인정보 처리방침의 변경</h2>
+          <p>
+            본 개인정보 처리방침은 관련 법령, 정책 또는 보안 기술의 변경에 따라
+            내용의 추가, 삭제 및 수정이 있을 수 있습니다. 개인정보 처리방침을
+            변경하는 경우 변경 사항을 애플리케이션 업데이트 노트 및 GitHub
+            저장소를 통해 공지합니다.
+          </p>
+        </section>
+
+        <section class="section">
+          <h2>12. 개인정보 보호책임자</h2>
+          <p>
+            본 서비스는 개인 개발자가 운영하며, 개인정보 보호 관련 문의는 아래
+            연락처로 해주시기 바랍니다.
+          </p>
+          <ul>
+            <li><strong>개발자:</strong> Shinya (bliss)</li>
+            <li><strong>구분:</strong> 개인 개발자 (사업자 아님)</li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>13. 연락처</h2>
+          <p>
+            개인정보 보호와 관련하여 문의사항이 있으시면 다음 연락처로 문의해
+            주세요:
+          </p>
+          <ul>
+            <li>
+              <strong>이메일:</strong>
+              <a href="mailto:blissful.y0@gmail.com">blissful.y0@gmail.com</a>
+            </li>
+            <li><strong>Discord:</strong> @ambiguousmorality</li>
+            <li>
+              <strong>GitHub:</strong>
+              <a
+                href="https://github.com/blissful-y0/shinya_calendar"
+                target="_blank"
+                rel="noopener noreferrer"
+                >https://github.com/blissful-y0/shinya_calendar</a
+              >
+            </li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>14. 데이터 이동성</h2>
+          <p>
+            사용자는 자신의 데이터를 다른 서비스로 이동할 권리가 있습니다. 로컬
+            저장소의 데이터 파일은 다음 위치에서 직접 접근 가능합니다:
+          </p>
+          <ul>
+            <li>Windows: <code>%APPDATA%/simya-calendar/</code></li>
+            <li>
+              macOS: <code>~/Library/Application Support/simya-calendar/</code>
+            </li>
+            <li>Linux: <code>~/.config/simya-calendar/</code></li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>15. 적용 범위</h2>
+          <p>
+            본 개인정보 처리방침은 Shinya Calendar 데스크톱 애플리케이션에만
+            적용됩니다.
+          </p>
+        </section>
+
+        <hr
+          style="
+            margin: 40px 0;
+            border: none;
+            border-top: 1px solid var(--border-color);
+          "
+        />
+
+        <p style="text-align: center; color: var(--text-light)">
+          <strong
+            >본 개인정보 처리방침은 2025년 10월 1일부터 시행됩니다.</strong
+          >
+        </p>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 Shinya Calendar. All rights reserved.</p>
+      <p>
+        <a href="index.html">홈</a> |
+        <a href="privacy-policy.html">개인정보 처리방침</a> |
+        <a href="terms-of-service.html">서비스 이용약관</a>
+      </p>
+    </footer>
+  </body>
+</html>
