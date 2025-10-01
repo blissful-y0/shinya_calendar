@@ -2,7 +2,10 @@
 
 interface ElectronAPI {
   getAppPath: () => Promise<string>;
-  resizeWindow: (width: number, height: number) => Promise<{ width: number; height: number }>;
+  resizeWindow: (
+    width: number,
+    height: number
+  ) => Promise<{ width: number; height: number }>;
   minimizeWindow: () => Promise<void>;
   maximizeWindow: () => Promise<void>;
   closeWindow: () => Promise<void>;
@@ -28,6 +31,7 @@ interface ElectronAPI {
     stop: () => Promise<void>;
   };
   openExternal: (url: string) => Promise<void>;
+  getAppVersion: () => Promise<string>;
 }
 
 interface Window {

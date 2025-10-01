@@ -86,7 +86,8 @@ function createWindow() {
   if (process.env.NODE_ENV === "development") {
     mainWindow.loadURL("http://localhost:5173");
   } else {
-    mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
+    // Production: dist-electron과 dist는 같은 레벨에 위치
+    mainWindow.loadFile(path.join(__dirname, "..", "dist", "index.html"));
   }
 
   mainWindow.on("closed", () => {
@@ -314,11 +315,18 @@ ipcMain.handle("open-external", (_, url: string) => {
 // 앱 버전 가져오기 (package.json에서)
 ipcMain.handle("get-app-version", () => {
   try {
-    const packageJsonPath = path.join(__dirname, "..", "package.json");
+    // Production: app.asar 내부에서 접근 시 __dirname 기준으로 찾기
+    let packageJsonPath = path.join(__dirname, "..", "package.json");
+
+    // app.asar로 패키징된 경우를 위한 대체 경로
+    if (!require("fs").existsSync(packageJsonPath)) {
+      packageJsonPath = path.join(process.resourcesPath, "app.asar", "package.json");
+    }
+
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
     return packageJson.version;
   } catch (error) {
     console.error("Failed to read app version:", error);
-    return "1.0.1"; // 폴백 버전
+    return "1.1.0"; // 폴백 버전
   }
 });
