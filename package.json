@@ -1,6 +1,6 @@
 {
   "name": "simya-calendar",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "심야 캘린더",
   "main": "dist-electron/main.js",
   "author": {
