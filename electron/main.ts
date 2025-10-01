@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, Notification, shell } from "electron";
 import path from "path";
 import os from "os";
 import Store from "electron-store";
+import { readFileSync } from "fs";
 import {
   startOAuthServer,
   stopOAuthServer,
@@ -307,5 +308,17 @@ ipcMain.handle("open-external", (_, url: string) => {
     openAuthWindow(url);
   } else {
     shell.openExternal(url);
+  }
+});
+
+// 앱 버전 가져오기 (package.json에서)
+ipcMain.handle("get-app-version", () => {
+  try {
+    const packageJsonPath = path.join(__dirname, "..", "package.json");
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+    return packageJson.version;
+  } catch (error) {
+    console.error("Failed to read app version:", error);
+    return "1.0.1"; // 폴백 버전
   }
 });

@@ -41,4 +41,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     stop: () => ipcRenderer.invoke("google-oauth-stop"),
   },
   openExternal: (url: string) => ipcRenderer.invoke("open-external", url),
+
+  // 앱 버전 가져오기
+  getAppVersion: () => ipcRenderer.invoke("get-app-version"),
 });
