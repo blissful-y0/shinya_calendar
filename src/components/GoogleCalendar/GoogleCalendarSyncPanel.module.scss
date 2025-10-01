@@ -135,7 +135,7 @@
 
 .rangeSelector {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 
   button {
@@ -150,13 +150,13 @@
     transition: all 0.2s;
 
     &:hover {
-      border-color: #4285f4;
-      color: #4285f4;
+      border-color: var(--color-primary);
+      color: var(--color-primary);
     }
 
     &.active {
-      background: #4285f4;
-      border-color: #4285f4;
+      background: var(--color-primary);
+      border-color: var(--color-primary);
       color: white;
     }
   }
@@ -165,6 +165,7 @@
 .actions {
   display: flex;
   flex-direction: column;
+
   gap: 12px;
 }
 
@@ -182,7 +183,7 @@
 
   svg {
     flex-shrink: 0;
-    color: #4285f4;
+    color: var(--color-primary);
   }
 
   div {
@@ -204,14 +205,14 @@
   }
 
   &:hover:not(:disabled) {
-    border-color: #4285f4;
+    border-color: var(--color-primary);
     box-shadow: 0 2px 8px rgba(66, 133, 244, 0.15);
     transform: translateY(-1px);
   }
 
   &.primary {
-    background: #4285f4;
-    border-color: #4285f4;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
 
     svg {
       color: white;
@@ -228,8 +229,8 @@
     }
 
     &:hover:not(:disabled) {
-      background: #357ae8;
-      border-color: #357ae8;
+      background: var(--color-primary);
+      border-color: var(--color-primary);
     }
   }
 
@@ -242,15 +243,15 @@
 
 .autoSyncNotice {
   padding: 16px;
-  background: #fff9e6;
-  border: 1px solid #ffe699;
+  background: var(--color-accent);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   margin-top: 20px;
 
   p {
     margin: 0;
     font-size: 13px;
-    color: #666;
+    color: var(--color-text);
     line-height: 1.5;
   }
 }

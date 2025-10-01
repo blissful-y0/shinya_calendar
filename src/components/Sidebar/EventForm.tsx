@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useSetRecoilState } from "recoil";
-import { eventsState, selectedEventState } from "@store/atoms";
+import { useSetRecoilState, useRecoilValue } from "recoil";
+import { eventsState, selectedEventState, googleCalendarSyncState } from "@store/atoms";
 import { Event, RecurrenceRule, ReminderTime } from "@types";
 import { v4 as uuidv4 } from "uuid";
 import { format, isAfter, parse } from "date-fns";
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import CustomDatePicker from "@components/Common/CustomDatePicker";
 import CustomTimePicker from "@components/Common/CustomTimePicker";
 import { HexColorPicker } from "react-colorful";
+import { useGoogleCalendarSync } from "@/hooks/useGoogleCalendarSync";
 import styles from "./EventForm.module.scss";
 
 interface EventFormProps {
@@ -20,6 +21,10 @@ interface EventFormProps {
 const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const setEvents = useSetRecoilState(eventsState);
   const setSelectedEvent = useSetRecoilState(selectedEventState);
+  // 구글 캘린더 동기화 상태 가져오기
+  const syncState = useRecoilValue(googleCalendarSyncState);
+  // 구글 캘린더 동기화 훅
+  const { exportToGoogle } = useGoogleCalendarSync();
   const [title, setTitle] = useState(event?.title || "");
   const [startDate, setStartDate] = useState<Date>(
     event?.date ? new Date(event.date) : date
@@ -78,7 +83,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     "#DDA0DD",
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!title.trim()) {
@@ -159,6 +164,7 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       tags: [],
     };
 
+    // 로컬 상태에 이벤트 저장
     setEvents((prev) => {
       if (event) {
         // 반복 이벤트의 경우 baseEventId 사용, 없으면 원본 ID 추출
@@ -172,6 +178,25 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     toast.success(
       event ? "이벤트가 수정되었습니다" : "이벤트가 추가되었습니다"
     );
+
+    // 구글 캘린더 자동 동기화 (연동된 경우에만)
+    if (syncState.isConnected) {
+      // 구글 캘린더에서 가져온 이벤트인지 확인 (ID가 'google_'로 시작)
+      const isGoogleEvent = newEvent.id.startsWith('google_');
+
+      // 구글 캘린더에서 가져온 이벤트가 아닌 경우에만 동기화
+      if (!isGoogleEvent) {
+        try {
+          await exportToGoogle(newEvent);
+          console.log("구글 캘린더에 이벤트가 동기화되었습니다:", newEvent.title);
+        } catch (error) {
+          console.error("구글 캘린더 동기화 실패:", error);
+          // 에러가 발생해도 로컬 저장은 완료되었으므로 사용자에게 별도 에러 표시 안 함
+        }
+      } else {
+        console.log("구글 캘린더 이벤트는 자동 동기화하지 않습니다:", newEvent.title);
+      }
+    }
 
     // 선택된 이벤트 초기화
     setSelectedEvent(null);
