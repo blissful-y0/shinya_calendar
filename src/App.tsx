@@ -35,6 +35,19 @@ function App() {
   const previousStickersRef = useRef(stickers);
   const isEditModeStartingRef = useRef(false);
   const isWindows = useRef(false);
+
+  // 플랫폼 확인 함수
+  const checkPlatform = async () => {
+    try {
+      if (window.electronAPI?.getPlatform) {
+        const platform = await window.electronAPI.getPlatform();
+        isWindows.current = platform === "win32";
+      }
+    } catch (error) {
+      console.error("Failed to get platform:", error);
+      isWindows.current = false;
+    }
+  };
   // 앱 시작 시 이전 상태 복원
   useEffect(() => {
     document.title = "";
@@ -59,12 +72,8 @@ function App() {
     };
 
     restoreAppState();
+    checkPlatform();
 
-    if (window.electronAPI?.getPlatform) {
-      window.electronAPI.getPlatform()
-        .then(platform => { isWindows.current = platform === 'win32';})
-        .catch(() => {isWindows.current = false});
-    }
     // Start notification service
     notificationService.start();
 
@@ -143,7 +152,11 @@ function App() {
   };
 
   return (
-    <div className={`${styles.app} ${isWindows.current ?  styles.winSystemTitleBar : '' }`}>
+    <div
+      className={`${styles.app} ${
+        isWindows.current ? styles.winSystemTitleBar : ""
+      }`}
+    >
       <Toaster
         position="top-right"
         toastOptions={{

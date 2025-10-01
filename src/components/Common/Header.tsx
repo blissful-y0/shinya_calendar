@@ -9,8 +9,8 @@ import {
   stickerVisibilityState,
 } from "@store/atoms";
 import { getNextMonth, getPreviousMonth, monthNames } from "@utils/calendar";
-import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
+import dayjs from "dayjs";
+import "dayjs/locale/ko";
 import { FcGoogle } from "react-icons/fc";
 import { MdDeleteForever } from "react-icons/md";
 import toast from "react-hot-toast";
@@ -63,11 +63,11 @@ const Header: React.FC = () => {
 
   const handlePrevious = () => {
     if (viewMode === "day") {
-      const newDate = dayjs(selectedDate).subtract(1, 'day').toDate();
+      const newDate = dayjs(selectedDate).subtract(1, "day").toDate();
       setSelectedDate(newDate);
       setCurrentMonth(newDate);
     } else if (viewMode === "week") {
-      const newDate = dayjs(selectedDate).subtract(1, 'week').toDate();
+      const newDate = dayjs(selectedDate).subtract(1, "week").toDate();
       setSelectedDate(newDate);
       setCurrentMonth(newDate);
     } else {
@@ -77,11 +77,11 @@ const Header: React.FC = () => {
 
   const handleNext = () => {
     if (viewMode === "day") {
-      const newDate = dayjs(selectedDate).add(1, 'day').toDate();
+      const newDate = dayjs(selectedDate).add(1, "day").toDate();
       setSelectedDate(newDate);
       setCurrentMonth(newDate);
     } else if (viewMode === "week") {
-      const newDate = dayjs(selectedDate).add(1, 'week').toDate();
+      const newDate = dayjs(selectedDate).add(1, "week").toDate();
       setSelectedDate(newDate);
       setCurrentMonth(newDate);
     } else {
@@ -97,7 +97,7 @@ const Header: React.FC = () => {
 
   const getDateDisplay = () => {
     if (viewMode === "day") {
-      return dayjs(selectedDate).locale('ko').format("YYYY년 M월 D일 dddd");
+      return dayjs(selectedDate).locale("ko").format("YYYY년 M월 D일 dddd");
     } else if (viewMode === "week") {
       return dayjs(selectedDate).format("YYYY년 M월");
     } else {
@@ -231,26 +231,95 @@ const Header: React.FC = () => {
               <button
                 onClick={async () => {
                   setShowMenu(false);
-                  // byweekday 정렬 수정
-                  const events = await electronStore.get('events') || [];
-                  const fixedEvents = events.map((event: any) => {
-                    if (event.recurrence?.byweekday && Array.isArray(event.recurrence.byweekday)) {
-                      return {
-                        ...event,
-                        recurrence: {
-                          ...event.recurrence,
-                          byweekday: [...event.recurrence.byweekday].sort((a: number, b: number) => a - b)
-                        }
-                      };
-                    }
-                    return event;
-                  });
-                  await electronStore.set('events', fixedEvents);
-                  toast.success('요일 데이터를 수정했습니다. 새로고침합니다.');
-                  setTimeout(() => window.location.reload(), 1000);
+
+                  const confirmed = window.confirm(
+                    "기존 이벤트 데이터를 새로운 형식으로 변환하시겠습니까?\n\n" +
+                      "이 작업은 RRULE 도입 이전의 반복 이벤트 데이터를 현재 형식으로 업데이트합니다.\n" +
+                      "- 주별 반복: 시작일의 요일을 byweekday로 설정\n" +
+                      "- 월별 반복: 시작일의 날짜를 bymonthday로 설정\n\n" +
+                      "진행하시겠습니까?"
+                  );
+
+                  if (!confirmed) return;
+
+                  try {
+                    // 기존 이벤트 데이터 가져오기
+                    const events = (await electronStore.get("events")) || [];
+                    let convertedCount = 0;
+
+                    // 이전 형식을 현재 형식으로 변환
+                    const convertedEvents = events.map((event: any) => {
+                      // recurrence가 없으면 변환 불필요
+                      if (!event.recurrence) {
+                        return event;
+                      }
+
+                      const recurrence = event.recurrence;
+                      let needsConversion = false;
+                      const newRecurrence = { ...recurrence };
+
+                      // 주별 반복: byweekday가 없으면 시작일의 요일로 설정
+                      if (
+                        recurrence.frequency === "weekly" &&
+                        !recurrence.byweekday
+                      ) {
+                        const eventDate = new Date(event.date);
+                        const dayOfWeek = eventDate.getDay(); // 0=일요일, 1=월요일...
+                        const rruleDayOfWeek =
+                          dayOfWeek === 0 ? 6 : dayOfWeek - 1; // RRule: 0=월요일
+                        newRecurrence.byweekday = [rruleDayOfWeek];
+                        needsConversion = true;
+                      }
+
+                      // 월별 반복: bymonthday와 bysetpos가 없으면 시작일의 날짜로 설정
+                      if (
+                        recurrence.frequency === "monthly" &&
+                        !recurrence.bymonthday &&
+                        !recurrence.bysetpos
+                      ) {
+                        const eventDate = new Date(event.date);
+                        newRecurrence.bymonthday = eventDate.getDate();
+                        needsConversion = true;
+                      }
+
+                      // byweekday 정렬 (이미 있는 경우)
+                      if (
+                        recurrence.byweekday &&
+                        Array.isArray(recurrence.byweekday)
+                      ) {
+                        newRecurrence.byweekday = [
+                          ...recurrence.byweekday,
+                        ].sort((a: number, b: number) => a - b);
+                        needsConversion = true;
+                      }
+
+                      if (needsConversion) {
+                        convertedCount++;
+                        return {
+                          ...event,
+                          recurrence: newRecurrence,
+                        };
+                      }
+
+                      return event;
+                    });
+
+                    // 변환된 데이터 저장
+                    await electronStore.set("events", convertedEvents);
+
+                    toast.success(
+                      `${convertedCount}개의 이벤트를 새로운 형식으로 변환했습니다. 페이지를 새로고침합니다.`
+                    );
+
+                    // 페이지 새로고침
+                    setTimeout(() => window.location.reload(), 1500);
+                  } catch (error) {
+                    console.error("데이터 변환 실패:", error);
+                    toast.error("데이터 변환에 실패했습니다.");
+                  }
                 }}
               >
-                🔧 요일 데이터 수정
+                기존 데이터 옮기기
               </button>
               <button
                 onClick={() => {
@@ -259,7 +328,7 @@ const Header: React.FC = () => {
                 }}
                 className={styles.dangerButton}
               >
-                <MdDeleteForever size={16} /> 데이터 초기화
+                데이터 초기화
               </button>
             </div>
           )}
