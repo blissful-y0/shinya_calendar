@@ -32,6 +32,30 @@ interface ElectronAPI {
   };
   openExternal: (url: string) => Promise<void>;
   getAppVersion: () => Promise<string>;
+  autoUpdater: {
+    checkForUpdates: () => Promise<{
+      available: boolean;
+      updateInfo?: any;
+      message?: string;
+      error?: string;
+    }>;
+    downloadUpdate: () => Promise<{
+      success: boolean;
+      message?: string;
+      error?: string;
+    }>;
+    installUpdate: () => Promise<{
+      success: boolean;
+      message?: string;
+      error?: string;
+    }>;
+    onCheckingForUpdate: (callback: () => void) => () => void;
+    onUpdateAvailable: (callback: (info: any) => void) => () => void;
+    onUpdateNotAvailable: (callback: (info: any) => void) => () => void;
+    onDownloadProgress: (callback: (progress: any) => void) => () => void;
+    onUpdateDownloaded: (callback: (info: any) => void) => () => void;
+    onUpdateError: (callback: (error: any) => void) => () => void;
+  };
 }
 
 interface Window {

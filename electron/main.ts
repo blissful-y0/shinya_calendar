@@ -3,6 +3,7 @@ import path from "path";
 import os from "os";
 import Store from "electron-store";
 import { readFileSync } from "fs";
+import { autoUpdater } from "electron-updater";
 import {
   startOAuthServer,
   stopOAuthServer,
@@ -61,7 +62,9 @@ function createWindow() {
       experimentalFeatures: true,
     },
     // Windows에서는 menu hide, macOS에서는 hidden 사용
-    ...(isWindows ? { frame:true, autoHideMenuBar: true  } : { titleBarStyle: "hidden" }),
+    ...(isWindows
+      ? { frame: true, autoHideMenuBar: true }
+      : { titleBarStyle: "hidden" }),
     // macOS에서 트래픽 라이트 버튼 위치 조정
     ...(isMac ? { trafficLightPosition: { x: 15, y: 13 } } : {}),
     backgroundColor: "#faf8f5",
@@ -320,7 +323,11 @@ ipcMain.handle("get-app-version", () => {
 
     // app.asar로 패키징된 경우를 위한 대체 경로
     if (!require("fs").existsSync(packageJsonPath)) {
-      packageJsonPath = path.join(process.resourcesPath, "app.asar", "package.json");
+      packageJsonPath = path.join(
+        process.resourcesPath,
+        "app.asar",
+        "package.json"
+      );
     }
 
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
@@ -329,4 +336,150 @@ ipcMain.handle("get-app-version", () => {
     console.error("Failed to read app version:", error);
     return "1.1.0"; // 폴백 버전
   }
+});
+
+// ============================================================
+// Auto Updater 설정
+// ============================================================
+
+// 개발 환경에서 업데이트 체크 강제 활성화
+if (process.env.NODE_ENV === "development") {
+  autoUpdater.forceDevUpdateConfig = true;
+}
+
+// 로그 레벨 설정
+autoUpdater.logger = require("electron-log");
+(autoUpdater.logger as any).transports.file.level = "info";
+
+// 자동 다운로드 비활성화 (사용자에게 선택권 제공)
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+
+// 업데이트 체크 중 에러 처리
+autoUpdater.on("error", (error) => {
+  console.error("Update error:", error);
+  if (mainWindow) {
+    mainWindow.webContents.send("update-error", {
+      message: error.message,
+    });
+  }
+});
+
+// 업데이트 확인 중
+autoUpdater.on("checking-for-update", () => {
+  console.log("Checking for updates...");
+  if (mainWindow) {
+    mainWindow.webContents.send("checking-for-update");
+  }
+});
+
+// 업데이트 사용 가능
+autoUpdater.on("update-available", (info) => {
+  console.log("Update available:", info);
+  if (mainWindow) {
+    mainWindow.webContents.send("update-available", {
+      version: info.version,
+      releaseDate: info.releaseDate,
+      releaseNotes: info.releaseNotes,
+    });
+  }
+});
+
+// 업데이트 없음
+autoUpdater.on("update-not-available", (info) => {
+  console.log("Update not available:", info);
+  if (mainWindow) {
+    mainWindow.webContents.send("update-not-available", {
+      version: info.version,
+    });
+  }
+});
+
+// 다운로드 진행상황
+autoUpdater.on("download-progress", (progressObj) => {
+  console.log(
+    `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`
+  );
+  if (mainWindow) {
+    mainWindow.webContents.send("download-progress", {
+      percent: progressObj.percent,
+      transferred: progressObj.transferred,
+      total: progressObj.total,
+      bytesPerSecond: progressObj.bytesPerSecond,
+    });
+  }
+});
+
+// 다운로드 완료
+autoUpdater.on("update-downloaded", (info) => {
+  console.log("Update downloaded:", info);
+  if (mainWindow) {
+    mainWindow.webContents.send("update-downloaded", {
+      version: info.version,
+    });
+  }
+});
+
+// IPC 핸들러: 업데이트 체크
+ipcMain.handle("check-for-updates", async () => {
+  // if (process.env.NODE_ENV === "development") {
+  //   return {
+  //     available: false,
+  //     message: "개발 모드에서는 업데이트를 확인할 수 없습니다.",
+  //   };
+  // }
+
+  try {
+    const result = await autoUpdater.checkForUpdates();
+    return {
+      available: result?.updateInfo ? true : false,
+      updateInfo: result?.updateInfo,
+    };
+  } catch (error: any) {
+    console.error("Error checking for updates:", error);
+    return { available: false, error: error.message };
+  }
+});
+
+// IPC 핸들러: 업데이트 다운로드
+ipcMain.handle("download-update", async () => {
+  // if (process.env.NODE_ENV === "development") {
+  //   return {
+  //     success: false,
+  //     message: "개발 모드에서는 다운로드할 수 없습니다.",
+  //   };
+  // }
+
+  try {
+    await autoUpdater.downloadUpdate();
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error downloading update:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+// IPC 핸들러: 업데이트 설치 및 재시작
+ipcMain.handle("install-update", () => {
+  // if (process.env.NODE_ENV === "development") {
+  //   return { success: false, message: "개발 모드에서는 설치할 수 없습니다." };
+  // }
+
+  try {
+    autoUpdater.quitAndInstall(false, true);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error installing update:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+// 앱이 준비되면 자동으로 업데이트 체크
+app.on("ready", () => {
+  // 앱 시작 3초 후 업데이트 체크 (초기 로딩 후, 조용하게 백그라운드에서 실행)
+  setTimeout(() => {
+    autoUpdater.checkForUpdates().catch((error) => {
+      console.error("Auto update check failed on startup:", error);
+    });
+  }, 3000);
 });

@@ -44,4 +44,39 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // 앱 버전 가져오기
   getAppVersion: () => ipcRenderer.invoke("get-app-version"),
+
+  // Auto Update API
+  autoUpdater: {
+    checkForUpdates: () => ipcRenderer.invoke("check-for-updates"),
+    downloadUpdate: () => ipcRenderer.invoke("download-update"),
+    installUpdate: () => ipcRenderer.invoke("install-update"),
+
+    // 업데이트 이벤트 리스너
+    onCheckingForUpdate: (callback: () => void) => {
+      ipcRenderer.on("checking-for-update", callback);
+      return () => ipcRenderer.removeListener("checking-for-update", callback);
+    },
+    onUpdateAvailable: (callback: (info: any) => void) => {
+      ipcRenderer.on("update-available", (_event, info) => callback(info));
+      return () => ipcRenderer.removeListener("update-available", callback);
+    },
+    onUpdateNotAvailable: (callback: (info: any) => void) => {
+      ipcRenderer.on("update-not-available", (_event, info) => callback(info));
+      return () => ipcRenderer.removeListener("update-not-available", callback);
+    },
+    onDownloadProgress: (callback: (progress: any) => void) => {
+      ipcRenderer.on("download-progress", (_event, progress) =>
+        callback(progress)
+      );
+      return () => ipcRenderer.removeListener("download-progress", callback);
+    },
+    onUpdateDownloaded: (callback: (info: any) => void) => {
+      ipcRenderer.on("update-downloaded", (_event, info) => callback(info));
+      return () => ipcRenderer.removeListener("update-downloaded", callback);
+    },
+    onUpdateError: (callback: (error: any) => void) => {
+      ipcRenderer.on("update-error", (_event, error) => callback(error));
+      return () => ipcRenderer.removeListener("update-error", callback);
+    },
+  },
 });

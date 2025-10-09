@@ -21,6 +21,8 @@ import CustomBanner from "@components/Common/CustomBanner";
 import FloatingActionButton from "@components/Styling/FloatingActionButton";
 import StickerCanvas from "@components/Styling/StickerCanvas";
 import FloatingToolbar from "@components/Styling/FloatingToolbar";
+import UpdateNotification from "@components/Common/UpdateNotification";
+import UpdateNotificationDemo from "@components/Common/UpdateNotificationDemo"; // 테스트용
 import { useTheme } from "@hooks/useTheme";
 import styles from "./App.module.scss";
 
@@ -203,6 +205,7 @@ function App() {
         />
       )}
       <FloatingActionButton />
+      <UpdateNotification />
     </div>
   );
 }

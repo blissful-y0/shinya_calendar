@@ -475,3 +475,16 @@ export const googleCalendarSyncState = atom<GoogleCalendarSyncState>({
     }
   ]
 });
+
+// 앱 업데이트 상태 (UpdateNotification과 Header 간 공유)
+export const updateStatusState = atom<{
+  hasUpdate: boolean;
+  version?: string;
+  isDownloading?: boolean;
+  isDownloaded?: boolean;
+}>({
+  key: 'updateStatus',
+  default: {
+    hasUpdate: false
+  }
+});

@@ -1,6 +1,6 @@
 {
   "name": "simya-calendar",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "심야 캘린더",
   "main": "dist-electron/main.js",
   "author": {
@@ -25,14 +25,17 @@
     "electron:dev": "concurrently \"yarn dev\" \"wait-on http://localhost:5173 && electron .\"",
     "dist": "electron-builder",
     "lint": "eslint . --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "release": "bash scripts/release.sh"
   },
   "dependencies": {
     "@types/react-datepicker": "^7.0.0",
     "date-fns": "^3.6.0",
     "date-fns-tz": "^3.2.0",
     "dayjs": "^1.11.18",
+    "electron-log": "^5.4.3",
     "electron-store": "^10.1.0",
+    "electron-updater": "^6.6.2",
     "react": "^18.2.0",
     "react-colorful": "^5.6.1",
     "react-datepicker": "^8.7.0",
@@ -75,7 +78,7 @@
   },
   "build": {
     "appId": "com.simya.calendar",
-    "productName": "Shinya Calendar",
+    "productName": "Shinya-Calendar",
     "directories": {
       "output": "release"
     },
@@ -83,6 +86,13 @@
       "dist",
       "dist-electron",
       "!**/*.{ts,map,spec.js,test.js}"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "blissful-y0",
+        "repo": "shinya_calendar"
+      }
     ],
     "mac": {
       "icon": "public/icon.icns",
@@ -95,6 +105,13 @@
       "target": [
         {
           "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
           "arch": [
             "x64",
             "arm64"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState, useRecoilValue } from "recoil";
 import {
   currentMonthState,
   selectedDateState,
@@ -7,6 +7,7 @@ import {
   sidebarOpenState,
   viewModeState,
   stickerVisibilityState,
+  updateStatusState,
 } from "@store/atoms";
 import { getNextMonth, getPreviousMonth, monthNames } from "@utils/calendar";
 import dayjs from "dayjs";
@@ -46,7 +47,8 @@ const Header: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [appVersion, setAppVersion] = useState<string>("");
-  const [hasUpdate, setHasUpdate] = useState<boolean>(false);
+  const updateStatus = useRecoilValue(updateStatusState);
+  const setUpdateStatus = useSetRecoilState(updateStatusState);
 
   // 앱 버전 로드 및 업데이트 확인
   useEffect(() => {
@@ -55,21 +57,30 @@ const Header: React.FC = () => {
         const version = await getCurrentVersion();
         setAppVersion(version);
 
-        // 업데이트 확인 (백그라운드에서)
-        checkForUpdates()
-          .then((updateInfo) => {
-            setHasUpdate(updateInfo.hasUpdate);
-          })
-          .catch((error) => {
-            console.error("Update check failed:", error);
-          });
+        // Electron autoUpdater를 사용할 수 있으면 자동 업데이트 확인
+        if (window.electronAPI?.autoUpdater) {
+          // autoUpdater가 자동으로 확인하므로 별도 작업 불필요
+          // UpdateNotification 컴포넌트에서 상태 관리
+        } else {
+          // 웹 환경이거나 autoUpdater가 없는 경우 GitHub API 사용
+          checkForUpdates()
+            .then((updateInfo) => {
+              setUpdateStatus({
+                hasUpdate: updateInfo.hasUpdate,
+                version: updateInfo.latestVersion,
+              });
+            })
+            .catch((error) => {
+              console.error("Update check failed:", error);
+            });
+        }
       } catch (error) {
         console.error("Failed to load version:", error);
       }
     };
 
     loadVersion();
-  }, []);
+  }, [setUpdateStatus]);
 
   // 메뉴 외부 클릭 시 닫기
   useEffect(() => {
@@ -161,12 +172,32 @@ const Header: React.FC = () => {
   const handleCheckVersion = async () => {
     setShowMenu(false);
 
-    toast.loading("버전 확인 중...");
+    // Electron autoUpdater를 사용할 수 있으면 수동 체크
+    if (window.electronAPI?.autoUpdater) {
+      try {
+        await window.electronAPI.autoUpdater.checkForUpdates();
+        // 결과는 UpdateNotification 컴포넌트에서 처리됨
+      } catch (error) {
+        console.error("Update check failed:", error);
+      }
+      return;
+    }
+
+    // 웹 환경이거나 autoUpdater가 없는 경우 GitHub API 사용
+    const loadingToast = toast.loading("버전 확인 중...", {
+      duration: Infinity, // 수동으로 dismiss할 때까지 유지
+    });
 
     try {
       const updateInfo = await checkForUpdates();
 
-      toast.dismiss();
+      toast.dismiss(loadingToast);
+
+      // 전역 상태 업데이트
+      setUpdateStatus({
+        hasUpdate: updateInfo.hasUpdate,
+        version: updateInfo.latestVersion,
+      });
 
       if (updateInfo.hasUpdate) {
         const confirmed = window.confirm(
@@ -185,12 +216,14 @@ const Header: React.FC = () => {
       } else {
         toast.success(
           `최신 버전을 사용 중입니다.\n현재 버전: ${updateInfo.currentVersion}`,
-          { duration: 3000 }
+          { duration: 4000 }
         );
       }
     } catch (error) {
-      toast.dismiss();
-      toast.error("버전 확인 중 오류가 발생했습니다.");
+      toast.dismiss(loadingToast);
+      toast.error("버전 확인 중 오류가 발생했습니다.", {
+        duration: 4000,
+      });
       console.error("Version check failed:", error);
     }
   };
@@ -272,13 +305,13 @@ const Header: React.FC = () => {
             className={styles.versionBadge}
             onClick={handleCheckVersion}
             title={
-              hasUpdate
+              updateStatus.hasUpdate
                 ? "새로운 버전이 있습니다! 클릭하여 확인하세요."
                 : "버전 정보"
             }
           >
             <span className={styles.versionText}>v{appVersion}</span>
-            {hasUpdate && <span className={styles.updateDot}>●</span>}
+            {updateStatus.hasUpdate && <span className={styles.updateDot}>●</span>}
           </div>
         )}
         <div className={styles.googleMenu} ref={menuRef}>
