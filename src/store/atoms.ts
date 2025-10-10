@@ -236,6 +236,30 @@ export const sidebarWidthState = atom<number>({
   ]
 });
 
+export const sidebarPositionState = atom<'left' | 'right'>({
+  key: 'sidebarPosition',
+  default: 'right',
+  effects: [
+    ({ setSelf, onSet }) => {
+      // Electron Store에서 저장된 위치 불러오기
+      electronStore.get('sidebarPosition').then(savedPosition => {
+        if (savedPosition === 'left' || savedPosition === 'right') {
+          setSelf(savedPosition);
+        }
+      }).catch(error => {
+        console.error('Failed to load sidebar position:', error);
+      });
+
+      // 위치 변경 시 Electron Store에 저장
+      onSet((newPosition, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('sidebarPosition', newPosition);
+        }
+      });
+    }
+  ]
+});
+
 export const viewModeState = atom<'month' | 'week' | 'day'>({
   key: 'viewMode',
   default: 'month'

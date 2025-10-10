@@ -12,7 +12,7 @@
 .mainContent {
   flex: 1;
   min-width: 0; // flexbox 오버플로 방지
-  transition: margin-right 0.1s ease-out;
+  transition: margin-right 0.1s ease-out, margin-left 0.1s ease-out;
 
   &.resizing {
     transition: none; // 리사이징 중에는 트랜지션 제거
@@ -21,19 +21,26 @@
 
 .sidebar {
   position: fixed;
-  right: 0;
   top: calc(40px + #{$header-height}); // TitleBar(40px) + Header 높이
   bottom: 0;
   background: var(--color-surface);
-  border-left: 1px solid var(--color-border);
   display: flex;
   transition: width 0.1s ease-out;
   z-index: 5;
+
+  &.right {
+    right: 0;
+    border-left: 1px solid var(--color-border);
+  }
+
+  &.left {
+    left: 0;
+    border-right: 1px solid var(--color-border);
+  }
 }
 
 .resizeHandle {
   position: absolute;
-  left: -4px;
   top: 0;
   bottom: 0;
   width: 8px;
@@ -41,6 +48,14 @@
   background: transparent;
   transition: all $transition-fast;
   z-index: 10;
+
+  .right & {
+    left: -4px;
+  }
+
+  .left & {
+    right: -4px;
+  }
 
   &:hover {
     .handleBar {
@@ -98,7 +113,14 @@
 @media (hover: none) and (pointer: coarse) {
   .resizeHandle {
     width: 16px;
-    left: -8px;
+
+    .right & {
+      left: -8px;
+    }
+
+    .left & {
+      right: -8px;
+    }
 
     .handleBar {
       width: 4px;
