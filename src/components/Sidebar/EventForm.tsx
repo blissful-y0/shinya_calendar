@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { eventsState, selectedEventState, googleCalendarSyncState } from "@store/atoms";
 import { Event, RecurrenceRule, ReminderTime } from "@types";
@@ -10,6 +10,7 @@ import CustomDatePicker from "@components/Common/CustomDatePicker";
 import CustomTimePicker from "@components/Common/CustomTimePicker";
 import { HexColorPicker } from "react-colorful";
 import { useGoogleCalendarSync } from "@/hooks/useGoogleCalendarSync";
+import { electronStore } from "@utils/electronStore";
 import styles from "./EventForm.module.scss";
 
 interface EventFormProps {
@@ -71,8 +72,10 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const [reminderForAllOccurrences, setReminderForAllOccurrences] = useState(
     event?.reminderForAllOccurrences || false
   );
+  const [customColors, setCustomColors] = useState<Array<{ id: string; color: string }>>([]);
+  const [tempColor, setTempColor] = useState<string>("#FFB6C1");
 
-  const colorOptions = [
+  const defaultColorOptions = [
     "#FFB6C1",
     "#FFC0CB",
     "#FFE4B5",
@@ -82,6 +85,47 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     "#F0E68C",
     "#DDA0DD",
   ];
+
+  // Load custom colors from electron store
+  useEffect(() => {
+    const loadCustomColors = async () => {
+      const stored = await electronStore.get("customColors");
+      if (stored && Array.isArray(stored)) {
+        setCustomColors(stored);
+      }
+    };
+    loadCustomColors();
+  }, []);
+
+  // Save custom colors to electron store
+  const saveCustomColors = async (colors: Array<{ id: string; color: string }>) => {
+    await electronStore.set("customColors", colors);
+    setCustomColors(colors);
+  };
+
+  // Add new custom color
+  const addCustomColor = async () => {
+    console.log("addCustomColor called, tempColor:", tempColor);
+    try {
+      const newColor = { id: uuidv4(), color: tempColor };
+      const updated = [...customColors, newColor];
+      console.log("Saving custom colors:", updated);
+      await saveCustomColors(updated);
+      setColor(tempColor);
+      setShowColorPicker(false);
+      toast.success("커스텀 컬러가 추가되었습니다");
+    } catch (error) {
+      console.error("Error adding custom color:", error);
+      toast.error("커스텀 컬러 추가 실패");
+    }
+  };
+
+  // Delete custom color
+  const deleteCustomColor = async (id: string) => {
+    const updated = customColors.filter((c) => c.id !== id);
+    await saveCustomColors(updated);
+    toast.success("커스텀 컬러가 삭제되었습니다");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -525,7 +569,8 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
         <label>색상</label>
         <div className={styles.colorSection}>
           <div className={styles.colorOptions}>
-            {colorOptions.map((colorOption) => (
+            {/* 기본 컬러 */}
+            {defaultColorOptions.map((colorOption) => (
               <button
                 key={colorOption}
                 type="button"
@@ -534,16 +579,73 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
                 }`}
                 style={{ backgroundColor: colorOption }}
                 onClick={() => setColor(colorOption)}
+                title="기본 컬러"
               />
             ))}
+
+            {/* 커스텀 컬러 */}
+            {customColors.map((customColor) => (
+              <div key={customColor.id} className={styles.customColorItem}>
+                <button
+                  type="button"
+                  className={`${styles.colorOption} ${
+                    color === customColor.color ? styles.selected : ""
+                  }`}
+                  style={{ backgroundColor: customColor.color }}
+                  onClick={() => setColor(customColor.color)}
+                  title="커스텀 컬러"
+                />
+                <button
+                  type="button"
+                  className={styles.deleteButton}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteCustomColor(customColor.id);
+                  }}
+                  title="삭제"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+
+            {/* 커스텀 컬러 추가 버튼 */}
+            <button
+              type="button"
+              className={styles.customColorButton}
+              onClick={() => setShowColorPicker(!showColorPicker)}
+              title="커스텀 컬러 추가"
+            >
+              +
+            </button>
           </div>
+
+          {/* 컬러 피커 팝오버 - 새 컬러 추가 */}
           {showColorPicker && (
             <div className={styles.colorPickerPopover}>
               <div
                 className={styles.colorPickerCover}
                 onClick={() => setShowColorPicker(false)}
               />
-              <HexColorPicker color={color} onChange={setColor} />
+              <div className={styles.colorPickerContent}>
+                <HexColorPicker color={tempColor} onChange={setTempColor} />
+                <div className={styles.colorPickerActions}>
+                  <button
+                    type="button"
+                    className={styles.cancelColorButton}
+                    onClick={() => setShowColorPicker(false)}
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.addColorButton}
+                    onClick={addCustomColor}
+                  >
+                    추가
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
