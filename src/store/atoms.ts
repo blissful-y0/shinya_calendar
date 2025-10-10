@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { Event, DiaryEntry, Theme, DDay, GoogleCalendarSyncState } from '@types';
+import { Event, DiaryEntry, Theme, DDay, GoogleCalendarSyncState, TodoItem, MemoEntry } from '@types';
 import { Sticker, StickerLayout, UploadedStickerTemplate } from '@components/Styling/StickerPanel';
 import { startOfMonth } from 'date-fns';
 import { electronStore } from '@utils/electronStore';
@@ -494,6 +494,63 @@ export const googleCalendarSyncState = atom<GoogleCalendarSyncState>({
       onSet((newState, _, isReset) => {
         if (!isReset) {
           electronStore.set('googleCalendarSyncState', newState);
+        }
+      });
+    }
+  ]
+});
+
+// 투두 리스트 상태
+export const todosState = atom<TodoItem[]>({
+  key: 'todos',
+  default: [],
+  effects: [
+    ({ setSelf, onSet }) => {
+      electronStore.get('todos').then(savedTodos => {
+        if (savedTodos && Array.isArray(savedTodos)) {
+          const todosWithDates = savedTodos.map((todo: any) => ({
+            ...todo,
+            date: new Date(todo.date),
+            createdAt: new Date(todo.createdAt)
+          }));
+          setSelf(todosWithDates);
+        }
+      }).catch(error => {
+        console.error('Failed to load todos:', error);
+      });
+
+      onSet((newTodos, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('todos', newTodos);
+        }
+      });
+    }
+  ]
+});
+
+// 메모 상태
+export const memosState = atom<MemoEntry[]>({
+  key: 'memos',
+  default: [],
+  effects: [
+    ({ setSelf, onSet }) => {
+      electronStore.get('memos').then(savedMemos => {
+        if (savedMemos && Array.isArray(savedMemos)) {
+          const memosWithDates = savedMemos.map((memo: any) => ({
+            ...memo,
+            date: new Date(memo.date),
+            createdAt: new Date(memo.createdAt),
+            updatedAt: new Date(memo.updatedAt)
+          }));
+          setSelf(memosWithDates);
+        }
+      }).catch(error => {
+        console.error('Failed to load memos:', error);
+      });
+
+      onSet((newMemos, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('memos', newMemos);
         }
       });
     }

@@ -106,3 +106,19 @@ export type GoogleCalendarEvent = {
   colorId?: string;
   recurrence?: string[];
 };
+
+export interface TodoItem {
+  id: string;
+  date: Date;
+  content: string;
+  completed: boolean;
+  createdAt: Date;
+}
+
+export interface MemoEntry {
+  id: string;
+  date: Date;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
