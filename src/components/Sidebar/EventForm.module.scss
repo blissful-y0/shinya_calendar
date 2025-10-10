@@ -237,6 +237,92 @@
   }
 }
 
+.customColorItem {
+  position: relative;
+  display: inline-block;
+}
+
+.deleteButton {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-fast;
+  opacity: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+
+  .customColorItem:hover & {
+    opacity: 1;
+  }
+
+  &:hover {
+    background: #ff4444;
+    transform: scale(1.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.colorPickerContent {
+  position: relative;
+  z-index: 2001;
+  background: var(--color-surface);
+  border-radius: $border-radius;
+  padding: $spacing-md;
+  box-shadow: $shadow-large;
+  border: 2px solid var(--color-border);
+}
+
+.colorPickerActions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.cancelColorButton,
+.addColorButton {
+  flex: 1;
+  padding: $spacing-xs $spacing-sm;
+  border: none;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-small;
+  font-weight: 500;
+  transition: all $transition-fast;
+}
+
+.cancelColorButton {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+
+  &:hover {
+    background: var(--color-background);
+  }
+}
+
+.addColorButton {
+  background: var(--color-primary);
+  color: white;
+
+  &:hover {
+    background: var(--color-secondary);
+  }
+}
+
 .colorPickerPopover {
   position: absolute;
   z-index: 2000;
@@ -250,6 +336,7 @@
   right: 0;
   bottom: 0;
   left: 0;
+  z-index: 1999;
 }
 
 // React Colorful 커스텀 스타일
