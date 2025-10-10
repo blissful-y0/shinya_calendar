@@ -81,14 +81,13 @@
 }
 
 .body {
-  padding: 28px;
+  padding: 16px;
 }
 
 .connectSection {
   .description {
     color: #666;
-    line-height: 1.6;
-    margin-bottom: 28px;
+    margin-bottom: 16px;
   }
 
   .steps {
@@ -264,7 +263,7 @@
     cursor: pointer;
     user-select: none;
 
-    input[type='checkbox'] {
+    input[type="checkbox"] {
       width: 20px;
       height: 20px;
       cursor: pointer;

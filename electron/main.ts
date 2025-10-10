@@ -50,6 +50,7 @@ function createWindow() {
 
   mainWindow = new BrowserWindow({
     ...windowState,
+    title: "신야캘린더",
     minWidth: 1024,
     minHeight: 576,
     webPreferences: {
