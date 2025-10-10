@@ -10,6 +10,7 @@ import {
 import EventForm from "./EventForm";
 import EventList from "./EventList";
 import DiarySection from "./DiarySection";
+import TodoMemo from "./TodoMemo";
 import DDayWidget from "../Common/DDayWidget";
 import { formatDate } from "@utils/calendar";
 import { getEventsForDate } from "@utils/eventUtils";
@@ -22,7 +23,9 @@ const Sidebar: React.FC = () => {
   const setSelectedEvent = useSetRecoilState(selectedEventState);
   const events = useRecoilValue(eventsState);
   const diaryEntries = useRecoilValue(diaryEntriesState);
-  const [activeTab, setActiveTab] = useState<"events" | "diary">("events");
+  const [activeTab, setActiveTab] = useState<"events" | "todoMemo" | "diary">(
+    "events"
+  );
   const [showEventForm, setShowEventForm] = useState(false);
 
   // 날짜가 변경되면 선택된 이벤트 초기화
@@ -31,7 +34,7 @@ const Sidebar: React.FC = () => {
   }, [selectedDate, setSelectedEvent]);
 
   // 탭이 변경되면 선택된 이벤트 초기화
-  const handleTabChange = (tab: "events" | "diary") => {
+  const handleTabChange = (tab: "events" | "todoMemo" | "diary") => {
     setActiveTab(tab);
     setSelectedEvent(null);
   };
@@ -80,6 +83,14 @@ const Sidebar: React.FC = () => {
           </button>
           <button
             className={`${styles.tab} ${
+              activeTab === "todoMemo" ? styles.active : ""
+            }`}
+            onClick={() => handleTabChange("todoMemo")}
+          >
+            리스트
+          </button>
+          <button
+            className={`${styles.tab} ${
               activeTab === "diary" ? styles.active : ""
             }`}
             onClick={() => handleTabChange("diary")}
@@ -109,6 +120,8 @@ const Sidebar: React.FC = () => {
             <EventList events={selectedDateEvents} />
           </>
         )}
+
+        {activeTab === "todoMemo" && <TodoMemo date={selectedDate} />}
 
         {activeTab === "diary" && (
           <DiarySection date={selectedDate} entry={selectedDateDiary} />

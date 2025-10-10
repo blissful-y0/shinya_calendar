@@ -1,0 +1,244 @@
+@use '@styles/variables' as *;
+@use '@styles/mixins' as *;
+
+.todoMemoContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.todoSection {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: $spacing-md;
+  min-height: 0; // flexbox overflow 수정
+}
+
+.memoSection {
+  flex-shrink: 0;
+  padding-top: $spacing-md;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-surface);
+  position: relative;
+  margin: 0;
+  flex-shrink: 0;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--color-border) 20%,
+      var(--color-primary) 50%,
+      var(--color-border) 80%,
+      transparent 100%
+    );
+    opacity: 0.6;
+  }
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: $spacing-md;
+}
+
+.todoInput {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.input {
+  flex: 1;
+  padding: $spacing-sm;
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  font-size: $font-size-base;
+  color: var(--color-text);
+  background: var(--color-surface);
+  transition: all $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+  }
+
+  &::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.6;
+  }
+}
+
+.addButton {
+  padding: $spacing-sm $spacing-md;
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  font-size: $font-size-base;
+  font-weight: 500;
+  transition: all $transition-fast;
+  min-width: 60px;
+
+  &:hover:not(:disabled) {
+    background: var(--color-secondary);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.todoList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.emptyMessage {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: $font-size-sm;
+  padding: $spacing-lg 0;
+  font-style: italic;
+}
+
+.todoItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--color-accent);
+    border-color: var(--color-primary-light);
+  }
+
+  &.completed {
+    opacity: 0.6;
+
+    .todoContent {
+      text-decoration: line-through;
+      color: var(--color-text-secondary);
+    }
+  }
+}
+
+.checkButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    color: var(--color-secondary);
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.todoContent {
+  flex: 1;
+  font-size: $font-size-base;
+  color: var(--color-text);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.deleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: $border-radius-small;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+  opacity: 0;
+
+  .todoItem:hover & {
+    opacity: 1;
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: var(--color-danger-light);
+    color: var(--color-danger);
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.memoTextarea {
+  width: 100%;
+  padding: $spacing-md;
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  font-size: $font-size-base;
+  font-family: inherit;
+  line-height: 1.6;
+  color: var(--color-text);
+  background: var(--color-surface);
+  resize: none;
+  transition: all $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary), 0.1);
+  }
+
+  &::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.6;
+  }
+}
