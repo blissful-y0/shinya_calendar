@@ -5,7 +5,9 @@
 
 🌐 **[공식 홈페이지 보기](https://blissful-y0.github.io/shinya_calendar)** | 📥 **[다운로드](https://github.com/blissful-y0/shinya_calendar/releases)**
 
-### 개발자용: 소스에서 빌드
+---
+
+## 개발자용: 소스에서 빌드
 
 #### 필수 요구사항
 
