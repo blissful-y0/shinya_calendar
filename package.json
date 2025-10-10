@@ -1,6 +1,6 @@
 {
   "name": "simya-calendar",
-  "version": "1.1.1",
+  "version": "1.1.0",
   "description": "심야 캘린더",
   "main": "dist-electron/main.js",
   "author": {
@@ -78,7 +78,7 @@
   },
   "build": {
     "appId": "com.simya.calendar",
-    "productName": "Shinya-Calendar",
+    "productName": "ShinyaCalendar",
     "directories": {
       "output": "release"
     },
@@ -98,10 +98,8 @@
       "icon": "public/icon.icns",
       "category": "public.app-category.productivity",
       "identity": null,
-      "hardenedRuntime": true,
-      "gatekeeperAssess": true,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
       "target": [
         {
           "target": "dmg",

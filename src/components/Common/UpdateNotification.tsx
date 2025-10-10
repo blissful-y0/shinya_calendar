@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSetRecoilState } from "recoil";
 import { updateStatusState } from "@store/atoms";
 import styles from "./UpdateNotification.module.scss";
@@ -31,6 +31,7 @@ export default function UpdateNotification() {
   const [progress, setProgress] = useState<DownloadProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const isInitialCheckRef = useRef(true);
   const setUpdateStatus = useSetRecoilState(updateStatusState);
 
   useEffect(() => {
@@ -42,13 +43,17 @@ export default function UpdateNotification() {
     // 업데이트 확인 중
     const removeCheckingListener =
       window.electronAPI.autoUpdater.onCheckingForUpdate(() => {
-        setStatus("checking");
-        setDismissed(false);
+        // 첫 번째 자동 체크에서는 "확인 중" 메시지를 표시하지 않음
+        if (!isInitialCheckRef.current) {
+          setStatus("checking");
+          setDismissed(false);
+        }
       });
 
     // 업데이트 사용 가능
     const removeAvailableListener =
       window.electronAPI.autoUpdater.onUpdateAvailable((info: UpdateInfo) => {
+        isInitialCheckRef.current = false;
         setStatus("available");
         setUpdateInfo(info);
         setDismissed(false);
@@ -64,17 +69,24 @@ export default function UpdateNotification() {
     // 업데이트 없음 - 3초간 메시지 표시
     const removeNotAvailableListener =
       window.electronAPI.autoUpdater.onUpdateNotAvailable(() => {
-        setStatus("not-available");
-        setDismissed(false);
+        const wasInitialCheck = isInitialCheckRef.current;
+        isInitialCheckRef.current = false;
+
+        // 첫 번째 자동 체크에서는 "최신 버전 사용 중" 메시지도 표시하지 않음
+        if (!wasInitialCheck) {
+          setStatus("not-available");
+          setDismissed(false);
+          // 3초 후 자동으로 숨김
+          setTimeout(() => {
+            setStatus("idle");
+            setDismissed(true);
+          }, 3000);
+        }
+
         // 전역 상태 업데이트
         setUpdateStatus({
           hasUpdate: false,
         });
-        // 3초 후 자동으로 숨김
-        setTimeout(() => {
-          setStatus("idle");
-          setDismissed(true);
-        }, 3000);
       });
 
     // 다운로드 진행
@@ -110,10 +122,17 @@ export default function UpdateNotification() {
     // 에러
     const removeErrorListener = window.electronAPI.autoUpdater.onUpdateError(
       (err: { message: string }) => {
-        setStatus("error");
-        setError(err.message);
-        // 5초 후 자동으로 숨김
-        setTimeout(() => setDismissed(true), 5000);
+        const wasInitialCheck = isInitialCheckRef.current;
+        isInitialCheckRef.current = false;
+
+        // 첫 번째 자동 체크에서 에러가 발생해도 표시하지 않음
+        if (!wasInitialCheck) {
+          setStatus("error");
+          setError(err.message);
+          setDismissed(false);
+          // 5초 후 자동으로 숨김
+          setTimeout(() => setDismissed(true), 5000);
+        }
       }
     );
 
@@ -130,22 +149,14 @@ export default function UpdateNotification() {
 
   const handleDownload = async () => {
     if (!window.electronAPI?.autoUpdater) return;
-
-    try {
-      await window.electronAPI.autoUpdater.downloadUpdate();
-    } catch (err) {
-      console.error("Failed to download update:", err);
-    }
+    await window.electronAPI.autoUpdater.downloadUpdate();
+    // 에러는 onUpdateError 이벤트를 통해 처리됨
   };
 
   const handleInstall = async () => {
     if (!window.electronAPI?.autoUpdater) return;
-
-    try {
-      await window.electronAPI.autoUpdater.installUpdate();
-    } catch (err) {
-      console.error("Failed to install update:", err);
-    }
+    await window.electronAPI.autoUpdater.installUpdate();
+    // 에러는 onUpdateError 이벤트를 통해 처리됨
   };
 
   const handleDismiss = () => {
@@ -198,7 +209,6 @@ export default function UpdateNotification() {
       {status === "available" && updateInfo && (
         <div className={styles.notification}>
           <div className={styles.content}>
-            <div className={styles.icon}>🎉</div>
             <div className={styles.text}>
               <strong>새 버전 사용 가능</strong>
               <p>버전 {updateInfo.version}이(가) 출시되었습니다.</p>

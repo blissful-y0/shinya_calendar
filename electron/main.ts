@@ -342,11 +342,6 @@ ipcMain.handle("get-app-version", () => {
 // Auto Updater 설정
 // ============================================================
 
-// 개발 환경에서 업데이트 체크 강제 활성화
-if (process.env.NODE_ENV === "development") {
-  autoUpdater.forceDevUpdateConfig = true;
-}
-
 // 로그 레벨 설정
 autoUpdater.logger = require("electron-log");
 (autoUpdater.logger as any).transports.file.level = "info";
@@ -422,13 +417,6 @@ autoUpdater.on("update-downloaded", (info) => {
 
 // IPC 핸들러: 업데이트 체크
 ipcMain.handle("check-for-updates", async () => {
-  // if (process.env.NODE_ENV === "development") {
-  //   return {
-  //     available: false,
-  //     message: "개발 모드에서는 업데이트를 확인할 수 없습니다.",
-  //   };
-  // }
-
   try {
     const result = await autoUpdater.checkForUpdates();
     return {
@@ -443,13 +431,6 @@ ipcMain.handle("check-for-updates", async () => {
 
 // IPC 핸들러: 업데이트 다운로드
 ipcMain.handle("download-update", async () => {
-  // if (process.env.NODE_ENV === "development") {
-  //   return {
-  //     success: false,
-  //     message: "개발 모드에서는 다운로드할 수 없습니다.",
-  //   };
-  // }
-
   try {
     await autoUpdater.downloadUpdate();
     return { success: true };
@@ -461,10 +442,6 @@ ipcMain.handle("download-update", async () => {
 
 // IPC 핸들러: 업데이트 설치 및 재시작
 ipcMain.handle("install-update", () => {
-  // if (process.env.NODE_ENV === "development") {
-  //   return { success: false, message: "개발 모드에서는 설치할 수 없습니다." };
-  // }
-
   try {
     autoUpdater.quitAndInstall(false, true);
     return { success: true };
