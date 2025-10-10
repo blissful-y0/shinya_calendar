@@ -337,6 +337,16 @@ export class GoogleCalendarService {
   }
 
   /**
+   * 날짜를 YYYY-MM-DD 형식으로 포맷 (로컬 타임존 기준)
+   */
+  private formatDateOnly(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  /**
    * 앱 이벤트를 구글 캘린더 형식으로 변환
    */
   private convertToGoogleEvent(event: Event): any {
@@ -347,13 +357,17 @@ export class GoogleCalendarService {
 
     // 종일 이벤트 처리
     if (event.isAllDay) {
+      // 로컬 타임존 기준으로 날짜 포맷 (UTC 변환하지 않음)
       googleEvent.start = {
-        date: event.date.toISOString().split("T")[0],
+        date: this.formatDateOnly(event.date),
       };
+
+      // 구글 캘린더의 종료 날짜는 exclusive이므로 하루 더하기
+      const endDate = event.endDate ? new Date(event.endDate) : new Date(event.date);
+      endDate.setDate(endDate.getDate() + 1);
+
       googleEvent.end = {
-        date: event.endDate
-          ? event.endDate.toISOString().split("T")[0]
-          : event.date.toISOString().split("T")[0],
+        date: this.formatDateOnly(endDate),
       };
     } else {
       // 시간이 있는 이벤트

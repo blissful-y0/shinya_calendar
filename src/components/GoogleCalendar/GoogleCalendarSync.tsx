@@ -20,7 +20,10 @@ export const GoogleCalendarSync: React.FC<GoogleCalendarSyncProps> = ({
   const handleConnect = async () => {
     setIsLoading(true);
     try {
-      if (!window.electronAPI?.googleOAuth || !window.electronAPI?.openExternal) {
+      if (
+        !window.electronAPI?.googleOAuth ||
+        !window.electronAPI?.openExternal
+      ) {
         toast.error("Electron API를 사용할 수 없습니다");
         return;
       }
@@ -41,7 +44,9 @@ export const GoogleCalendarSync: React.FC<GoogleCalendarSyncProps> = ({
 
       // 4. code를 토큰으로 교환
       const auth = await googleCalendarService.getTokenFromCode(result.code);
-      const userEmail = await googleCalendarService.getUserEmail(auth.access_token);
+      const userEmail = await googleCalendarService.getUserEmail(
+        auth.access_token
+      );
 
       setSyncState({
         isConnected: true,
@@ -104,19 +109,6 @@ export const GoogleCalendarSync: React.FC<GoogleCalendarSyncProps> = ({
         <div className={styles.body}>
           {!syncState.isConnected ? (
             <div className={styles.connectSection}>
-              <p className={styles.description}>
-                구글 캘린더와 연동하여 이벤트를 동기화할 수 있습니다.
-              </p>
-
-              <div className={styles.instructions}>
-                <h3>연동 방법:</h3>
-                <ol>
-                  <li>아래 버튼을 클릭하면 브라우저가 열립니다</li>
-                  <li>구글 계정으로 로그인하고 권한을 승인합니다</li>
-                  <li>자동으로 연동이 완료됩니다</li>
-                </ol>
-              </div>
-
               <button
                 className={styles.connectButton}
                 onClick={handleConnect}

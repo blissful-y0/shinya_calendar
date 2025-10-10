@@ -56,6 +56,9 @@
   // 요일 헤더
   :global(.react-datepicker__day-names) {
     margin-top: $spacing-xs;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
   }
 
   :global(.react-datepicker__day-name) {
@@ -64,7 +67,7 @@
     font-weight: $font-weight-medium;
     width: 36px;
     line-height: 36px;
-    margin: 0;
+    margin: 2px;
   }
 
   // 월 년도 선택
@@ -73,6 +76,17 @@
     font-size: $font-size-base;
     font-weight: $font-weight-medium;
     margin-bottom: $spacing-xs;
+  }
+
+  // 월 컨테이너
+  :global(.react-datepicker__month) {
+    margin: $spacing-xs 0;
+  }
+
+  // 주 컨테이너
+  :global(.react-datepicker__week) {
+    display: flex;
+    justify-content: space-between;
   }
 
   // 날짜 버튼
