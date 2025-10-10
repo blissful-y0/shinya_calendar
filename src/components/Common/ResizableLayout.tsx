@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useRecoilState } from 'recoil';
-import { sidebarWidthState } from '@store/atoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { sidebarWidthState, sidebarPositionState } from '@store/atoms';
 import styles from './ResizableLayout.module.scss';
 
 interface ResizableLayoutProps {
@@ -17,6 +17,7 @@ const ResizableLayout: React.FC<ResizableLayoutProps> = ({
   maxWidth = 600
 }) => {
   const [sidebarWidth, setSidebarWidth] = useRecoilState(sidebarWidthState);
+  const sidebarPosition = useRecoilValue(sidebarPositionState);
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -29,12 +30,16 @@ const ResizableLayout: React.FC<ResizableLayoutProps> = ({
     if (!isResizing || !containerRef.current) return;
 
     const containerRect = containerRef.current.getBoundingClientRect();
-    const newWidth = containerRect.right - e.clientX;
+
+    // 사이드바 위치에 따라 너비 계산
+    const newWidth = sidebarPosition === 'right'
+      ? containerRect.right - e.clientX
+      : e.clientX - containerRect.left;
 
     // 최소/최대 너비 제한
     const constrainedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
     setSidebarWidth(constrainedWidth);
-  }, [isResizing, minWidth, maxWidth, setSidebarWidth]);
+  }, [isResizing, minWidth, maxWidth, setSidebarWidth, sidebarPosition]);
 
   const handleMouseUp = useCallback(() => {
     setIsResizing(false);
@@ -66,13 +71,16 @@ const ResizableLayout: React.FC<ResizableLayoutProps> = ({
     <div className={styles.resizableLayout} ref={containerRef}>
       <div
         className={`${styles.mainContent} ${isResizing ? styles.resizing : ''}`}
-        style={{ marginRight: `${sidebarWidth}px` }}
+        style={{
+          marginRight: sidebarPosition === 'right' ? `${sidebarWidth}px` : 0,
+          marginLeft: sidebarPosition === 'left' ? `${sidebarWidth}px` : 0
+        }}
       >
         {children}
       </div>
 
       <div
-        className={styles.sidebar}
+        className={`${styles.sidebar} ${sidebarPosition === 'left' ? styles.left : styles.right}`}
         style={{ width: `${sidebarWidth}px` }}
       >
         <div

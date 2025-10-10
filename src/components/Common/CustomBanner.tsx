@@ -108,7 +108,7 @@ const CustomBanner: React.FC = () => {
         <div className={styles.uploadPrompt}>
           <div className={styles.uploadIcon}></div>
           <div className={styles.uploadText}>클릭하여 배너 이미지를 추가</div>
-          <div className={styles.uploadHint}>권장 크기: 1200 x 400px</div>
+          <div className={styles.uploadHint}>권장 크기: 1200 x 200px</div>
         </div>
       )}
       <input

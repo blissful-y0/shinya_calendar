@@ -7,6 +7,7 @@ import {
   stickerLayoutsState,
   uploadedStickersState,
   stickerVisibilityState,
+  sidebarPositionState,
 } from "@store/atoms";
 import {
   MdBrush,
@@ -15,10 +16,9 @@ import {
   MdEdit,
   MdEditOff,
   MdDelete,
-  MdPhotoLibrary,
   MdRestore,
-  MdFolder,
   MdMoreVert,
+  MdViewSidebar,
 } from "react-icons/md";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -30,7 +30,7 @@ interface StylingManagerProps {
   onClose: () => void;
 }
 
-type StylingMode = "sticker" | "theme";
+type StylingMode = "sticker" | "theme" | "sidebar";
 
 const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
   const [activeMode, setActiveMode] = useState<StylingMode>("sticker");
@@ -46,6 +46,8 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
   );
   const [layoutMenuId, setLayoutMenuId] = useState<string | null>(null);
   const setStickerVisibility = useSetRecoilState(stickerVisibilityState);
+  const [sidebarPosition, setSidebarPosition] =
+    useRecoilState(sidebarPositionState);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -143,6 +145,15 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
           >
             <MdBrush />
             테마
+          </button>
+          <button
+            className={`${styles.tab} ${
+              activeMode === "sidebar" ? styles.active : ""
+            }`}
+            onClick={() => setActiveMode("sidebar")}
+          >
+            <MdViewSidebar />
+            사이드바
           </button>
         </div>
 
@@ -297,6 +308,34 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
           {activeMode === "theme" && (
             <div className={styles.themeContent}>
               <ThemeSelector />
+            </div>
+          )}
+          {activeMode === "sidebar" && (
+            <div className={styles.sidebarContent}>
+              <div className={styles.sectionHeader}>
+                <h3>사이드바 위치</h3>
+              </div>
+
+              <div className={styles.positionSelector}>
+                <button
+                  className={`${styles.positionButton} ${
+                    sidebarPosition === "left" ? styles.active : ""
+                  }`}
+                  onClick={() => setSidebarPosition("left")}
+                >
+                  <MdViewSidebar style={{ transform: "scaleX(-1)" }} />
+                  <span>왼쪽</span>
+                </button>
+                <button
+                  className={`${styles.positionButton} ${
+                    sidebarPosition === "right" ? styles.active : ""
+                  }`}
+                  onClick={() => setSidebarPosition("right")}
+                >
+                  <MdViewSidebar />
+                  <span>오른쪽</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
