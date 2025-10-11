@@ -234,7 +234,7 @@ const WeekView: React.FC = () => {
           <div className={styles.allDayLabel}>종일</div>
           {weekDays.map((date) => {
             const dayEvents = getEventsForDateLocal(date).filter(
-              (e) => !e.startTime
+              (e) => e.isAllDay || !e.startTime
             );
             return (
               <div key={date.toISOString()} className={styles.allDayCell}>
@@ -279,7 +279,7 @@ const WeekView: React.FC = () => {
             <div className={styles.eventsLayer}>
               {weekDays.map((date, dayIndex) => {
                 const dayEvents = getEventsForDateLocal(date).filter(
-                  (e) => e.startTime || (e.endDate && e.date !== e.endDate)
+                  (e) => !e.isAllDay && (e.startTime || (e.endDate && e.date !== e.endDate))
                 );
                 return dayEvents.map((event) => {
                   const position = getEventPosition(event, dayIndex, date);

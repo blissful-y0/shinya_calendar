@@ -625,10 +625,58 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
             <div className={styles.colorPickerPopover}>
               <div
                 className={styles.colorPickerCover}
-                onClick={() => setShowColorPicker(false)}
+                onMouseDown={(e) => {
+                  // 컬러 피커 컨텐츠 외부를 클릭한 경우에만 닫기
+                  if (e.target === e.currentTarget) {
+                    setShowColorPicker(false);
+                  }
+                }}
               />
-              <div className={styles.colorPickerContent}>
+              <div
+                className={styles.colorPickerContent}
+                onWheel={(e) => {
+                  // 스크롤 이벤트가 부모로 전파되지 않도록 방지
+                  e.stopPropagation();
+                }}
+                onMouseDown={(e) => {
+                  // 컬러 피커 내부 클릭 시 이벤트 전파 방지
+                  e.stopPropagation();
+                }}
+              >
                 <HexColorPicker color={tempColor} onChange={setTempColor} />
+                <div className={styles.hexInputContainer}>
+                  <label htmlFor="hexInput" className={styles.hexLabel}>
+                    HEX
+                  </label>
+                  <input
+                    id="hexInput"
+                    type="text"
+                    className={styles.hexInput}
+                    value={tempColor}
+                    onChange={(e) => {
+                      let value = e.target.value.trim().toUpperCase();
+
+                      // 빈 값은 허용
+                      if (value === '') {
+                        setTempColor('#');
+                        return;
+                      }
+
+                      // # 기호 자동 추가
+                      if (!value.startsWith('#')) {
+                        value = '#' + value;
+                      }
+
+                      // 헥사코드 문자만 허용 (0-9, A-F)
+                      // 입력 중간 단계도 허용 (1~6자리)
+                      if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
+                        setTempColor(value);
+                      }
+                    }}
+                    placeholder="#000000"
+                    maxLength={7}
+                  />
+                </div>
                 <div className={styles.colorPickerActions}>
                   <button
                     type="button"
