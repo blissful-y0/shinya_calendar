@@ -112,6 +112,7 @@ export interface TodoItem {
   date: Date;
   content: string;
   completed: boolean;
+  important: boolean;
   createdAt: Date;
 }
 

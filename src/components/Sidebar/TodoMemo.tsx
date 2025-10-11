@@ -4,7 +4,7 @@ import { todosState, memosState } from "@store/atoms";
 import { TodoItem, MemoEntry } from "@types";
 import { v4 as uuidv4 } from "uuid";
 import { formatDate } from "@utils/calendar";
-import { MdCheckBox, MdCheckBoxOutlineBlank, MdDelete } from "react-icons/md";
+import { MdCheckBox, MdCheckBoxOutlineBlank, MdDelete, MdStar, MdStarBorder } from "react-icons/md";
 import styles from "./TodoMemo.module.scss";
 
 interface TodoMemoProps {
@@ -15,12 +15,20 @@ const TodoMemo: React.FC<TodoMemoProps> = ({ date }) => {
   const [todos, setTodos] = useRecoilState(todosState);
   const [memos, setMemos] = useRecoilState(memosState);
   const [newTodoContent, setNewTodoContent] = useState("");
+  const [newTodoImportant, setNewTodoImportant] = useState(false);
   const [memoContent, setMemoContent] = useState("");
 
-  // 선택된 날짜의 투두와 메모 가져오기
-  const dateTodos = todos.filter(
-    (todo) => formatDate(new Date(todo.date)) === formatDate(date)
-  );
+  // 선택된 날짜의 투두와 메모 가져오기 (중요한 항목 먼저 정렬)
+  const dateTodos = todos
+    .filter((todo) => formatDate(new Date(todo.date)) === formatDate(date))
+    .sort((a, b) => {
+      // 중요한 항목을 먼저
+      if (a.important !== b.important) {
+        return a.important ? -1 : 1;
+      }
+      // 같은 중요도면 생성 시간순
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
   const dateMemo = memos.find(
     (memo) => formatDate(new Date(memo.date)) === formatDate(date)
   );
@@ -37,17 +45,27 @@ const TodoMemo: React.FC<TodoMemoProps> = ({ date }) => {
       date,
       content: newTodoContent,
       completed: false,
+      important: newTodoImportant,
       createdAt: new Date(),
     };
 
     setTodos((prev) => [...prev, newTodo]);
     setNewTodoContent("");
+    setNewTodoImportant(false); // 기본값으로 리셋
   };
 
   const handleToggleTodo = (id: string) => {
     setTodos((prev) =>
       prev.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const handleToggleImportant = (id: string) => {
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === id ? { ...todo, important: !todo.important } : todo
       )
     );
   };
@@ -100,6 +118,16 @@ const TodoMemo: React.FC<TodoMemoProps> = ({ date }) => {
       {/* 투두 리스트 섹션 */}
       <div className={styles.todoSection}>
         <div className={styles.todoInput}>
+          <button
+            className={`${styles.importantButton} ${
+              newTodoImportant ? styles.active : ""
+            }`}
+            onClick={() => setNewTodoImportant(!newTodoImportant)}
+            type="button"
+            title="중요 표시"
+          >
+            {newTodoImportant ? <MdStar /> : <MdStarBorder />}
+          </button>
           <input
             type="text"
             value={newTodoContent}
@@ -126,13 +154,22 @@ const TodoMemo: React.FC<TodoMemoProps> = ({ date }) => {
                 key={todo.id}
                 className={`${styles.todoItem} ${
                   todo.completed ? styles.completed : ""
-                }`}
+                } ${todo.important ? styles.important : ""}`}
               >
                 <button
                   className={styles.checkButton}
                   onClick={() => handleToggleTodo(todo.id)}
                 >
                   {todo.completed ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
+                </button>
+                <button
+                  className={`${styles.starButton} ${
+                    todo.important ? styles.active : ""
+                  }`}
+                  onClick={() => handleToggleImportant(todo.id)}
+                  title={todo.important ? "중요 표시 해제" : "중요 표시"}
+                >
+                  {todo.important ? <MdStar /> : <MdStarBorder />}
                 </button>
                 <span className={styles.todoContent}>{todo.content}</span>
                 <button
