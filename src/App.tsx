@@ -50,8 +50,6 @@ function App() {
   };
   // 앱 시작 시 이전 상태 복원
   useEffect(() => {
-    document.title = "";
-
     const restoreAppState = async () => {
       try {
         if (window.electronAPI?.store) {
