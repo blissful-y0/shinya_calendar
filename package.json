@@ -1,6 +1,6 @@
 {
   "name": "simya-calendar",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "심야 캘린더",
   "main": "dist-electron/main.js",
   "author": {
@@ -88,8 +88,8 @@
       "icon": "public/icon.icns",
       "category": "public.app-category.productivity",
       "identity": null,
-      "hardenedRuntime": false,
-      "gatekeeperAssess": false,
+      "hardenedRuntime": true,
+      "gatekeeperAssess": true,
       "target": [
         {
           "target": "dmg",
