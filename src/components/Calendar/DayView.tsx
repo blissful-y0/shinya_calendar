@@ -167,8 +167,8 @@ const DayView: React.FC = () => {
           <div className={styles.allDayEvents}>
             {dayEvents
               .filter((e) => {
-                // 원래 종일 이벤트
-                if (!e.startTime && !e.endDate) return true;
+                // 종일 이벤트
+                if (e.isAllDay || !e.startTime) return true;
 
                 // Multi-day 이벤트 중 이 날짜를 전체로 차지하는 경우
                 if (e.endDate && e.date !== e.endDate) {
@@ -223,7 +223,7 @@ const DayView: React.FC = () => {
 
           <div className={styles.eventsContainer}>
             {dayEvents
-              .filter((e) => e.startTime || (e.endDate && e.date !== e.endDate))
+              .filter((e) => !e.isAllDay && (e.startTime || (e.endDate && e.date !== e.endDate)))
               .map((event) => {
                 const position = getEventPosition(event);
                 if (!position) return null;

@@ -185,6 +185,10 @@ function convertGoogleEventToAppEvent(gEvent: GoogleCalendarEvent): Event {
       // 구글 캘린더의 종일 이벤트는 종료일이 다음날로 설정되므로 하루 빼기
       endDate.setUTCDate(endDate.getUTCDate() - 1);
     }
+
+    // 종일 이벤트는 시간 정보를 명시적으로 undefined로 설정
+    startTime = undefined;
+    endTime = undefined;
   } else {
     // 시간 지정 이벤트: 로컬 타임존 기준으로 날짜 추출
     const startDateTime = new Date(gEvent.start.dateTime!);

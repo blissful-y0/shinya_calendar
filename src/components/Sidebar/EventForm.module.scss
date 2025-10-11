@@ -284,6 +284,70 @@
   padding: $spacing-md;
   box-shadow: $shadow-large;
   border: 2px solid var(--color-border);
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  // 스크롤바 스타일링
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-background);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--color-text-secondary);
+    }
+  }
+}
+
+.hexInputContainer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-top: $spacing-sm;
+  padding: $spacing-xs;
+  background: var(--color-background);
+  border-radius: $border-radius-small;
+}
+
+.hexLabel {
+  font-size: $font-size-small;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  min-width: 35px;
+}
+
+.hexInput {
+  flex: 1;
+  padding: $spacing-xs $spacing-sm;
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius-small;
+  font-size: $font-size-small;
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  color: var(--color-text);
+  background: var(--color-surface);
+  transition: all $transition-fast;
+  text-transform: uppercase;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.1);
+  }
+
+  &::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.5;
+  }
 }
 
 .colorPickerActions {
