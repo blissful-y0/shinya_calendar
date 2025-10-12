@@ -1,0 +1,275 @@
+@import "../../styles/mixins";
+
+.bannerContainer {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  margin-bottom: 16px; // 캘린더와의 gap 추가
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  flex-shrink: 0; // flex 아이템이 줄어들지 않도록
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  // 작은 화면 최적화
+  @media (max-height: 700px) {
+    height: 150px;
+    margin-bottom: 8px;
+  }
+
+  @media (max-height: 600px) {
+    height: 120px;
+  }
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+
+  :global {
+    .swiper-pagination {
+      bottom: 10px;
+    }
+
+    .swiper-pagination-bullet {
+      background: rgba(255, 255, 255, 0.7);
+      opacity: 0.5;
+      transition: all 0.3s ease;
+
+      &-active {
+        opacity: 1;
+        background: white;
+      }
+    }
+
+    .swiper-button-prev,
+    .swiper-button-next {
+      color: white;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      width: 32px;
+      height: 32px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 50%;
+
+      &::after {
+        font-size: 16px;
+        font-weight: bold;
+      }
+    }
+  }
+
+  &:hover {
+    :global {
+      .swiper-button-prev,
+      .swiper-button-next {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.banner {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  pointer-events: none;
+}
+
+.slideControls {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+  animation: fadeIn 0.2s ease;
+}
+
+.cropButton,
+.removeButton {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  backdrop-filter: blur(4px);
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.cropButton:hover {
+  background: rgba(100, 100, 255, 0.7);
+}
+
+.removeButton:hover {
+  background: rgba(255, 100, 100, 0.7);
+}
+
+.globalControls {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 10;
+  animation: fadeIn 0.2s ease;
+}
+
+.addButton {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+
+  &:hover {
+    background: rgba(100, 100, 255, 0.7);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  svg {
+    font-size: 18px;
+  }
+}
+
+.uploadPrompt {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg,
+    var(--color-accent) 0%,
+    var(--color-surface) 100%
+  );
+  border: 2px dashed var(--color-border);
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg,
+      var(--color-primary-light, rgba(255, 182, 193, 0.2)) 0%,
+      var(--color-surface) 100%
+    );
+  }
+}
+
+.uploadIcon {
+  width: 64px;
+  height: 64px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+  animation: bounce 2s infinite;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    background: var(--color-primary);
+    border-radius: 2px;
+  }
+
+  &::before {
+    width: 24px;
+    height: 3px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &::after {
+    width: 3px;
+    height: 24px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.uploadPrompt:hover .uploadIcon {
+  transform: scale(1.1);
+  background: var(--color-primary);
+
+  &::before,
+  &::after {
+    background: white;
+  }
+}
+
+.uploadText {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.uploadHint {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

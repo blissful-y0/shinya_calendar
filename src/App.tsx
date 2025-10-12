@@ -17,7 +17,7 @@ import DayView from "@components/Calendar/DayView";
 import WeekView from "@components/Calendar/WeekView";
 import Sidebar from "@components/Sidebar/Sidebar";
 import ResizableLayout from "@components/Common/ResizableLayout";
-import CustomBanner from "@components/Common/CustomBanner";
+import CarouselBanner from "@components/Common/CarouselBanner";
 import StickerCanvas from "@components/Styling/StickerCanvas";
 import FloatingToolbar from "@components/Styling/FloatingToolbar";
 import LoadingOverlay from "@components/Common/LoadingOverlay";
@@ -184,13 +184,13 @@ function App() {
         {sidebarOpen ? (
           <ResizableLayout sidebar={<Sidebar />} minWidth={240} maxWidth={480}>
             <div className={styles.calendarContainer}>
-              <CustomBanner />
+              <CarouselBanner />
               {renderView()}
             </div>
           </ResizableLayout>
         ) : (
           <div className={styles.calendarContainer}>
-            <CustomBanner />
+            <CarouselBanner />
             {renderView()}
           </div>
         )}
