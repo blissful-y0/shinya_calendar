@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { googleCalendarSyncState, eventsState } from "@store/atoms";
 import { useGoogleCalendarSync } from "@hooks/useGoogleCalendarSync";
 import { googleCalendarService } from "@services/googleCalendarService";
+import { electronStore } from "@utils/electronStore";
 import { FcGoogle } from "react-icons/fc";
 import { FiDownload, FiUpload, FiRefreshCw, FiArrowLeft, FiCheck, FiLogOut } from "react-icons/fi";
 import styles from "./GoogleCalendarSyncPanel.module.scss";
@@ -44,6 +45,24 @@ export const GoogleCalendarSyncPanel: React.FC<
   const [availableCalendars, setAvailableCalendars] = useState<GoogleCalendar[]>([]);
   const [selectedCalendarIds, setSelectedCalendarIds] = useState<string[]>([]);
   const [isLoadingCalendars, setIsLoadingCalendars] = useState(false);
+
+  // 저장된 선택 캘린더 목록 불러오기
+  useEffect(() => {
+    const loadSelectedCalendars = async () => {
+      try {
+        const saved = await electronStore.get("selectedGoogleCalendars");
+        if (saved && Array.isArray(saved)) {
+          setSelectedCalendarIds(saved);
+        }
+      } catch (error) {
+        console.error("Failed to load selected calendars:", error);
+      }
+    };
+
+    if (syncState.isConnected) {
+      loadSelectedCalendars();
+    }
+  }, [syncState.isConnected]);
 
   // 구글 캘린더 연동
   const handleConnect = async () => {
@@ -162,8 +181,20 @@ export const GoogleCalendarSyncPanel: React.FC<
       // 캐시 사용 (forceRefresh = false)
       const calendars = await googleCalendarService.listCalendars(false);
       setAvailableCalendars(calendars);
-      // 기본적으로 모든 캘린더 선택
-      setSelectedCalendarIds(calendars.map((cal) => cal.id));
+
+      // 저장된 선택 목록이 있으면 사용, 없으면 모든 캘린더 선택
+      const saved = await electronStore.get("selectedGoogleCalendars");
+      if (saved && Array.isArray(saved) && saved.length > 0) {
+        // 저장된 캘린더 중 현재 사용 가능한 것만 필터링
+        const validIds = saved.filter((id: string) =>
+          calendars.some((cal) => cal.id === id)
+        );
+        setSelectedCalendarIds(validIds.length > 0 ? validIds : calendars.map((cal) => cal.id));
+      } else {
+        // 처음 사용하는 경우 모든 캘린더 선택
+        setSelectedCalendarIds(calendars.map((cal) => cal.id));
+      }
+
       setShowCalendarSelection(true);
     } catch (error) {
       console.error("Failed to load calendars:", error);
@@ -205,8 +236,19 @@ export const GoogleCalendarSyncPanel: React.FC<
 
     const { timeMin, timeMax } = getDateRange();
     try {
+      // 선택한 캘린더 목록 저장
+      await electronStore.set("selectedGoogleCalendars", selectedCalendarIds);
+
+      // 선택한 캘린더 정보도 함께 저장 (카테고리 생성용)
+      const selectedCalendarsInfo = availableCalendars.filter((cal) =>
+        selectedCalendarIds.includes(cal.id)
+      );
+      await electronStore.set("selectedGoogleCalendarsInfo", selectedCalendarsInfo);
+
       await importFromGoogle(timeMin, timeMax, selectedCalendarIds);
       setShowCalendarSelection(false);
+
+      toast.success(`${selectedCalendarIds.length}개의 캘린더가 선택되었습니다`);
     } catch (error) {
       // Error already handled in hook
     }

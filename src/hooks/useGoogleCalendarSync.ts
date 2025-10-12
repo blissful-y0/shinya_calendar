@@ -8,6 +8,7 @@ import {
 } from "@store/atoms";
 import { googleCalendarService } from "@/services/googleCalendarService";
 import { Event, GoogleCalendarEvent } from "@types";
+import { electronStore } from "@utils/electronStore";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
 import { RRule, rrulestr } from "rrule";
@@ -108,6 +109,10 @@ export const useGoogleCalendarSync = () => {
             calendarIds
           );
 
+        // 선택된 캘린더 정보 가져오기
+        const selectedCalendarsInfo = await electronStore.get("selectedGoogleCalendarsInfo") as any[] || [];
+        const selectedCalendarIds = calendarIds || selectedCalendarsInfo.map((cal: any) => cal.id);
+
         // 각 이벤트를 순차적으로 처리
         const importedEvents: Event[] = [];
 
@@ -123,6 +128,50 @@ export const useGoogleCalendarSync = () => {
         // 현재 카테고리 목록 (루프 중에 변경되지 않는 스냅샷)
         let currentCategories = categories;
 
+        // 1단계: 선택된 캘린더를 먼저 카테고리로 생성 (이벤트가 없는 캘린더 대응)
+        for (const calendarInfo of selectedCalendarsInfo) {
+          if (!selectedCalendarIds.includes(calendarInfo.id)) {
+            continue; // 선택되지 않은 캘린더는 건너뛰기
+          }
+
+          // 이미 카테고리로 등록되어 있는지 확인
+          const existingCategory = currentCategories.find(
+            (cat) => cat.googleCalendarId === calendarInfo.id
+          );
+
+          if (!existingCategory) {
+            // 새 카테고리 생성
+            const colorIndex = currentCategories.length + newCategoriesToCreate.length;
+            const newCategory = {
+              id: uuidv4(),
+              name: calendarInfo.summary,
+              description: calendarInfo.description,
+              color: getColorByIndex(colorIndex),
+              googleCalendarId: calendarInfo.id,
+              accessRole: calendarInfo.accessRole,
+              createdInApp: false,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+
+            newCategoriesToCreate.push(newCategory);
+            currentCategories = [...currentCategories, newCategory];
+
+            // 캐시에도 추가
+            processedCalendars.set(calendarInfo.summary || "", {
+              id: newCategory.id,
+              color: newCategory.color,
+            });
+          } else {
+            // 기존 카테고리 캐시에 추가
+            processedCalendars.set(calendarInfo.summary || "", {
+              id: existingCategory.id,
+              color: existingCategory.color,
+            });
+          }
+        }
+
+        // 2단계: 이벤트 처리
         for (const gEvent of googleEvents) {
           const event = convertGoogleEventToAppEvent(gEvent);
 
@@ -130,27 +179,25 @@ export const useGoogleCalendarSync = () => {
           const calendarKey = gEvent.calendarName || "";
           let categoryInfo = processedCalendars.get(calendarKey);
 
-          // 캐시에 없으면 찾거나 생성
+          // 캐시에 없으면 찾기 (1단계에서 이미 생성했으므로 여기서는 생성하지 않음)
           if (!categoryInfo) {
-            const colorIndex = currentCategories.length + newCategoriesToCreate.length;
-            const result = findOrCreateCategory(
-              gEvent.calendarName,
-              gEvent.calendarId,
-              currentCategories,
-              colorIndex
+            // 기존 카테고리에서 찾기
+            const existingCategory = currentCategories.find(
+              (cat) => cat.googleCalendarId === gEvent.calendarId
             );
 
-            categoryInfo = { id: result.id, color: result.color };
-
-            if (calendarKey) {
+            if (existingCategory) {
+              categoryInfo = {
+                id: existingCategory.id,
+                color: existingCategory.color,
+              };
               processedCalendars.set(calendarKey, categoryInfo);
-            }
-
-            // 새 카테고리인 경우 생성 목록에 추가
-            if (result.isNew && result.category) {
-              newCategoriesToCreate.push(result.category);
-              // 로컬 스냅샷 업데이트 (다음 이벤트 처리 시 사용)
-              currentCategories = [...currentCategories, result.category];
+            } else {
+              // 선택되지 않은 캘린더의 이벤트인 경우 기본 카테고리 사용
+              const defaultCategory = currentCategories.find((c) => c.isDefault);
+              categoryInfo = defaultCategory
+                ? { id: defaultCategory.id, color: defaultCategory.color }
+                : { id: '', color: getColorByIndex(0) };
             }
           }
 
@@ -164,10 +211,10 @@ export const useGoogleCalendarSync = () => {
           });
         }
 
-        // 새 카테고리 일괄 생성
+        // 3단계: 새 카테고리 일괄 생성 (선택된 캘린더, 이벤트 유무 무관)
         if (newCategoriesToCreate.length > 0) {
           setCategories((prev) => [...prev, ...newCategoriesToCreate]);
-          toast.success(`${newCategoriesToCreate.length}개의 카테고리가 자동으로 생성되었습니다`);
+          toast.success(`${newCategoriesToCreate.length}개의 카테고리가 생성되었습니다`);
         }
 
         // 로컬 이벤트 처리

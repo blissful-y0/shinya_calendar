@@ -47,8 +47,8 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onClose }) => 
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [syncWithGoogle, setSyncWithGoogle] = useState(false);
 
-  // 구글 캘린더 목록
-  const [googleCalendars, setGoogleCalendars] = useState<GoogleCalendar[]>([]);
+  // 구글 캘린더 목록 (사용하지 않음 - 선택된 캘린더는 동기화 패널에서 관리)
+  // const [googleCalendars, setGoogleCalendars] = useState<GoogleCalendar[]>([]);
 
   // 공유 관련 상태
   const [sharingCategoryId, setSharingCategoryId] = useState<string | null>(null);
@@ -79,58 +79,8 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onClose }) => 
     };
   }, [showRoleDropdown]);
 
-  // 구글 캘린더 목록 로드
-  useEffect(() => {
-    if (googleSyncState.isConnected) {
-      loadGoogleCalendars();
-    } else {
-      setGoogleCalendars([]);
-    }
-  }, [googleSyncState.isConnected]);
-
-  const loadGoogleCalendars = async () => {
-    try {
-      const calendarList = await googleCalendarService.listCalendars();
-      setGoogleCalendars(calendarList);
-
-      // 구글 캘린더를 로컬 카테고리에 자동으로 동기화
-      const newCategories: typeof categories = [];
-
-      // 색상 인덱스 초기화 (현재 카테고리 개수부터 시작)
-      let colorIndex = categories.length;
-
-      for (const googleCalendar of calendarList) {
-        // 이미 로컬 카테고리에 연결되어 있는지 확인
-        const alreadyLinked = categories.some(
-          (cat) => cat.googleCalendarId === googleCalendar.id
-        );
-
-        if (!alreadyLinked) {
-          const newCategory = {
-            id: uuidv4(),
-            name: googleCalendar.summary,
-            description: googleCalendar.description,
-            color: getColorByIndex(colorIndex), // 순서대로 색상 할당
-            googleCalendarId: googleCalendar.id,
-            accessRole: googleCalendar.accessRole,
-            createdInApp: false, // 자동 동기화된 캘린더는 공유받은 것
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          };
-          newCategories.push(newCategory);
-          colorIndex++; // 다음 색상으로
-        }
-      }
-
-      if (newCategories.length > 0) {
-        setCategories([...categories, ...newCategories]);
-        toast.success(`${newCategories.length}개의 구글 캘린더가 동기화되었습니다`);
-      }
-    } catch (error) {
-      console.error("Failed to load Google calendars:", error);
-      toast.error("구글 캘린더 목록을 불러오는데 실패했습니다");
-    }
-  };
+  // 구글 캘린더 자동 동기화 제거됨
+  // 이제 사용자가 구글 캘린더 동기화 패널에서 선택한 캘린더만 카테고리로 추가됩니다
 
   const handleCreateCategory = async () => {
     if (!formName.trim()) {
@@ -189,8 +139,8 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onClose }) => 
 
     if (googleCalendarId) {
       toast.success(`"${formName}" 카테고리가 구글 캘린더와 연동되어 생성되었습니다`);
-      // 구글 캘린더 목록 새로고침
-      loadGoogleCalendars();
+      // 구글 캘린더 캐시 무효화
+      googleCalendarService.invalidateCalendarListCache();
     } else {
       toast.success(`"${formName}" 카테고리가 생성되었습니다`);
     }
@@ -288,9 +238,9 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ onClose }) => 
         setSharingCategoryId(null);
       }
 
-      // 구글 캘린더 목록 새로고침
+      // 구글 캘린더 캐시 무효화
       if (category.googleCalendarId && googleSyncState.isConnected) {
-        loadGoogleCalendars();
+        googleCalendarService.invalidateCalendarListCache();
       }
 
       toast.success("카테고리가 삭제되었습니다");
