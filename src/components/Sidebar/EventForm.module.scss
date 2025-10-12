@@ -1,11 +1,109 @@
-@use '@styles/variables' as *;
-@use '@styles/mixins' as *;
+@use "@styles/variables" as *;
+@use "@styles/mixins" as *;
+
+// Modal wrapper styles
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.content {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #333;
+  }
+}
 
 .eventForm {
-  background: var(--color-background);
-  padding: $spacing-md;
-  border-radius: $border-radius;
-  margin-bottom: $spacing-md;
+  background: white;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.formBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+
+  // 스크롤바 숨기기
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // IE and Edge
+
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari, Opera
+  }
 }
 
 .formGroup {
@@ -20,7 +118,8 @@
   }
 
   input,
-  textarea {
+  textarea,
+  select {
     width: 100%;
     padding: $spacing-sm;
     border: 1px solid var(--color-border);
@@ -45,6 +144,10 @@
   textarea {
     resize: vertical;
     min-height: 60px;
+  }
+
+  select {
+    cursor: pointer;
   }
 }
 
@@ -332,7 +435,7 @@
   border: 1px solid var(--color-border);
   border-radius: $border-radius-small;
   font-size: $font-size-small;
-  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-family: "Monaco", "Menlo", "Courier New", monospace;
   color: var(--color-text);
   background: var(--color-surface);
   transition: all $transition-fast;
@@ -435,7 +538,10 @@
 .formActions {
   display: flex;
   gap: $spacing-sm;
-  margin-top: $spacing-lg;
+  padding: 20px 28px;
+  border-top: 1px solid #f0f0f0;
+  flex-shrink: 0;
+  background: white;
 }
 
 .cancelButton,

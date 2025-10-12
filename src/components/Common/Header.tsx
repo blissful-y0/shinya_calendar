@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   currentMonthState,
   selectedDateState,
@@ -7,27 +7,36 @@ import {
   sidebarOpenState,
   viewModeState,
   stickerVisibilityState,
+  googleCalendarSyncState,
 } from "@store/atoms";
 import { getNextMonth, getPreviousMonth, monthNames } from "@utils/calendar";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
-import { FcGoogle } from "react-icons/fc";
-import { MdDeleteForever } from "react-icons/md";
+import { IoSettings } from "react-icons/io5";
+import { MdBrush, MdDeleteForever } from "react-icons/md";
 import { FiInfo } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
+import { BiRefresh } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { electronStore } from "@utils/electronStore";
 import { getCurrentVersion, checkForUpdates } from "@utils/version";
+import { useGoogleCalendarSync } from "@hooks/useGoogleCalendarSync";
 import styles from "./Header.module.scss";
 
-// Lazy load Google Calendar components
-const GoogleCalendarSync = React.lazy(() =>
-  import("@components/GoogleCalendar/GoogleCalendarSync").then((m) => ({
-    default: m.GoogleCalendarSync,
-  }))
-);
+// Lazy load Google Calendar component
 const GoogleCalendarSyncPanel = React.lazy(() =>
   import("@components/GoogleCalendar/GoogleCalendarSyncPanel").then((m) => ({
     default: m.GoogleCalendarSyncPanel,
+  }))
+);
+const CategoryManager = React.lazy(() =>
+  import("@components/Category/CategoryManager").then((m) => ({
+    default: m.CategoryManager,
+  }))
+);
+const StylingManager = React.lazy(() =>
+  import("@components/Styling/StylingManager").then((m) => ({
+    default: m.default,
   }))
 );
 
@@ -40,9 +49,11 @@ const Header: React.FC = () => {
   const [stickerVisibility, setStickerVisibility] = useRecoilState(
     stickerVisibilityState
   );
-  const [showGoogleCalendarSettings, setShowGoogleCalendarSettings] =
-    useState(false);
-  const [showGoogleCalendarSync, setShowGoogleCalendarSync] = useState(false);
+  const syncState = useRecoilValue(googleCalendarSyncState);
+  const { importFromGoogle, isSyncing } = useGoogleCalendarSync();
+  const [showGoogleCalendar, setShowGoogleCalendar] = useState(false);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [showStylingManager, setShowStylingManager] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [appVersion, setAppVersion] = useState<string>("");
@@ -195,6 +206,20 @@ const Header: React.FC = () => {
     }
   };
 
+  // 구글 캘린더 동기화
+  const handleGoogleSync = async () => {
+    if (!syncState.isConnected) {
+      toast.error("구글 캘린더와 먼저 연동해주세요");
+      return;
+    }
+
+    try {
+      await importFromGoogle();
+    } catch (error) {
+      console.error("Sync failed:", error);
+    }
+  };
+
   return (
     <header className={styles.header}>
       <div className={styles.leftSection}>
@@ -281,31 +306,49 @@ const Header: React.FC = () => {
             {hasUpdate && <span className={styles.updateDot}>●</span>}
           </div>
         )}
+        <button
+          className={styles.stylingButton}
+          onClick={() => setShowStylingManager(true)}
+          title="스타일링 매니저"
+        >
+          <MdBrush size={24} />
+        </button>
+        {syncState.isConnected && (
+          <button
+            className={`${styles.syncButton} ${isSyncing ? styles.syncing : ""}`}
+            onClick={handleGoogleSync}
+            disabled={isSyncing}
+            title="구글 캘린더 동기화"
+          >
+            <BiRefresh size={24} className={isSyncing ? styles.rotating : ""} />
+          </button>
+        )}
         <div className={styles.googleMenu} ref={menuRef}>
           <button
             className={styles.googleButton}
             onClick={() => setShowMenu(!showMenu)}
-            title="구글 캘린더"
+            title="설정"
           >
-            <FcGoogle size={24} />
+            <IoSettings size={24} />
           </button>
           {showMenu && (
             <div className={styles.dropdown}>
               <button
                 onClick={() => {
-                  setShowGoogleCalendarSettings(true);
+                  setShowCategoryManager(true);
                   setShowMenu(false);
                 }}
               >
-                구글 캘린더 연동 설정
+                카테고리 관리
               </button>
               <button
                 onClick={() => {
-                  setShowGoogleCalendarSync(true);
+                  setShowGoogleCalendar(true);
                   setShowMenu(false);
                 }}
               >
-                이벤트 동기화
+                <FcGoogle size={18} />
+                구글 캘린더
               </button>
 
               <button
@@ -414,17 +457,24 @@ const Header: React.FC = () => {
           )}
         </div>
       </div>
-      {showGoogleCalendarSettings && (
+      {showCategoryManager && (
         <React.Suspense fallback={<div>로딩 중...</div>}>
-          <GoogleCalendarSync
-            onClose={() => setShowGoogleCalendarSettings(false)}
+          <CategoryManager
+            onClose={() => setShowCategoryManager(false)}
           />
         </React.Suspense>
       )}
-      {showGoogleCalendarSync && (
+      {showGoogleCalendar && (
         <React.Suspense fallback={<div>로딩 중...</div>}>
           <GoogleCalendarSyncPanel
-            onClose={() => setShowGoogleCalendarSync(false)}
+            onClose={() => setShowGoogleCalendar(false)}
+          />
+        </React.Suspense>
+      )}
+      {showStylingManager && (
+        <React.Suspense fallback={<div>로딩 중...</div>}>
+          <StylingManager
+            onClose={() => setShowStylingManager(false)}
           />
         </React.Suspense>
       )}

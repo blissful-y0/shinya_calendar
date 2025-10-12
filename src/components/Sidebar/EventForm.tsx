@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useSetRecoilState, useRecoilValue } from "recoil";
-import { eventsState, selectedEventState, googleCalendarSyncState } from "@store/atoms";
+import { eventsState, selectedEventState, googleCalendarSyncState, categoriesState } from "@store/atoms";
 import { Event, RecurrenceRule, ReminderTime } from "@types";
 import { v4 as uuidv4 } from "uuid";
 import { format, isAfter, parse } from "date-fns";
@@ -8,9 +9,11 @@ import { ko } from "date-fns/locale";
 import toast from "react-hot-toast";
 import CustomDatePicker from "@components/Common/CustomDatePicker";
 import CustomTimePicker from "@components/Common/CustomTimePicker";
+import { CategorySelect } from "./CategorySelect";
 import { HexColorPicker } from "react-colorful";
 import { useGoogleCalendarSync } from "@/hooks/useGoogleCalendarSync";
 import { electronStore } from "@utils/electronStore";
+import { COLOR_PALETTE } from "@constants/colors";
 import styles from "./EventForm.module.scss";
 
 interface EventFormProps {
@@ -24,9 +27,14 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const setSelectedEvent = useSetRecoilState(selectedEventState);
   // 구글 캘린더 동기화 상태 가져오기
   const syncState = useRecoilValue(googleCalendarSyncState);
+  // 카테고리 목록 가져오기
+  const categories = useRecoilValue(categoriesState);
   // 구글 캘린더 동기화 훅
-  const { exportToGoogle } = useGoogleCalendarSync();
+  const { exportToGoogle, updateGoogleEvent } = useGoogleCalendarSync();
   const [title, setTitle] = useState(event?.title || "");
+  const [categoryId, setCategoryId] = useState(
+    event?.categoryId || categories.find((c) => c.isDefault)?.id || categories[0]?.id || ""
+  );
   const [startDate, setStartDate] = useState<Date>(
     event?.date ? new Date(event.date) : date
   );
@@ -75,16 +83,13 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
   const [customColors, setCustomColors] = useState<Array<{ id: string; color: string }>>([]);
   const [tempColor, setTempColor] = useState<string>("#FFB6C1");
 
-  const defaultColorOptions = [
-    "#FFB6C1",
-    "#FFC0CB",
-    "#FFE4B5",
-    "#E6E6FA",
-    "#B0E0E6",
-    "#98FB98",
-    "#F0E68C",
-    "#DDA0DD",
-  ];
+  // 카테고리 변경 시 카테고리 색상을 이벤트 색상으로 자동 적용
+  useEffect(() => {
+    const selectedCategory = categories.find((c) => c.id === categoryId);
+    if (selectedCategory) {
+      setColor(selectedCategory.color);
+    }
+  }, [categoryId, categories]);
 
   // Load custom colors from electron store
   useEffect(() => {
@@ -199,12 +204,15 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       endTime: !isAllDay ? endTime : undefined,
       description,
       color,
+      categoryId: categoryId || undefined,
       isAllDay,
       recurrence: finalRecurrence,
       reminder,
       reminderTime: reminder ? reminderTime : undefined,
       reminderForAllOccurrences:
         reminder && isRecurring ? reminderForAllOccurrences : undefined,
+      googleEventId: event?.googleEventId, // 기존 구글 이벤트 ID 유지
+      googleCalendarId: event?.googleCalendarId, // 기존 구글 캘린더 ID 유지
       tags: [],
     };
 
@@ -223,22 +231,40 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       event ? "이벤트가 수정되었습니다" : "이벤트가 추가되었습니다"
     );
 
-    // 구글 캘린더 자동 동기화 (연동된 경우에만)
-    if (syncState.isConnected) {
+    // 구글 캘린더 자동 동기화 (연동되고 autoSync가 켜져 있을 때만)
+    if (syncState.isConnected && syncState.autoSync) {
       // 구글 캘린더에서 가져온 이벤트인지 확인 (ID가 'google_'로 시작)
       const isGoogleEvent = newEvent.id.startsWith('google_');
 
-      // 구글 캘린더에서 가져온 이벤트가 아닌 경우에만 동기화
-      if (!isGoogleEvent) {
-        try {
-          await exportToGoogle(newEvent);
-          console.log("구글 캘린더에 이벤트가 동기화되었습니다:", newEvent.title);
-        } catch (error) {
-          console.error("구글 캘린더 동기화 실패:", error);
-          // 에러가 발생해도 로컬 저장은 완료되었으므로 사용자에게 별도 에러 표시 안 함
+      try {
+        // 수정 모드이고 googleEventId가 있으면 → 업데이트 (구글 이벤트든 일반 이벤트든)
+        if (event && newEvent.googleEventId && newEvent.googleCalendarId) {
+          await updateGoogleEvent(newEvent);
+          console.log("✅ 구글 캘린더 이벤트가 업데이트되었습니다:", newEvent.title);
         }
-      } else {
-        console.log("구글 캘린더 이벤트는 자동 동기화하지 않습니다:", newEvent.title);
+        // 새 이벤트이고 구글 이벤트가 아닌 경우 → 생성
+        else if (!event && !isGoogleEvent) {
+          const result = await exportToGoogle(newEvent);
+          if (result) {
+            // 구글 캘린더 ID 정보를 로컬 이벤트에 저장
+            setEvents((prev) =>
+              prev.map((e) =>
+                e.id === newEvent.id
+                  ? {
+                      ...e,
+                      googleEventId: result.googleEventId,
+                      googleCalendarId: result.googleCalendarId,
+                    }
+                  : e
+              )
+            );
+            console.log("✅ 구글 캘린더에 이벤트가 자동 동기화되었습니다:", newEvent.title);
+          }
+        }
+        // 그 외의 경우 (구글 이벤트를 새로 생성하는 경우 등)는 건너뛰기
+      } catch (error) {
+        console.error("❌ 구글 캘린더 자동 동기화 실패:", error);
+        // 에러가 발생해도 로컬 저장은 완료되었으므로 사용자에게 별도 에러 표시 안 함
       }
     }
 
@@ -247,10 +273,20 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
     onClose();
   };
 
-  return (
-    <form className={styles.eventForm} onSubmit={handleSubmit}>
-      <div className={styles.formGroup}>
-        <label htmlFor="title">이벤트 제목</label>
+  const modalContent = (
+    <div className={styles.modal}>
+      <div className={styles.overlay} onClick={onClose} />
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <h2>{event ? "이벤트 수정" : "새 이벤트"}</h2>
+          <button className={styles.closeButton} onClick={onClose} type="button">
+            ×
+          </button>
+        </div>
+        <form className={styles.eventForm} onSubmit={handleSubmit}>
+          <div className={styles.formBody}>
+            <div className={styles.formGroup}>
+              <label htmlFor="title">이벤트 제목</label>
         <input
           id="title"
           type="text"
@@ -566,11 +602,20 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
       </div>
 
       <div className={styles.formGroup}>
+        <label htmlFor="category">카테고리</label>
+        <CategorySelect
+          categories={categories}
+          value={categoryId}
+          onChange={setCategoryId}
+        />
+      </div>
+
+      <div className={styles.formGroup}>
         <label>색상</label>
         <div className={styles.colorSection}>
           <div className={styles.colorOptions}>
             {/* 기본 컬러 */}
-            {defaultColorOptions.map((colorOption) => (
+            {COLOR_PALETTE.map((colorOption: string) => (
               <button
                 key={colorOption}
                 type="button"
@@ -696,19 +741,24 @@ const EventForm: React.FC<EventFormProps> = ({ date, onClose, event }) => {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
 
-      <div className={styles.formActions}>
-        <button type="button" className={styles.cancelButton} onClick={onClose}>
-          취소
-        </button>
-        <button type="submit" className={styles.saveButton}>
-          {event ? "수정" : "저장"}
-        </button>
+          <div className={styles.formActions}>
+            <button type="button" className={styles.cancelButton} onClick={onClose}>
+              취소
+            </button>
+            <button type="submit" className={styles.saveButton}>
+              {event ? "수정" : "저장"}
+            </button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default EventForm;

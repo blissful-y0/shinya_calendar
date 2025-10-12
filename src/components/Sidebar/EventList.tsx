@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useSetRecoilState, useRecoilState } from "recoil";
-import { eventsState, selectedEventState } from "@store/atoms";
+import { useSetRecoilState, useRecoilState, useRecoilValue } from "recoil";
+import { eventsState, selectedEventState, googleCalendarSyncState } from "@store/atoms";
 import { Event } from "@types";
 import { formatEventTime } from "@utils/eventUtils";
 import { format } from "date-fns";
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import EventForm from "./EventForm";
 import EventDetail from "./EventDetail";
 import RecurringEventDeleteModal from "@components/Common/RecurringEventDeleteModal";
+import { googleCalendarService } from "@services/googleCalendarService";
 import styles from "./EventList.module.scss";
 
 interface EventListProps {
@@ -18,6 +19,7 @@ interface EventListProps {
 const EventList: React.FC<EventListProps> = ({ events }) => {
   const setEvents = useSetRecoilState(eventsState);
   const [selectedEvent, setSelectedEvent] = useRecoilState(selectedEventState);
+  const syncState = useRecoilValue(googleCalendarSyncState);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deletingEvent, setDeletingEvent] = useState<Event | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -31,7 +33,7 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     setSelectedEvent(null);
   };
 
-  const handleDelete = (event: Event) => {
+  const handleDelete = async (event: Event) => {
     // 반복 이벤트인 경우 모달 표시
     if (event.recurrence || event.baseEventId) {
       setDeletingEvent(event);
@@ -39,8 +41,20 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     } else {
       // 일반 이벤트는 바로 삭제 확인
       if (confirm("이 이벤트를 삭제하시겠습니까?")) {
+        // 로컬에서 삭제
         setEvents((prev) => prev.filter((e) => e.id !== event.id));
         toast.success("이벤트가 삭제되었습니다");
+
+        // 구글 캘린더 자동 동기화 (연동되고 autoSync가 켜져 있을 때만)
+        if (syncState.isConnected && syncState.autoSync && event.googleEventId && event.googleCalendarId) {
+          try {
+            await googleCalendarService.deleteEvent(event.googleEventId, event.googleCalendarId);
+            console.log("✅ 구글 캘린더에서 이벤트가 자동 삭제되었습니다:", event.title);
+          } catch (error) {
+            console.error("❌ 구글 캘린더 자동 삭제 실패:", error);
+            // 에러가 발생해도 로컬 삭제는 완료되었으므로 사용자에게 별도 에러 표시 안 함
+          }
+        }
       }
     }
   };
@@ -77,15 +91,28 @@ const EventList: React.FC<EventListProps> = ({ events }) => {
     toast.success("선택한 이벤트가 삭제되었습니다");
   };
 
-  const handleDeleteAll = () => {
+  const handleDeleteAll = async () => {
     if (!deletingEvent) return;
 
     // 전체 시리즈 삭제
     const targetId = deletingEvent.baseEventId || deletingEvent.id;
+
+    // 로컬에서 삭제
     setEvents((prev) => prev.filter((e) => e.id !== targetId));
     setShowDeleteModal(false);
     setDeletingEvent(null);
     toast.success("모든 반복 이벤트가 삭제되었습니다");
+
+    // 구글 캘린더 자동 동기화 (연동되고 autoSync가 켜져 있을 때만)
+    if (syncState.isConnected && syncState.autoSync && deletingEvent.googleEventId && deletingEvent.googleCalendarId) {
+      try {
+        await googleCalendarService.deleteEvent(deletingEvent.googleEventId, deletingEvent.googleCalendarId);
+        console.log("✅ 구글 캘린더에서 반복 이벤트가 자동 삭제되었습니다:", deletingEvent.title);
+      } catch (error) {
+        console.error("❌ 구글 캘린더 자동 삭제 실패:", error);
+        // 에러가 발생해도 로컬 삭제는 완료되었으므로 사용자에게 별도 에러 표시 안 함
+      }
+    }
   };
 
   const formatTime = (time?: string) => {

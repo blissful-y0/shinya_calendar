@@ -34,7 +34,8 @@
 }
 
 .datePickerPopper {
-  z-index: 1000 !important;
+  z-index: 10000 !important;
+  position: fixed !important;
 }
 
 .datePickerCalendar {

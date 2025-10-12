@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { Event, DiaryEntry, Theme, DDay, GoogleCalendarSyncState, TodoItem, MemoEntry } from '@types';
+import { Event, DiaryEntry, Theme, DDay, GoogleCalendarSyncState, TodoItem, MemoEntry, Category } from '@types';
 import { Sticker, StickerLayout, UploadedStickerTemplate } from '@components/Styling/StickerPanel';
 import { startOfMonth } from 'date-fns';
 import { electronStore } from '@utils/electronStore';
@@ -555,4 +555,91 @@ export const memosState = atom<MemoEntry[]>({
       });
     }
   ]
+});
+
+// 카테고리 상태
+export const categoriesState = atom<Category[]>({
+  key: 'categories',
+  default: [],
+  effects: [
+    ({ setSelf, onSet }) => {
+      // Electron Store에서 저장된 카테고리 목록 불러오기
+      electronStore.get('categories').then(savedCategories => {
+        if (savedCategories && Array.isArray(savedCategories)) {
+          const categoriesWithDates = savedCategories.map((category: any) => ({
+            ...category,
+            createdAt: new Date(category.createdAt),
+            updatedAt: new Date(category.updatedAt)
+          }));
+          setSelf(categoriesWithDates);
+        } else {
+          // 기본 카테고리 생성
+          const defaultCategory: Category = {
+            id: 'default',
+            name: '기본',
+            description: '기본 카테고리',
+            color: '#FFB6C1',
+            isDefault: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          setSelf([defaultCategory]);
+          electronStore.set('categories', [defaultCategory]);
+        }
+      }).catch(error => {
+        console.error('Failed to load categories:', error);
+        // 에러 발생 시에도 기본 카테고리 설정
+        const defaultCategory: Category = {
+          id: 'default',
+          name: '기본',
+          description: '기본 카테고리',
+          color: '#FFB6C1',
+          isDefault: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        setSelf([defaultCategory]);
+      });
+
+      // 카테고리 변경 시 Electron Store에 저장
+      onSet((newCategories, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('categories', newCategories);
+        }
+      });
+    }
+  ]
+});
+
+// 선택된 카테고리 필터 (null이면 전체 표시)
+export const selectedCategoryIdState = atom<string | null>({
+  key: 'selectedCategoryId',
+  default: null,
+  effects: [
+    ({ setSelf, onSet }) => {
+      electronStore.get('selectedCategoryId').then(savedId => {
+        if (savedId) {
+          setSelf(savedId);
+        }
+      }).catch(error => {
+        console.error('Failed to load selected category:', error);
+      });
+
+      onSet((newId, _, isReset) => {
+        if (!isReset) {
+          if (newId) {
+            electronStore.set('selectedCategoryId', newId);
+          } else {
+            electronStore.delete('selectedCategoryId');
+          }
+        }
+      });
+    }
+  ]
+});
+
+// 전역 로딩 상태 (API 요청 중 표시용)
+export const globalLoadingState = atom<boolean>({
+  key: 'globalLoading',
+  default: false
 });
