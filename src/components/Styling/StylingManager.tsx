@@ -8,6 +8,9 @@ import {
   uploadedStickersState,
   stickerVisibilityState,
   sidebarPositionState,
+  bannerImagesState,
+  carouselSettingsState,
+  BannerImage,
 } from "@store/atoms";
 import {
   MdBrush,
@@ -19,6 +22,9 @@ import {
   MdRestore,
   MdMoreVert,
   MdViewSidebar,
+  MdPhotoLibrary,
+  MdArrowUpward,
+  MdArrowDownward,
 } from "react-icons/md";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -30,7 +36,7 @@ interface StylingManagerProps {
   onClose: () => void;
 }
 
-type StylingMode = "sticker" | "theme" | "sidebar";
+type StylingMode = "sticker" | "theme" | "sidebar" | "banner";
 
 const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
   const [activeMode, setActiveMode] = useState<StylingMode>("sticker");
@@ -48,6 +54,10 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
   const setStickerVisibility = useSetRecoilState(stickerVisibilityState);
   const [sidebarPosition, setSidebarPosition] =
     useRecoilState(sidebarPositionState);
+  const [bannerImages, setBannerImages] = useRecoilState(bannerImagesState);
+  const [carouselSettings, setCarouselSettings] = useRecoilState(
+    carouselSettingsState
+  );
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -117,6 +127,50 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
     }
   };
 
+  const moveBannerUp = (index: number) => {
+    if (index === 0) return;
+    const newBanners = [...bannerImages];
+    [newBanners[index - 1], newBanners[index]] = [
+      newBanners[index],
+      newBanners[index - 1],
+    ];
+    // 순서 업데이트
+    const reordered = newBanners.map((banner, idx) => ({
+      ...banner,
+      order: idx,
+    }));
+    setBannerImages(reordered);
+  };
+
+  const moveBannerDown = (index: number) => {
+    if (index === bannerImages.length - 1) return;
+    const newBanners = [...bannerImages];
+    [newBanners[index + 1], newBanners[index]] = [
+      newBanners[index],
+      newBanners[index + 1],
+    ];
+    // 순서 업데이트
+    const reordered = newBanners.map((banner, idx) => ({
+      ...banner,
+      order: idx,
+    }));
+    setBannerImages(reordered);
+  };
+
+  const removeBanner = (id: string) => {
+    if (confirm("이 배너를 삭제하시겠습니까?")) {
+      const filtered = bannerImages.filter((b) => b.id !== id);
+      const reordered = filtered.map((banner, idx) => ({
+        ...banner,
+        order: idx,
+      }));
+      setBannerImages(reordered);
+    }
+  };
+
+  // 정렬된 배너 목록
+  const sortedBanners = [...bannerImages].sort((a, b) => a.order - b.order);
+
   return (
     <div className={styles.overlay} onClick={handleBackdropClick}>
       <div className={styles.panel}>
@@ -154,6 +208,15 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
           >
             <MdViewSidebar />
             사이드바
+          </button>
+          <button
+            className={`${styles.tab} ${
+              activeMode === "banner" ? styles.active : ""
+            }`}
+            onClick={() => setActiveMode("banner")}
+          >
+            <MdPhotoLibrary />
+            배너
           </button>
         </div>
 
@@ -335,6 +398,136 @@ const StylingManager: React.FC<StylingManagerProps> = ({ onClose }) => {
                   <MdViewSidebar />
                   <span>오른쪽</span>
                 </button>
+              </div>
+            </div>
+          )}
+          {activeMode === "banner" && (
+            <div className={styles.bannerContent}>
+              <div className={styles.sectionHeader}>
+                <h3>배너 이미지 관리</h3>
+                <div className={styles.bannerCount}>
+                  {bannerImages.length}/5개
+                </div>
+              </div>
+
+              {sortedBanners.length > 0 ? (
+                <div className={styles.bannerList}>
+                  {sortedBanners.map((banner, index) => (
+                    <div key={banner.id} className={styles.bannerItem}>
+                      <div
+                        className={styles.bannerPreview}
+                        style={{ backgroundImage: `url(${banner.image})` }}
+                      />
+                      <div className={styles.bannerInfo}>
+                        <span className={styles.bannerOrder}>
+                          배너 {index + 1}
+                        </span>
+                      </div>
+                      <div className={styles.bannerActions}>
+                        <button
+                          className={styles.moveButton}
+                          onClick={() => moveBannerUp(index)}
+                          disabled={index === 0}
+                          title="위로 이동"
+                        >
+                          <MdArrowUpward />
+                        </button>
+                        <button
+                          className={styles.moveButton}
+                          onClick={() => moveBannerDown(index)}
+                          disabled={index === sortedBanners.length - 1}
+                          title="아래로 이동"
+                        >
+                          <MdArrowDownward />
+                        </button>
+                        <button
+                          className={styles.deleteButton}
+                          onClick={() => removeBanner(banner.id)}
+                          title="삭제"
+                        >
+                          <MdDelete />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className={styles.emptyBanner}>
+                  <MdPhotoLibrary />
+                  <p>배너가 없습니다</p>
+                  <p className={styles.hint}>
+                    상단의 배너 영역을 클릭하여 추가하세요
+                  </p>
+                </div>
+              )}
+
+              <div className={styles.carouselSettings}>
+                <div className={styles.sectionHeader}>
+                  <h3>배너 설정</h3>
+                </div>
+
+                <div className={styles.settingItem}>
+                  <label className={styles.settingLabel}>
+                    <input
+                      type="checkbox"
+                      checked={carouselSettings.autoplay}
+                      onChange={(e) =>
+                        setCarouselSettings({
+                          ...carouselSettings,
+                          autoplay: e.target.checked,
+                        })
+                      }
+                    />
+                    <span>자동 재생</span>
+                  </label>
+                </div>
+
+                <div className={styles.settingItem}>
+                  <label className={styles.settingLabel}>전환 속도</label>
+                  <div className={styles.sliderContainer}>
+                    <input
+                      type="range"
+                      min="300"
+                      max="1500"
+                      step="100"
+                      value={carouselSettings.speed}
+                      onChange={(e) =>
+                        setCarouselSettings({
+                          ...carouselSettings,
+                          speed: Number(e.target.value),
+                        })
+                      }
+                      className={styles.slider}
+                    />
+                    <span className={styles.sliderValue}>
+                      {carouselSettings.speed}ms
+                    </span>
+                  </div>
+                </div>
+
+                <div className={styles.settingItem}>
+                  <label className={styles.settingLabel}>자동 재생 간격</label>
+                  <div className={styles.sliderContainer}>
+                    <input
+                      type="range"
+                      min="1000"
+                      max="10000"
+                      step="500"
+                      value={carouselSettings.delay}
+                      onChange={(e) =>
+                        setCarouselSettings({
+                          ...carouselSettings,
+                          delay: Number(e.target.value),
+                        })
+                      }
+                      className={styles.slider}
+                      disabled={!carouselSettings.autoplay}
+                    />
+                    <span className={styles.sliderValue}>
+                      {carouselSettings.delay / 1000}초
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           )}

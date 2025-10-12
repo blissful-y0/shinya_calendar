@@ -1,6 +1,6 @@
 {
   "name": "simya-calendar",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "심야 캘린더",
   "main": "dist-electron/main.js",
   "author": {
@@ -42,6 +42,7 @@
     "react-icons": "^5.5.0",
     "recoil": "^0.7.7",
     "rrule": "^2.8.1",
+    "swiper": "^12.0.2",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

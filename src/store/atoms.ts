@@ -327,7 +327,21 @@ export const activeDDayState = atom<DDay | null>({
   ]
 });
 
-// 배너 이미지 상태
+// 배너 이미지 타입 정의
+export interface BannerImage {
+  id: string;
+  image: string; // base64 이미지 데이터
+  order: number; // 순서 (0-4)
+}
+
+// Carousel 설정 타입 정의
+export interface CarouselSettings {
+  autoplay: boolean;
+  speed: number; // 전환 속도 (ms)
+  delay: number; // autoplay 딜레이 (ms)
+}
+
+// 배너 이미지 상태 (단일 이미지 - 기존 호환성 유지)
 export const bannerImageState = atom<string | null>({
   key: 'bannerImage',
   default: null,
@@ -352,6 +366,56 @@ export const bannerImageState = atom<string | null>({
           } else {
             electronStore.delete('bannerImage');
           }
+        }
+      });
+    }
+  ]
+});
+
+// 다중 배너 이미지 상태 (최대 5개)
+export const bannerImagesState = atom<BannerImage[]>({
+  key: 'bannerImages',
+  default: [],
+  effects: [
+    ({ setSelf, onSet }) => {
+      electronStore.get('bannerImages').then(savedBanners => {
+        if (savedBanners && Array.isArray(savedBanners)) {
+          setSelf(savedBanners);
+        }
+      }).catch(error => {
+        console.error('Failed to load banner images:', error);
+      });
+
+      onSet((newBanners, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('bannerImages', newBanners);
+        }
+      });
+    }
+  ]
+});
+
+// Carousel 설정 상태
+export const carouselSettingsState = atom<CarouselSettings>({
+  key: 'carouselSettings',
+  default: {
+    autoplay: true,
+    speed: 600, // 기본 전환 속도: 600ms
+    delay: 3000, // 기본 autoplay 딜레이: 3초
+  },
+  effects: [
+    ({ setSelf, onSet }) => {
+      electronStore.get('carouselSettings').then(savedSettings => {
+        if (savedSettings) {
+          setSelf(savedSettings);
+        }
+      }).catch(error => {
+        console.error('Failed to load carousel settings:', error);
+      });
+
+      onSet((newSettings, _, isReset) => {
+        if (!isReset) {
+          electronStore.set('carouselSettings', newSettings);
         }
       });
     }

@@ -4120,6 +4120,11 @@ supports-color@^8.1.1:
   dependencies:
     has-flag "^4.0.0"
 
+swiper@^12.0.2:
+  version "12.0.2"
+  resolved "https://registry.yarnpkg.com/swiper/-/swiper-12.0.2.tgz#aa52251d125fc6e9986af09ae3769fe836e68780"
+  integrity sha512-y8F6fDGXmTVVgwqJj6I00l4FdGuhpFJn0U/9Ucn1MwWOw3NdLV8aH88pZOjyhBgU/6PyBlUx+JuAQ5KMWz906Q==
+
 symbol-tree@^3.2.4:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
