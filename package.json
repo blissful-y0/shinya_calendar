@@ -104,6 +104,8 @@
     "dmg": {
       "title": "Shinya Calendar 설치",
       "icon": "public/icon.icns",
+      "format": "UDZO",
+      "background": null,
       "contents": [
         {
           "x": 150,
