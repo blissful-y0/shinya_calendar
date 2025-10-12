@@ -18,9 +18,9 @@ import WeekView from "@components/Calendar/WeekView";
 import Sidebar from "@components/Sidebar/Sidebar";
 import ResizableLayout from "@components/Common/ResizableLayout";
 import CustomBanner from "@components/Common/CustomBanner";
-import FloatingActionButton from "@components/Styling/FloatingActionButton";
 import StickerCanvas from "@components/Styling/StickerCanvas";
 import FloatingToolbar from "@components/Styling/FloatingToolbar";
+import LoadingOverlay from "@components/Common/LoadingOverlay";
 import { useTheme } from "@hooks/useTheme";
 import styles from "./App.module.scss";
 
@@ -176,6 +176,8 @@ function App() {
         }}
       />
 
+      <LoadingOverlay />
+
       <TitleBar />
       <Header />
       <div className={styles.mainContent}>
@@ -200,7 +202,6 @@ function App() {
           onCancel={handleEditCancel}
         />
       )}
-      <FloatingActionButton />
     </div>
   );
 }

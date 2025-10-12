@@ -97,7 +97,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -170,7 +171,7 @@
 .rightSection {
   display: flex;
   align-items: center;
-  gap: $spacing-md;
+  gap: 8px;
   min-width: 200px;
   justify-content: flex-end;
 }
@@ -243,13 +244,9 @@
   }
 }
 
-.googleMenu {
-  position: relative;
-}
-
-.googleButton {
-  width: 40px;
-  height: 40px;
+.stylingButton {
+  width: 35px;
+  height: 35px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   border-radius: $border-radius-small;
@@ -258,12 +255,88 @@
   align-items: center;
   justify-content: center;
   transition: all $transition-fast;
+  color: var(--color-text);
 
   &:hover {
     background: var(--color-accent);
     border-color: var(--color-primary);
     transform: translateY(-2px);
     box-shadow: $shadow-small;
+    color: var(--color-primary);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.syncButton {
+  width: 35px;
+  height: 35px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-fast;
+  color: var(--color-text);
+
+  &:hover:not(:disabled) {
+    background: var(--color-accent);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: $shadow-small;
+    color: var(--color-primary);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .rotating {
+    animation: rotate 1s linear infinite;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.googleMenu {
+  position: relative;
+}
+
+.googleButton {
+  width: 35px;
+  height: 35px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: $border-radius-small;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-fast;
+  color: var(--color-text);
+
+  &:hover {
+    background: var(--color-accent);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: $shadow-small;
+    color: var(--color-primary);
   }
 
   &:active {

@@ -9,11 +9,14 @@ export interface Event {
   color: string;
   description?: string;
   tags?: string[];
+  categoryId?: string; // Category/Calendar ID
   reminder?: boolean;
   reminderTime?: ReminderTime; // When to send reminder
   reminderForAllOccurrences?: boolean; // Apply reminder to all recurring instances
   isAllDay?: boolean; // All-day event flag
   recurrence?: RecurrenceRule; // Recurring event settings
+  googleEventId?: string; // 구글 캘린더 이벤트 ID (동기화용)
+  googleCalendarId?: string; // 구글 캘린더 ID (동기화용)
 }
 
 export type ReminderTime = "now" | "5min" | "10min" | "30min" | "1hour";
@@ -91,8 +94,11 @@ export type GoogleCalendarSyncState = {
 
 export type GoogleCalendarEvent = {
   id: string;
+  originalEventId?: string; // 원본 구글 이벤트 ID (캘린더 ID 접두사 제거)
   summary: string;
   description?: string;
+  calendarId?: string; // 출처 구글 캘린더 ID
+  calendarName?: string; // 출처 구글 캘린더 이름
   start: {
     dateTime?: string;
     date?: string;
@@ -120,6 +126,20 @@ export interface MemoEntry {
   id: string;
   date: Date;
   content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// 카테고리 (로컬 캘린더)
+export interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  color: string;
+  isDefault?: boolean; // 기본 카테고리 여부
+  googleCalendarId?: string; // 구글 캘린더와 동기화된 경우 ID 저장
+  accessRole?: string; // 구글 캘린더 접근 권한 (owner, writer, reader)
+  createdInApp?: boolean; // 앱에서 직접 생성한 캘린더인지 여부 (false/undefined면 공유받은 캘린더)
   createdAt: Date;
   updatedAt: Date;
 }

@@ -28,7 +28,8 @@
       "@types/*": ["src/types/*"],
       "@styles/*": ["src/styles/*"],
       "@hooks/*": ["src/hooks/*"],
-      "@services/*": ["src/services/*"]
+      "@services/*": ["src/services/*"],
+      "@constants/*": ["src/constants/*"]
     }
   },
   "include": ["src"],

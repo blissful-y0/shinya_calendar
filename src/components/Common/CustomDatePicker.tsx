@@ -53,6 +53,10 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         }
         showPopperArrow={false}
         popperClassName={styles.datePickerPopper}
+        popperPlacement="bottom-start"
+        popperProps={{
+          strategy: "fixed",
+        }}
       />
     </div>
   );
