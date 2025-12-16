@@ -7,7 +7,19 @@ import {
   globalLoadingState,
 } from "@store/atoms";
 import { googleCalendarService } from "@/services/googleCalendarService";
-import { Event, GoogleCalendarEvent } from "@types";
+import { Event, GoogleCalendarEvent as OriginalGoogleCalendarEvent } from "@types";
+
+// GoogleCalendarEvent 타입 확장: extendedProperties를 선택적으로 추가
+type GoogleCalendarEvent = OriginalGoogleCalendarEvent & {
+  extendedProperties?: {
+    private?: Record<string, string>;
+    shared?: Record<string, string>;
+  };
+  organizer?: {
+    email?: string;
+    [key: string]: any;
+  };
+};
 import { electronStore } from "@utils/electronStore";
 import toast from "react-hot-toast";
 import { v4 as uuidv4 } from "uuid";
@@ -217,47 +229,104 @@ export const useGoogleCalendarSync = () => {
           toast.success(`${newCategoriesToCreate.length}개의 카테고리가 생성되었습니다`);
         }
 
-        // 로컬 이벤트 처리
-        const localGoogleEvents = events.filter((e) => e.googleEventId); // 구글에서 가져온 이벤트들
-        const localOnlyEvents = events.filter((e) => !e.googleEventId); // 로컬 전용 이벤트들
+        // 로컬 이벤트 처리 준비
+        const localGoogleEvents = events.filter((e) => e.googleEventId); // 구글 연동된 로컬 이벤트
+        const localOnlyEvents = events.filter((e) => !e.googleEventId); // 구글 미연동 로컬 이벤트
 
-        // 구글 API에서 삭제된 이벤트 ID 목록 (이미 google_ 접두사가 붙어있음)
+        // 삭제된 이벤트 ID 집합
         const deletedEventIdsSet = new Set(deletedEventIds);
 
-        // 로컬에서 삭제할 이벤트 찾기
-        const eventsToDelete = localGoogleEvents.filter((e) =>
-          deletedEventIdsSet.has(e.id)
+        // 기존 로컬 이벤트 맵: id -> event, googleId -> event
+        const existingEventsMapById = new Map(events.map((e) => [e.id, e]));
+        const existingEventsMapByGoogleId = new Map(
+          events.filter((e) => e.googleEventId).map((e) => [String(e.googleEventId), e])
         );
 
-        // 기존 로컬 이벤트 ID를 Map으로 변환 (빠른 조회)
-        const existingEventsMap = new Map(events.map((e) => [e.id, e]));
-
-        // 새로 추가되거나 업데이트될 이벤트 처리
         const newEvents: Event[] = [];
         const updatedEvents: Event[] = [];
+        const eventsToDelete: Event[] = [];
 
-        for (const event of importedEvents) {
-          if (existingEventsMap.has(event.id)) {
-            // 기존 이벤트 업데이트
-            updatedEvents.push(event);
-            existingEventsMap.set(event.id, event);
+        // helper: 콘텐츠 기반 matching (제목+date+startTime)
+        const findByContent = (candidate: Event) => {
+          return events.find((le) => {
+            if (le.title !== candidate.title) return false;
+            const sameDate = le.date?.toString() === candidate.date?.toString();
+            const sameStart = (le.startTime || "") === (candidate.startTime || "");
+            return sameDate && sameStart;
+          });
+        };
+
+        // 실제 처리 루프: importedEvents는 convertGoogleEventToAppEvent로 이미 변환된 로컬 형태
+        for (const importedEvent of importedEvents) {
+          // 1) shinya_local_id 우선 검사
+          const shinyaLocalId =
+            (importedEvent as any).id && String(importedEvent.id).startsWith("google_") === false
+              ? importedEvent.id
+              : (importedEvent as any).__shinya_local_id ?? null;
+
+          let matchedLocal: Event | undefined;
+
+          if (shinyaLocalId && existingEventsMapById.has(String(shinyaLocalId))) {
+            matchedLocal = existingEventsMapById.get(String(shinyaLocalId));
+            console.log("[sync] matched by shinya_local_id:", importedEvent.title, shinyaLocalId);
+          }
+
+          // 2) 구글 이벤트 ID로 매칭
+          if (!matchedLocal && importedEvent.googleEventId) {
+            matchedLocal = existingEventsMapByGoogleId.get(String(importedEvent.googleEventId));
+            if (matchedLocal) {
+              console.log("[sync] matched by googleEventId:", importedEvent.title, importedEvent.googleEventId);
+            }
+          }
+
+          // 3) 콘텐츠 기반 매칭(제목+날짜+시작시간) - 마지막 수단
+          if (!matchedLocal) {
+            const byContent = findByContent(importedEvent);
+            if (byContent) {
+              matchedLocal = byContent;
+              console.log("[sync] matched by content:", importedEvent.title);
+            }
+          }
+
+          if (matchedLocal) {
+            // 기존 로컬 이벤트가 있으면 병합(로컬 ID 유지)
+            const merged: Event = {
+              ...matchedLocal,
+              ...importedEvent,
+              id: matchedLocal.id,
+              // 보장: googleEventId는 구글 고유 ID로 덮어쓰거나 유지
+              googleEventId: importedEvent.googleEventId || matchedLocal.googleEventId,
+              googleCalendarId: importedEvent.googleCalendarId || matchedLocal.googleCalendarId,
+            };
+            updatedEvents.push(merged);
+            existingEventsMapById.set(merged.id, merged);
+            if (merged.googleEventId) {
+              existingEventsMapByGoogleId.set(String(merged.googleEventId), merged);
+            }
           } else {
-            // 새 이벤트 추가
-            newEvents.push(event);
-            existingEventsMap.set(event.id, event);
+            // 신규 이벤트 추가
+            newEvents.push(importedEvent);
+            existingEventsMapById.set(importedEvent.id, importedEvent);
+            if (importedEvent.googleEventId) {
+              existingEventsMapByGoogleId.set(String(importedEvent.googleEventId), importedEvent);
+            }
           }
         }
 
-        // 삭제된 이벤트 제거
-        for (const eventId of deletedEventIds) {
-          existingEventsMap.delete(eventId);
+        // 삭제 처리: 로컬에 googleEventId로 존재하는 이벤트 중 삭제 목록에 있는 것 제거
+        for (const localEv of localGoogleEvents) {
+          if (deletedEventIdsSet.has(String(localEv.googleEventId || localEv.id))) {
+            eventsToDelete.push(localEv);
+            existingEventsMapById.delete(localEv.id);
+            if (localEv.googleEventId) existingEventsMapByGoogleId.delete(String(localEv.googleEventId));
+            console.log("[sync] marked deleted:", localEv.title, localEv.googleEventId || localEv.id);
+          }
         }
 
-        // 최종 이벤트 목록
-        const finalEvents = Array.from(existingEventsMap.values());
-
+        // 최종 이벤트 목록 적용
+        const finalEvents = Array.from(existingEventsMapById.values());
         setEvents(finalEvents);
-
+        // 상태 업데이트, 토스트 등은 기존 로직 유지
         setSyncState({
           ...syncState,
           lastSyncTime: new Date(),
@@ -265,15 +334,9 @@ export const useGoogleCalendarSync = () => {
 
         // 결과 메시지
         const messages = [];
-        if (newEvents.length > 0) {
-          messages.push(`${newEvents.length}개 추가`);
-        }
-        if (updatedEvents.length > 0) {
-          messages.push(`${updatedEvents.length}개 수정`);
-        }
-        if (eventsToDelete.length > 0) {
-          messages.push(`${eventsToDelete.length}개 삭제`);
-        }
+        if (newEvents.length > 0) messages.push(`${newEvents.length}개 추가`);
+        if (updatedEvents.length > 0) messages.push(`${updatedEvents.length}개 수정`);
+        if (eventsToDelete.length > 0) messages.push(`${eventsToDelete.length}개 삭제`);
         if (messages.length === 0) {
           toast.success("이미 최신 상태입니다");
         } else {
@@ -583,8 +646,17 @@ function convertGoogleEventToAppEvent(gEvent: GoogleCalendarEvent): Event {
     recurrence = parseGoogleRecurrence(gEvent.recurrence, gEvent.summary);
   }
 
+  // 핵심 변화: 구글 이벤트에 저장된 로컬 ID가 있으면 그것을 로컬 이벤트 id로 사용
+  const injectedLocalId =
+    (gEvent as any).__shinya_local_id ??
+    gEvent.extendedProperties?.private?.shinya_local_id ??
+    gEvent.extendedProperties?.shared?.shinya_local_id ??
+    null;
+
+  const localId = injectedLocalId ? String(injectedLocalId) : `google_${gEvent.id || uuidv4()}`;
+
   return {
-    id: `google_${gEvent.id || uuidv4()}`, // 로컬 ID (google_ 접두사로 구분)
+    id: localId,
     title: gEvent.summary,
     date,
     endDate,
@@ -594,8 +666,9 @@ function convertGoogleEventToAppEvent(gEvent: GoogleCalendarEvent): Event {
     description: gEvent.description,
     isAllDay,
     recurrence,
-    googleEventId: gEvent.originalEventId || gEvent.id, // 원본 구글 이벤트 ID 저장
-    googleCalendarId: gEvent.calendarId, // 구글 캘린더 ID 저장
+    // googleEventId는 구글의 고유 ID -> 동기 시 구글 항목 확인용으로 사용
+    googleEventId: gEvent.originalEventId || gEvent.id,
+    googleCalendarId: (gEvent as any).calendarId || gEvent.organizer?.email || undefined,
   };
 }
 
