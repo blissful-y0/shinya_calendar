@@ -498,6 +498,16 @@ export class GoogleCalendarService {
     const auth = await this.ensureValidToken();
     const googleEvent = this.convertToGoogleEvent(event);
 
+    // 로컬 이벤트 ID를 구글 이벤트 extendedProperties.private에 저장
+    if (!googleEvent.extendedProperties) {
+      googleEvent.extendedProperties = { private: {} };
+    } else if (!googleEvent.extendedProperties.private) {
+      googleEvent.extendedProperties.private = {};
+    }
+    if (event.id) {
+      googleEvent.extendedProperties.private.shinya_local_id = String(event.id);
+    }
+
     const encodedCalendarId = encodeURIComponent(calendarId);
     const response = await fetch(
       `${CALENDAR_API_BASE}/calendars/${encodedCalendarId}/events`,
